@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "brain": {
+    "provider": "ollama",
+    "model": "qwen3.5:9b",
+    "license": "Apache-2.0",
+    "base_url": "http://127.0.0.1:11434"
+  },
+  "mcp": {
+    "client": "opencode",
+    "tool_sequence": ["run_create", "run_get", "run_approve", "run_edit_step"],
+    "note": "OpenCode + ollama + the motionfield snippet — terminal segment records live on Oct 28"
+  }
+}

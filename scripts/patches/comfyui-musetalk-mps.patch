@@ -1,0 +1,1412 @@
+# MotionField local patch — ComfyUI-MuseTalk for Apple Silicon / ComfyUI 0.41 / py3.14
+#
+# Upstream: https://github.com/chaojie/ComfyUI-MuseTalk  (MIT License)
+# Pinned commit: 84f4b6dcbb0d87e87687f324092056646582457d ("fix bugs", 2024-04-05)
+#
+# Apply with:  git apply scripts/patches/comfyui-musetalk-mps.patch
+# Reproduce:   scripts/setup-musetalk.sh <comfyui-dir>
+#
+# What it changes:
+#  - nodes.py: lazy ~4 GB weight load (upstream loads at import), CUDA->MPS/CPU
+#    device pick, optional AUDIO-tensor input for MuseTalkRun (LoadAudio/TTS
+#    graphs feed it directly), uploaded-file resolution via folder_paths,
+#    ffmpeg lookup + hard error on decode failure, and a required
+#    `mouth_masks` MASK input — per-frame lower-face masks from the
+#    OF_MouthMask node (MotionField pack), aligned to the decoded video frames.
+#  - musetalk/utils/blending.py: get_image pastes the lip-synced face crop
+#    back through that mouth mask (mouth contour + lower jaw hull) instead
+#    of the upstream face segmenter — an all-zero mask (frame had no face)
+#    leaves the frame untouched. The segmenter module is deleted by
+#    setup-musetalk.sh (nothing imports it after this patch).
+#  - musetalk/utils/preprocessing.py: landmark+bbox detection runs on the
+#    vendored Apache-2.0 DWPose ONNX pipeline (musetalk/utils/dwpose_onnx/,
+#    from IDEA-Research/DWPose onnx branch — keeps its LICENSE + NOTICE)
+#    instead of mmpose/mmcv (no py3.14 wheels). S3FD (research-licensed
+#    s3fd.pth) is removed entirely: the fallback bbox is derived from the
+#    same DWPose face keypoints. Low-confidence keypoints stay in the
+#    68-slot layout as missing; when nose points 28-30 are missing the box
+#    is built from the valid points; a run with no usable face in any frame
+#    raises a clear error. BGR frames are converted to RGB before inference.
+#  - torch.load(..., weights_only=False) + map_location fixes where the
+#    upstream assumed CUDA/default safety semantics (unet, vae, whisper).
+#
+diff --git a/musetalk/models/unet.py b/musetalk/models/unet.py
+index 02a9408..c0ddd8a 100644
+--- a/musetalk/models/unet.py
++++ b/musetalk/models/unet.py
+@@ -36,11 +36,11 @@ class UNet():
+             unet_config = json.load(f)
+         self.model = UNet2DConditionModel(**unet_config)
+         self.pe = PositionalEncoding(d_model=384)
+-        self.weights = torch.load(model_path)
++        self.weights = torch.load(model_path, map_location="cpu", weights_only=False)
+         self.model.load_state_dict(self.weights)
+         if use_float16:
+             self.model = self.model.half()
+-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
++        self.device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
+         self.model.to(self.device)
+     
+ if __name__ == "__main__":
+diff --git a/musetalk/models/vae.py b/musetalk/models/vae.py
+index 51efef4..ebff455 100644
+--- a/musetalk/models/vae.py
++++ b/musetalk/models/vae.py
+@@ -23,7 +23,7 @@ class VAE():
+         self.model_path = model_path
+         self.vae = AutoencoderKL.from_pretrained(self.model_path)
+ 
+-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
++        self.device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
+         self.vae.to(self.device)
+ 
+         if use_float16:
+diff --git a/musetalk/utils/blending.py b/musetalk/utils/blending.py
+index d9d8930..64fce01 100644
+--- a/musetalk/utils/blending.py
++++ b/musetalk/utils/blending.py
+@@ -1,9 +1,6 @@
+ from PIL import Image
+ import numpy as np
+ import cv2
+-from face_parsing import FaceParsing
+-
+-fp = FaceParsing()
+ 
+ def get_crop_box(box, expand):
+     x, y, x1, y1 = box
+@@ -13,48 +10,38 @@ def get_crop_box(box, expand):
+     crop_box = [x_c-s, y_c-s, x_c+s, y_c+s]
+     return crop_box, s
+ 
+-def face_seg(image):
+-    seg_image = fp(image)
+-    if seg_image is None:
+-        print("error, no person_segment")
+-        return None
+-
+-    seg_image = seg_image.resize(image.size)
+-    return seg_image
++def get_image(image, face, face_box, mouth_mask, expand=1.2):
++    """Paste the lip-synced face crop back into the frame.
+ 
+-def get_image(image,face,face_box,upper_boundary_ratio = 0.5,expand=1.2):
+-    #print(image.shape)
+-    #print(face.shape)
+-    
++    ``mouth_mask`` is the full-frame lower-face mask (float 0..1) for this
++    source frame — the mouth contour + lower jaw hull an OF_MouthMask node
++    builds from DWPose landmarks. Only the part inside the face box blends;
++    the rest of the frame keeps the original pixels, and an all-zero mask
++    (the frame had no face) leaves it untouched.
++    """
+     body = Image.fromarray(image[:,:,::-1])
+     face = Image.fromarray(face[:,:,::-1])
+ 
+-    x, y, x1, y1 = face_box 
+-    #print(x1-x,y1-y)
++    x, y, x1, y1 = face_box
+     crop_box, s = get_crop_box(face_box, expand)
+-    x_s, y_s, x_e, y_e = crop_box
+-    face_position = (x, y)
++    x_s, y_s = crop_box[:2]
+ 
+     face_large = body.crop(crop_box)
+     ori_shape = face_large.size
+ 
+-    mask_image = face_seg(face_large)
+-    mask_small = mask_image.crop((x-x_s, y-y_s, x1-x_s, y1-y_s))
++    mask = np.asarray(mouth_mask, dtype=np.float32)
++    if mask.shape[:2] != image.shape[:2]:
++        mask = cv2.resize(mask, (image.shape[1], image.shape[0]), interpolation=cv2.INTER_LINEAR)
++    mask_pil = Image.fromarray((np.clip(mask, 0.0, 1.0) * 255.0).astype(np.uint8))
++    mask_small = mask_pil.crop((x, y, x1, y1))
+     mask_image = Image.new('L', ori_shape, 0)
+-    mask_image.paste(mask_small, (x-x_s, y-y_s, x1-x_s, y1-y_s))
+-
+-    # keep upper_boundary_ratio of talking area
+-    width, height = mask_image.size
+-    top_boundary = int(height * upper_boundary_ratio)
+-    modified_mask_image = Image.new('L', ori_shape, 0)
+-    modified_mask_image.paste(mask_image.crop((0, top_boundary, width, height)), (0, top_boundary))
++    mask_image.paste(mask_small, (x - x_s, y - y_s))
+ 
+     blur_kernel_size = int(0.1 * ori_shape[0] // 2 * 2) + 1
+-    mask_array = cv2.GaussianBlur(np.array(modified_mask_image), (blur_kernel_size, blur_kernel_size), 0)
++    mask_array = cv2.GaussianBlur(np.array(mask_image), (blur_kernel_size, blur_kernel_size), 0)
+     mask_image = Image.fromarray(mask_array)
+-    mask_image.save("./debug_mask.png")
+-    
+-    face_large.paste(face, (x-x_s, y-y_s, x1-x_s, y1-y_s))
++
++    face_large.paste(face, (x-x_s, y-y_s))
+     body.paste(face_large, crop_box[:2], mask_image)
+     body = np.array(body)
+     return body[:,:,::-1]
+diff --git a/musetalk/utils/dwpose_onnx/LICENSE b/musetalk/utils/dwpose_onnx/LICENSE
+new file mode 100644
+index 0000000..0e17d02
+--- /dev/null
++++ b/musetalk/utils/dwpose_onnx/LICENSE
+@@ -0,0 +1,219 @@
++                                 Apache License
++                           Version 2.0, January 2004
++                        http://www.apache.org/licenses/
++
++   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
++
++   1. Definitions.
++
++      "License" shall mean the terms and conditions for use, reproduction,
++      and distribution as defined by Sections 1 through 9 of this document.
++
++      "Licensor" shall mean the copyright owner or entity authorized by
++      the copyright owner that is granting the License.
++
++      "Legal Entity" shall mean the union of the acting entity and all
++      other entities that control, are controlled by, or are under common
++      control with that entity. For the purposes of this definition,
++      "control" means (i) the power, direct or indirect, to cause the
++      direction or management of such entity, whether by contract or
++      otherwise, or (ii) ownership of fifty percent (50%) or more of the
++      outstanding shares, or (iii) beneficial ownership of such entity.
++
++      "You" (or "Your") shall mean an individual or Legal Entity
++      exercising permissions granted by this License.
++
++      "Source" form shall mean the preferred form for making modifications,
++      including but not limited to software source code, documentation
++      source, and configuration files.
++
++      "Object" form shall mean any form resulting from mechanical
++      transformation or translation of a Source form, including but
++      not limited to compiled object code, generated documentation,
++      and conversions to other media types.
++
++      "Work" shall mean the work of authorship, whether in Source or
++      Object form, made available under the License, as indicated by a
++      copyright notice that is included in or attached to the work
++      (an example is provided in the Appendix below).
++
++      "Derivative Works" shall mean any work, whether in Source or Object
++      form, that is based on (or derived from) the Work and for which the
++      editorial revisions, annotations, elaborations, or other modifications
++      represent, as a whole, an original work of authorship. For the purposes
++      of this License, Derivative Works shall not include works that remain
++      separable from, or merely link (or bind by name) to the interfaces of,
++      the Work and Derivative Works thereof.
++
++      "Contribution" shall mean any work of authorship, including
++      the original version of the Work and any modifications or additions
++      to that Work or Derivative Works thereof, that is intentionally
++      submitted to Licensor for inclusion in the Work by the copyright owner
++      or by an individual or Legal Entity authorized to submit on behalf of
++      the copyright owner. For the purposes of this definition, "submitted"
++      means any form of electronic, verbal, or written communication sent
++      to the Licensor or its representatives, including but not limited to
++      communication on electronic mailing lists, source code control systems,
++      and issue tracking systems that are managed by, or on behalf of, the
++      Licensor for the purpose of discussing and improving the Work, but
++      excluding communication that is conspicuously marked or otherwise
++      designated in writing by the copyright owner as "Not a Contribution."
++
++      "Contributor" shall mean Licensor and any individual or Legal Entity
++      on behalf of whom a Contribution has been received by Licensor and
++      subsequently incorporated within the Work.
++
++   2. Grant of Copyright License. Subject to the terms and conditions of
++      this License, each Contributor hereby grants to You a perpetual,
++      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
++      copyright license to reproduce, prepare Derivative Works of,
++      publicly display, publicly perform, sublicense, and distribute the
++      Work and such Derivative Works in Source or Object form.
++
++   3. Grant of Patent License. Subject to the terms and conditions of
++      this License, each Contributor hereby grants to You a perpetual,
++      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
++      (except as stated in this section) patent license to make, have made,
++      use, offer to sell, sell, import, and otherwise transfer the Work,
++      where such license applies only to those patent claims licensable
++      by such Contributor that are necessarily infringed by their
++      Contribution(s) alone or by combination of their Contribution(s)
++      with the Work to which such Contribution(s) was submitted. If You
++      institute patent litigation against any entity (including a
++      cross-claim or counterclaim in a lawsuit) alleging that the Work
++      or a Contribution incorporated within the Work constitutes direct
++      or contributory patent infringement, then any patent licenses
++      granted to You under this License for that Work shall terminate
++      as of the date such litigation is filed.
++
++   4. Redistribution. You may reproduce and distribute copies of the
++      Work or Derivative Works thereof in any medium, with or without
++      modifications, and in Source or Object form, provided that You
++      meet the following conditions:
++
++      (a) You must give any other recipients of the Work or
++          Derivative Works a copy of this License; and
++
++      (b) You must cause any modified files to carry prominent notices
++          stating that You changed the files; and
++
++      (c) You must retain, in the Source form of any Derivative Works
++          that You distribute, all copyright, patent, trademark, and
++          attribution notices from the Source form of the Work,
++          excluding those notices that do not pertain to any part of
++          the Derivative Works; and
++
++      (d) If the Work includes a "NOTICE" text file as part of its
++          distribution, then any Derivative Works that You distribute must
++          include a readable copy of the attribution notices contained
++          within such NOTICE file, excluding those notices that do not
++          pertain to any part of the Derivative Works, in at least one
++          of the following places: within a NOTICE text file distributed
++          as part of the Derivative Works; within the Source form or
++          documentation, if provided along with the Derivative Works; or,
++          within a display generated by the Derivative Works, if and
++          wherever such third-party notices normally appear. The contents
++          of the NOTICE file are for informational purposes only and
++          do not modify the License. You may add Your own attribution
++          notices within Derivative Works that You distribute, alongside
++          or as an addendum to the NOTICE text from the Work, provided
++          that such additional attribution notices cannot be construed
++          as modifying the License.
++
++      You may add Your own copyright statement to Your modifications and
++      may provide additional or different license terms and conditions
++      for use, reproduction, or distribution of Your modifications, or
++      for any such Derivative Works as a whole, provided Your use,
++      reproduction, and distribution of the Work otherwise complies with
++      the conditions stated in this License.
++
++   5. Submission of Contributions. Unless You explicitly state otherwise,
++      any Contribution intentionally submitted for inclusion in the Work
++      by You to the Licensor shall be under the terms and conditions of
++      this License, without any additional terms or conditions.
++      Notwithstanding the above, nothing herein shall supersede or modify
++      the terms of any separate license agreement you may have executed
++      with Licensor regarding such Contributions.
++
++   6. Trademarks. This License does not grant permission to use the trade
++      names, trademarks, service marks, or product names of the Licensor,
++      except as required for reasonable and customary use in describing the
++      origin of the Work and reproducing the content of the NOTICE file.
++
++   7. Disclaimer of Warranty. Unless required by applicable law or
++      agreed to in writing, Licensor provides the Work (and each
++      Contributor provides its Contributions) on an "AS IS" BASIS,
++      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
++      implied, including, without limitation, any warranties or conditions
++      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
++      PARTICULAR PURPOSE. You are solely responsible for determining the
++      appropriateness of using or redistributing the Work and assume any
++      risks associated with Your exercise of permissions under this License.
++
++   8. Limitation of Liability. In no event and under no legal theory,
++      whether in tort (including negligence), contract, or otherwise,
++      unless required by applicable law (such as deliberate and grossly
++      negligent acts) or agreed to in writing, shall any Contributor be
++      liable to You for damages, including any direct, indirect, special,
++      incidental, or consequential damages of any character arising as a
++      result of this License or out of the use or inability to use the
++      Work (including but not limited to damages for loss of goodwill,
++      work stoppage, computer failure or malfunction, or any and all
++      other commercial damages or losses), even if such Contributor
++      has been advised of the possibility of such damages.
++
++   9. Accepting Warranty or Additional Liability. While redistributing
++      the Work or Derivative Works thereof, You may choose to offer,
++      and charge a fee for, acceptance of support, warranty, indemnity,
++      or other liability obligations and/or rights consistent with this
++      License. However, in accepting such obligations, You may act only
++      on Your own behalf and on Your sole responsibility, not on behalf
++      of any other Contributor, and only if You agree to indemnify,
++      defend, and hold each Contributor harmless for any liability
++      incurred by, or claims asserted against, such Contributor by reason
++      of your accepting any such warranty or additional liability.
++
++   END OF TERMS AND CONDITIONS
++
++   APPENDIX: How to apply the Apache License to your work.
++
++      To apply the Apache License to your work, attach the following
++      boilerplate notice, with the fields enclosed by brackets "[]"
++      replaced with your own identifying information. (Don't include
++      the brackets!)  The text should be enclosed in the appropriate
++      comment syntax for the file format. We also recommend that a
++      file or class name and description of purpose be included on the
++      same "printed page" as the copyright notice for easier
++      identification within third-party archives.
++
++   Copyright 2023 IDEA. All Rights Reserved.
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++      http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++
++
++
++   MMPose (https://github.com/open-mmlab/mmpose)
++   
++   Copyright 2018-2020 Open-MMLab.
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++      http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
+\ No newline at end of file
+diff --git a/musetalk/utils/dwpose_onnx/NOTICE b/musetalk/utils/dwpose_onnx/NOTICE
+new file mode 100644
+index 0000000..6bceac3
+--- /dev/null
++++ b/musetalk/utils/dwpose_onnx/NOTICE
+@@ -0,0 +1,11 @@
++This directory vendors code from the DWPose project:
++
++  https://github.com/IDEA-Research/DWPose (onnx branch)
++  ControlNet-v1-1-nightly/annotator/dwpose/{onnxdet,onnxpose,wholebody}.py
++
++Copyright IDEA-Research / the DWPose authors.
++Licensed under the Apache License, Version 2.0 (see LICENSE).
++
++The ONNX weights these files load (yolox_l.onnx, dw-ll_ucoco_384.onnx) are
++distributed from https://huggingface.co/yzd-v/DWPose under Apache-2.0 and are
++not vendored here; setup-musetalk.sh or the runtime resolves them from disk.
+diff --git a/musetalk/utils/dwpose_onnx/__init__.py b/musetalk/utils/dwpose_onnx/__init__.py
+new file mode 100644
+index 0000000..20f67f6
+--- /dev/null
++++ b/musetalk/utils/dwpose_onnx/__init__.py
+@@ -0,0 +1,4 @@
++# DWPose ONNX inference helpers — vendored from IDEA-Research/DWPose
++# (https://github.com/IDEA-Research/DWPose, onnx branch), Apache License 2.0.
++# See LICENSE and NOTICE in this directory.
++from .wholebody import Wholebody
+diff --git a/musetalk/utils/dwpose_onnx/onnxdet.py b/musetalk/utils/dwpose_onnx/onnxdet.py
+new file mode 100644
+index 0000000..d21e2fb
+--- /dev/null
++++ b/musetalk/utils/dwpose_onnx/onnxdet.py
+@@ -0,0 +1,130 @@
++# Vendored from IDEA-Research/DWPose (Apache License 2.0)
++# Source: github.com/IDEA-Research/DWPose, onnx branch —
++#   ControlNet-v1-1-nightly/annotator/dwpose/
++# See LICENSE and NOTICE in this directory.
++
++import cv2
++import numpy as np
++
++import onnxruntime
++
++def nms(boxes, scores, nms_thr):
++    """Single class NMS implemented in Numpy."""
++    x1 = boxes[:, 0]
++    y1 = boxes[:, 1]
++    x2 = boxes[:, 2]
++    y2 = boxes[:, 3]
++
++    areas = (x2 - x1 + 1) * (y2 - y1 + 1)
++    order = scores.argsort()[::-1]
++
++    keep = []
++    while order.size > 0:
++        i = order[0]
++        keep.append(i)
++        xx1 = np.maximum(x1[i], x1[order[1:]])
++        yy1 = np.maximum(y1[i], y1[order[1:]])
++        xx2 = np.minimum(x2[i], x2[order[1:]])
++        yy2 = np.minimum(y2[i], y2[order[1:]])
++
++        w = np.maximum(0.0, xx2 - xx1 + 1)
++        h = np.maximum(0.0, yy2 - yy1 + 1)
++        inter = w * h
++        ovr = inter / (areas[i] + areas[order[1:]] - inter)
++
++        inds = np.where(ovr <= nms_thr)[0]
++        order = order[inds + 1]
++
++    return keep
++
++def multiclass_nms(boxes, scores, nms_thr, score_thr):
++    """Multiclass NMS implemented in Numpy. Class-aware version."""
++    final_dets = []
++    num_classes = scores.shape[1]
++    for cls_ind in range(num_classes):
++        cls_scores = scores[:, cls_ind]
++        valid_score_mask = cls_scores > score_thr
++        if valid_score_mask.sum() == 0:
++            continue
++        else:
++            valid_scores = cls_scores[valid_score_mask]
++            valid_boxes = boxes[valid_score_mask]
++            keep = nms(valid_boxes, valid_scores, nms_thr)
++            if len(keep) > 0:
++                cls_inds = np.ones((len(keep), 1)) * cls_ind
++                dets = np.concatenate(
++                    [valid_boxes[keep], valid_scores[keep, None], cls_inds], 1
++                )
++                final_dets.append(dets)
++    if len(final_dets) == 0:
++        return None
++    return np.concatenate(final_dets, 0)
++
++def demo_postprocess(outputs, img_size, p6=False):
++    grids = []
++    expanded_strides = []
++    strides = [8, 16, 32] if not p6 else [8, 16, 32, 64]
++
++    hsizes = [img_size[0] // stride for stride in strides]
++    wsizes = [img_size[1] // stride for stride in strides]
++
++    for hsize, wsize, stride in zip(hsizes, wsizes, strides):
++        xv, yv = np.meshgrid(np.arange(wsize), np.arange(hsize))
++        grid = np.stack((xv, yv), 2).reshape(1, -1, 2)
++        grids.append(grid)
++        shape = grid.shape[:2]
++        expanded_strides.append(np.full((*shape, 1), stride))
++
++    grids = np.concatenate(grids, 1)
++    expanded_strides = np.concatenate(expanded_strides, 1)
++    outputs[..., :2] = (outputs[..., :2] + grids) * expanded_strides
++    outputs[..., 2:4] = np.exp(outputs[..., 2:4]) * expanded_strides
++
++    return outputs
++
++def preprocess(img, input_size, swap=(2, 0, 1)):
++    if len(img.shape) == 3:
++        padded_img = np.ones((input_size[0], input_size[1], 3), dtype=np.uint8) * 114
++    else:
++        padded_img = np.ones(input_size, dtype=np.uint8) * 114
++
++    r = min(input_size[0] / img.shape[0], input_size[1] / img.shape[1])
++    resized_img = cv2.resize(
++        img,
++        (int(img.shape[1] * r), int(img.shape[0] * r)),
++        interpolation=cv2.INTER_LINEAR,
++    ).astype(np.uint8)
++    padded_img[: int(img.shape[0] * r), : int(img.shape[1] * r)] = resized_img
++
++    padded_img = padded_img.transpose(swap)
++    padded_img = np.ascontiguousarray(padded_img, dtype=np.float32)
++    return padded_img, r
++
++def inference_detector(session, oriImg):
++    input_shape = (640,640)
++    img, ratio = preprocess(oriImg, input_shape)
++
++    ort_inputs = {session.get_inputs()[0].name: img[None, :, :, :]}
++    output = session.run(None, ort_inputs)
++    predictions = demo_postprocess(output[0], input_shape)[0]
++
++    boxes = predictions[:, :4]
++    scores = predictions[:, 4:5] * predictions[:, 5:]
++
++    boxes_xyxy = np.ones_like(boxes)
++    boxes_xyxy[:, 0] = boxes[:, 0] - boxes[:, 2]/2.
++    boxes_xyxy[:, 1] = boxes[:, 1] - boxes[:, 3]/2.
++    boxes_xyxy[:, 2] = boxes[:, 0] + boxes[:, 2]/2.
++    boxes_xyxy[:, 3] = boxes[:, 1] + boxes[:, 3]/2.
++    boxes_xyxy /= ratio
++    dets = multiclass_nms(boxes_xyxy, scores, nms_thr=0.45, score_thr=0.1)
++    if dets is not None:
++        final_boxes, final_scores, final_cls_inds = dets[:, :4], dets[:, 4], dets[:, 5]
++        isscore = final_scores>0.3
++        iscat = final_cls_inds == 0
++        isbbox = [ i and j for (i, j) in zip(isscore, iscat)]
++        final_boxes = final_boxes[isbbox]
++    else:
++        final_boxes = np.array([])
++
++    return final_boxes
+diff --git a/musetalk/utils/dwpose_onnx/onnxpose.py b/musetalk/utils/dwpose_onnx/onnxpose.py
+new file mode 100644
+index 0000000..e25b10b
+--- /dev/null
++++ b/musetalk/utils/dwpose_onnx/onnxpose.py
+@@ -0,0 +1,365 @@
++# Vendored from IDEA-Research/DWPose (Apache License 2.0)
++# Source: github.com/IDEA-Research/DWPose, onnx branch —
++#   ControlNet-v1-1-nightly/annotator/dwpose/
++# See LICENSE and NOTICE in this directory.
++
++from typing import List, Tuple
++
++import cv2
++import numpy as np
++import onnxruntime as ort
++
++def preprocess(
++    img: np.ndarray, out_bbox, input_size: Tuple[int, int] = (192, 256)
++) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
++    """Do preprocessing for RTMPose model inference.
++
++    Args:
++        img (np.ndarray): Input image in shape.
++        input_size (tuple): Input image size in shape (w, h).
++
++    Returns:
++        tuple:
++        - resized_img (np.ndarray): Preprocessed image.
++        - center (np.ndarray): Center of image.
++        - scale (np.ndarray): Scale of image.
++    """
++    # get shape of image
++    img_shape = img.shape[:2]
++    out_img, out_center, out_scale = [], [], []
++    if len(out_bbox) == 0:
++        out_bbox = [[0, 0, img_shape[1], img_shape[0]]]
++    for i in range(len(out_bbox)):
++        x0 = out_bbox[i][0]
++        y0 = out_bbox[i][1]
++        x1 = out_bbox[i][2]
++        y1 = out_bbox[i][3]
++        bbox = np.array([x0, y0, x1, y1])
++
++        # get center and scale
++        center, scale = bbox_xyxy2cs(bbox, padding=1.25)
++
++        # do affine transformation
++        resized_img, scale = top_down_affine(input_size, scale, center, img)
++
++        # normalize image
++        mean = np.array([123.675, 116.28, 103.53])
++        std = np.array([58.395, 57.12, 57.375])
++        resized_img = (resized_img - mean) / std
++
++        out_img.append(resized_img)
++        out_center.append(center)
++        out_scale.append(scale)
++
++    return out_img, out_center, out_scale
++
++
++def inference(sess: ort.InferenceSession, img: np.ndarray) -> np.ndarray:
++    """Inference RTMPose model.
++
++    Args:
++        sess (ort.InferenceSession): ONNXRuntime session.
++        img (np.ndarray): Input image in shape.
++
++    Returns:
++        outputs (np.ndarray): Output of RTMPose model.
++    """
++    all_out = []
++    # build input
++    for i in range(len(img)):
++        input = [img[i].transpose(2, 0, 1)]
++
++        # build output
++        sess_input = {sess.get_inputs()[0].name: input}
++        sess_output = []
++        for out in sess.get_outputs():
++            sess_output.append(out.name)
++
++        # run model
++        outputs = sess.run(sess_output, sess_input)
++        all_out.append(outputs)
++
++    return all_out
++
++
++def postprocess(outputs: List[np.ndarray],
++                model_input_size: Tuple[int, int],
++                center: Tuple[int, int],
++                scale: Tuple[int, int],
++                simcc_split_ratio: float = 2.0
++                ) -> Tuple[np.ndarray, np.ndarray]:
++    """Postprocess for RTMPose model output.
++
++    Args:
++        outputs (np.ndarray): Output of RTMPose model.
++        model_input_size (tuple): RTMPose model Input image size.
++        center (tuple): Center of bbox in shape (x, y).
++        scale (tuple): Scale of bbox in shape (w, h).
++        simcc_split_ratio (float): Split ratio of simcc.
++
++    Returns:
++        tuple:
++        - keypoints (np.ndarray): Rescaled keypoints.
++        - scores (np.ndarray): Model predict scores.
++    """
++    all_key = []
++    all_score = []
++    for i in range(len(outputs)):
++        # use simcc to decode
++        simcc_x, simcc_y = outputs[i]
++        keypoints, scores = decode(simcc_x, simcc_y, simcc_split_ratio)
++
++        # rescale keypoints
++        keypoints = keypoints / model_input_size * scale[i] + center[i] - scale[i] / 2
++        all_key.append(keypoints[0])
++        all_score.append(scores[0])
++
++    return np.array(all_key), np.array(all_score)
++
++
++def bbox_xyxy2cs(bbox: np.ndarray,
++                 padding: float = 1.) -> Tuple[np.ndarray, np.ndarray]:
++    """Transform the bbox format from (x,y,w,h) into (center, scale)
++
++    Args:
++        bbox (ndarray): Bounding box(es) in shape (4,) or (n, 4), formatted
++            as (left, top, right, bottom)
++        padding (float): BBox padding factor that will be multilied to scale.
++            Default: 1.0
++
++    Returns:
++        tuple: A tuple containing center and scale.
++        - np.ndarray[float32]: Center (x, y) of the bbox in shape (2,) or
++            (n, 2)
++        - np.ndarray[float32]: Scale (w, h) of the bbox in shape (2,) or
++            (n, 2)
++    """
++    # convert single bbox from (4, ) to (1, 4)
++    dim = bbox.ndim
++    if dim == 1:
++        bbox = bbox[None, :]
++
++    # get bbox center and scale
++    x1, y1, x2, y2 = np.hsplit(bbox, [1, 2, 3])
++    center = np.hstack([x1 + x2, y1 + y2]) * 0.5
++    scale = np.hstack([x2 - x1, y2 - y1]) * padding
++
++    if dim == 1:
++        center = center[0]
++        scale = scale[0]
++
++    return center, scale
++
++
++def _fix_aspect_ratio(bbox_scale: np.ndarray,
++                      aspect_ratio: float) -> np.ndarray:
++    """Extend the scale to match the given aspect ratio.
++
++    Args:
++        scale (np.ndarray): The image scale (w, h) in shape (2, )
++        aspect_ratio (float): The ratio of ``w/h``
++
++    Returns:
++        np.ndarray: The reshaped image scale in (2, )
++    """
++    w, h = np.hsplit(bbox_scale, [1])
++    bbox_scale = np.where(w > h * aspect_ratio,
++                          np.hstack([w, w / aspect_ratio]),
++                          np.hstack([h * aspect_ratio, h]))
++    return bbox_scale
++
++
++def _rotate_point(pt: np.ndarray, angle_rad: float) -> np.ndarray:
++    """Rotate a point by an angle.
++
++    Args:
++        pt (np.ndarray): 2D point coordinates (x, y) in shape (2, )
++        angle_rad (float): rotation angle in radian
++
++    Returns:
++        np.ndarray: Rotated point in shape (2, )
++    """
++    sn, cs = np.sin(angle_rad), np.cos(angle_rad)
++    rot_mat = np.array([[cs, -sn], [sn, cs]])
++    return rot_mat @ pt
++
++
++def _get_3rd_point(a: np.ndarray, b: np.ndarray) -> np.ndarray:
++    """To calculate the affine matrix, three pairs of points are required. This
++    function is used to get the 3rd point, given 2D points a & b.
++
++    The 3rd point is defined by rotating vector `a - b` by 90 degrees
++    anticlockwise, using b as the rotation center.
++
++    Args:
++        a (np.ndarray): The 1st point (x,y) in shape (2, )
++        b (np.ndarray): The 2nd point (x,y) in shape (2, )
++
++    Returns:
++        np.ndarray: The 3rd point.
++    """
++    direction = a - b
++    c = b + np.r_[-direction[1], direction[0]]
++    return c
++
++
++def get_warp_matrix(center: np.ndarray,
++                    scale: np.ndarray,
++                    rot: float,
++                    output_size: Tuple[int, int],
++                    shift: Tuple[float, float] = (0., 0.),
++                    inv: bool = False) -> np.ndarray:
++    """Calculate the affine transformation matrix that can warp the bbox area
++    in the input image to the output size.
++
++    Args:
++        center (np.ndarray[2, ]): Center of the bounding box (x, y).
++        scale (np.ndarray[2, ]): Scale of the bounding box
++            wrt [width, height].
++        rot (float): Rotation angle (degree).
++        output_size (np.ndarray[2, ] | list(2,)): Size of the
++            destination heatmaps.
++        shift (0-100%): Shift translation ratio wrt the width/height.
++            Default (0., 0.).
++        inv (bool): Option to inverse the affine transform direction.
++            (inv=False: src->dst or inv=True: dst->src)
++
++    Returns:
++        np.ndarray: A 2x3 transformation matrix
++    """
++    shift = np.array(shift)
++    src_w = scale[0]
++    dst_w = output_size[0]
++    dst_h = output_size[1]
++
++    # compute transformation matrix
++    rot_rad = np.deg2rad(rot)
++    src_dir = _rotate_point(np.array([0., src_w * -0.5]), rot_rad)
++    dst_dir = np.array([0., dst_w * -0.5])
++
++    # get four corners of the src rectangle in the original image
++    src = np.zeros((3, 2), dtype=np.float32)
++    src[0, :] = center + scale * shift
++    src[1, :] = center + src_dir + scale * shift
++    src[2, :] = _get_3rd_point(src[0, :], src[1, :])
++
++    # get four corners of the dst rectangle in the input image
++    dst = np.zeros((3, 2), dtype=np.float32)
++    dst[0, :] = [dst_w * 0.5, dst_h * 0.5]
++    dst[1, :] = np.array([dst_w * 0.5, dst_h * 0.5]) + dst_dir
++    dst[2, :] = _get_3rd_point(dst[0, :], dst[1, :])
++
++    if inv:
++        warp_mat = cv2.getAffineTransform(np.float32(dst), np.float32(src))
++    else:
++        warp_mat = cv2.getAffineTransform(np.float32(src), np.float32(dst))
++
++    return warp_mat
++
++
++def top_down_affine(input_size: dict, bbox_scale: dict, bbox_center: dict,
++                    img: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
++    """Get the bbox image as the model input by affine transform.
++
++    Args:
++        input_size (dict): The input size of the model.
++        bbox_scale (dict): The bbox scale of the img.
++        bbox_center (dict): The bbox center of the img.
++        img (np.ndarray): The original image.
++
++    Returns:
++        tuple: A tuple containing center and scale.
++        - np.ndarray[float32]: img after affine transform.
++        - np.ndarray[float32]: bbox scale after affine transform.
++    """
++    w, h = input_size
++    warp_size = (int(w), int(h))
++
++    # reshape bbox to fixed aspect ratio
++    bbox_scale = _fix_aspect_ratio(bbox_scale, aspect_ratio=w / h)
++
++    # get the affine matrix
++    center = bbox_center
++    scale = bbox_scale
++    rot = 0
++    warp_mat = get_warp_matrix(center, scale, rot, output_size=(w, h))
++
++    # do affine transform
++    img = cv2.warpAffine(img, warp_mat, warp_size, flags=cv2.INTER_LINEAR)
++
++    return img, bbox_scale
++
++
++def get_simcc_maximum(simcc_x: np.ndarray,
++                      simcc_y: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
++    """Get maximum response location and value from simcc representations.
++
++    Note:
++        instance number: N
++        num_keypoints: K
++        heatmap height: H
++        heatmap width: W
++
++    Args:
++        simcc_x (np.ndarray): x-axis SimCC in shape (K, Wx) or (N, K, Wx)
++        simcc_y (np.ndarray): y-axis SimCC in shape (K, Wy) or (N, K, Wy)
++
++    Returns:
++        tuple:
++        - locs (np.ndarray): locations of maximum heatmap responses in shape
++            (K, 2) or (N, K, 2)
++        - vals (np.ndarray): values of maximum heatmap responses in shape
++            (K,) or (N, K)
++    """
++    N, K, Wx = simcc_x.shape
++    simcc_x = simcc_x.reshape(N * K, -1)
++    simcc_y = simcc_y.reshape(N * K, -1)
++
++    # get maximum value locations
++    x_locs = np.argmax(simcc_x, axis=1)
++    y_locs = np.argmax(simcc_y, axis=1)
++    locs = np.stack((x_locs, y_locs), axis=-1).astype(np.float32)
++    max_val_x = np.amax(simcc_x, axis=1)
++    max_val_y = np.amax(simcc_y, axis=1)
++
++    # get maximum value across x and y axis
++    mask = max_val_x > max_val_y
++    max_val_x[mask] = max_val_y[mask]
++    vals = max_val_x
++    locs[vals <= 0.] = -1
++
++    # reshape
++    locs = locs.reshape(N, K, 2)
++    vals = vals.reshape(N, K)
++
++    return locs, vals
++
++
++def decode(simcc_x: np.ndarray, simcc_y: np.ndarray,
++           simcc_split_ratio) -> Tuple[np.ndarray, np.ndarray]:
++    """Modulate simcc distribution with Gaussian.
++
++    Args:
++        simcc_x (np.ndarray[K, Wx]): model predicted simcc in x.
++        simcc_y (np.ndarray[K, Wy]): model predicted simcc in y.
++        simcc_split_ratio (int): The split ratio of simcc.
++
++    Returns:
++        tuple: A tuple containing center and scale.
++        - np.ndarray[float32]: keypoints in shape (K, 2) or (n, K, 2)
++        - np.ndarray[float32]: scores in shape (K,) or (n, K)
++    """
++    keypoints, scores = get_simcc_maximum(simcc_x, simcc_y)
++    keypoints /= simcc_split_ratio
++
++    return keypoints, scores
++
++
++def inference_pose(session, out_bbox, oriImg):
++    h, w = session.get_inputs()[0].shape[2:]
++    model_input_size = (w, h)
++    resized_img, center, scale = preprocess(oriImg, out_bbox, model_input_size)
++    outputs = inference(session, resized_img)
++    keypoints, scores = postprocess(outputs, model_input_size, center, scale)
++
++    return keypoints, scores
+\ No newline at end of file
+diff --git a/musetalk/utils/dwpose_onnx/wholebody.py b/musetalk/utils/dwpose_onnx/wholebody.py
+new file mode 100644
+index 0000000..3582359
+--- /dev/null
++++ b/musetalk/utils/dwpose_onnx/wholebody.py
+@@ -0,0 +1,48 @@
++# Vendored from IDEA-Research/DWPose (Apache License 2.0)
++# Source: github.com/IDEA-Research/DWPose, onnx branch —
++#   ControlNet-v1-1-nightly/annotator/dwpose/wholebody.py
++# See LICENSE and NOTICE in this directory.
++# Adapted: ONNX sessions take explicit model paths and execution providers
++# (upstream hardcoded CUDA + 'annotator/ckpts/...').
++
++import numpy as np
++
++import onnxruntime as ort
++from .onnxdet import inference_detector
++from .onnxpose import inference_pose
++
++class Wholebody:
++    def __init__(self, det_model_path, pose_model_path, providers=None):
++        providers = providers or ['CPUExecutionProvider']
++
++        self.session_det = ort.InferenceSession(path_or_bytes=det_model_path, providers=providers)
++        self.session_pose = ort.InferenceSession(path_or_bytes=pose_model_path, providers=providers)
++    
++    def __call__(self, oriImg):
++        det_result = inference_detector(self.session_det, oriImg)
++        keypoints, scores = inference_pose(self.session_pose, det_result, oriImg)
++
++        keypoints_info = np.concatenate(
++            (keypoints, scores[..., None]), axis=-1)
++        # compute neck joint
++        neck = np.mean(keypoints_info[:, [5, 6]], axis=1)
++        # neck score when visualizing pred
++        neck[:, 2:4] = np.logical_and(
++            keypoints_info[:, 5, 2:4] > 0.3,
++            keypoints_info[:, 6, 2:4] > 0.3).astype(int)
++        new_keypoints_info = np.insert(
++            keypoints_info, 17, neck, axis=1)
++        mmpose_idx = [
++            17, 6, 8, 10, 7, 9, 12, 14, 16, 13, 15, 2, 1, 4, 3
++        ]
++        openpose_idx = [
++            1, 2, 3, 4, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17
++        ]
++        new_keypoints_info[:, openpose_idx] = \
++            new_keypoints_info[:, mmpose_idx]
++        keypoints_info = new_keypoints_info
++
++        keypoints, scores = keypoints_info[
++            ..., :2], keypoints_info[..., 2]
++        
++        return keypoints, scores
+diff --git a/musetalk/utils/preprocessing.py b/musetalk/utils/preprocessing.py
+index a925339..940bc6f 100644
+--- a/musetalk/utils/preprocessing.py
++++ b/musetalk/utils/preprocessing.py
+@@ -1,5 +1,4 @@
+ import sys
+-from face_detection import FaceAlignment,LandmarksType
+ from os import listdir, path
+ import subprocess
+ import numpy as np
+@@ -7,8 +6,6 @@ import cv2
+ import pickle
+ import os
+ import json
+-from mmpose.apis import inference_topdown, init_model
+-from mmpose.structures import merge_data_samples
+ import torch
+ from tqdm import tqdm
+ import comfy.utils
+@@ -21,15 +18,121 @@ MuseVCheckPointDir = os.path.join(
+     diffusers_path, "TMElyralab/MuseTalk"
+ )
+ 
+-# initialize the mmpose model
+-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+-config_file = f'{comfy_path}/custom_nodes/ComfyUI-MuseTalk/musetalk/utils/dwpose/rtmpose-l_8xb32-270e_coco-ubody-wholebody-384x288.py'
+-checkpoint_file = f'{MuseVCheckPointDir}/dwpose/dw-ll_ucoco_384.pth'
+-model = init_model(config_file, checkpoint_file, device=device)
++def _device():
++    return "cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu")
+ 
+-# initialize the face detection model
+-device = "cuda" if torch.cuda.is_available() else "cpu"
+-fa = FaceAlignment(LandmarksType._2D, flip_input=False,device=device)
++# MotionField patch: the upstream pack drives landmark detection through
++# mmpose/mmcv (no usable wheels on Apple Silicon / py3.14) and face bboxes
++# through S3FD (research-only weights). Both are replaced by the Apache-2.0
++# DWPose ONNX pipeline vendored under musetalk/utils/dwpose_onnx/ — the same
++# dw-ll_ucoco_384 wholebody model, same 68-point face landmark layout,
++# plain onnxruntime (CUDA when available, else CoreML/CPU).
++_dwpose = None
++def _dwpose_weight(filename):
++    """DWPose ONNX weights (Apache-2.0, HF yzd-v/DWPose) — setup-musetalk.sh
++    stages them under the MuseTalk ckpt dir; download only as a last resort."""
++    local = os.path.join(MuseVCheckPointDir, "dwpose", filename)
++    if os.path.exists(local):
++        return local
++    from huggingface_hub import hf_hub_download
++    return hf_hub_download("yzd-v/DWPose", filename)
++
++def _ort_providers():
++    # CUDA first: CPU-only sessions left the GPU idle for ~7 s per frame
++    # (YOLOX + DWPose on every frame). OF_DWPOSE_PROVIDER overrides, as in
++    # motionfield_nodes/nodes_pose.py.
++    import onnxruntime as ort
++    override = os.environ.get("OF_DWPOSE_PROVIDER")
++    if override:
++        return [p.strip() for p in override.split(",") if p.strip()]
++    have = ort.get_available_providers()
++    if "CUDAExecutionProvider" in have and hasattr(ort, "preload_dlls"):
++        try:  # reuse the CUDA/cuDNN torch already loaded
++            ort.preload_dlls()
++        except Exception:
++            pass
++    return [p for p in ("CUDAExecutionProvider", "CoreMLExecutionProvider", "CPUExecutionProvider") if p in have]
++
++def _pose_model():
++    global _dwpose
++    if _dwpose is None:
++        from musetalk.utils.dwpose_onnx import Wholebody
++        _dwpose = Wholebody(_dwpose_weight("yolox_l.onnx"),
++                            _dwpose_weight("dw-ll_ucoco_384.onnx"),
++                            providers=_ort_providers())
++    return _dwpose
++
++MIN_KP_SCORE = 0.3
++
++def _face_detect(frame):
++    """One YOLOX+DWPose ONNX pass -> (68 face landmarks | None, fallback box | None).
++
++    Frames arrive BGR (cv2) — converted to RGB for the ONNX models. Keypoints
++    scoring <= MIN_KP_SCORE keep their 68-slot layout but are NaN-marked as
++    missing, so callers index positions, not counts. The second return is the
++    min/max box over the *valid* points, extended half a face-height upward to
++    cover the forehead — consumed only when the landmark-adjusted box below
++    comes out degenerate."""
++    wb = _pose_model()  # a load failure raises here — loud, not a silent no-face
++    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
++    try:
++        keypoints, scores = wb(rgb)
++    except Exception as e:
++        print("dwpose onnx inference failed:", e)
++        return None, None
++    if keypoints is None or len(keypoints) == 0:
++        return None, None
++    pts = keypoints[0][23:91].astype(np.float64)  # wholebody face block — 68 pts
++    conf = scores[0][23:91]
++    pts = np.where((conf > MIN_KP_SCORE)[:, None], pts, np.nan)
++    valid = np.isfinite(pts[:, 0])
++    if int(valid.sum()) < 4:
++        return None, None
++    h, w = frame.shape[:2]
++    x1, x2 = int(np.nanmin(pts[valid, 0])), int(np.nanmax(pts[valid, 0]))
++    y1, y2 = int(np.nanmin(pts[valid, 1])), int(np.nanmax(pts[valid, 1]))
++    return pts, (max(0, x1), max(0, y1 - (y2 - y1) // 2), min(w, x2), min(h, y2))
++
++def _landmark_bbox(face_land_mark, f, upperbondrange, average_range_minus, average_range_plus):
++    """Landmark-adjusted crop box (caller reuses f when it comes out degenerate).
++
++    When the nose-ridge points (28/29/30 in the 68-pt layout) are all present we
++    keep upstream's forehead estimate anchored on point 29; when any is missing
++    we fall back to the box built from the valid keypoints."""
++    valid = np.isfinite(face_land_mark[:, 0])
++    pts = face_land_mark[valid]
++    if all(valid[i] for i in (28, 29, 30)):
++        half_face_coord = face_land_mark[29]
++        range_minus = (face_land_mark[30] - face_land_mark[29])[1]
++        range_plus = (face_land_mark[29] - face_land_mark[28])[1]
++        average_range_minus.append(range_minus)
++        average_range_plus.append(range_plus)
++        half_face_dist = np.max(pts[:, 1]) - half_face_coord[1]
++        upper_bond = half_face_coord[1] - half_face_dist
++    else:
++        upper_bond = float(f[1])
++    if upperbondrange != 0:
++        upper_bond = upperbondrange + upper_bond
++    return (int(np.min(pts[:, 0])), int(upper_bond), int(np.max(pts[:, 0])), int(np.max(pts[:, 1])))
++
++def _all_blank(coords_list):
++    return not any(tuple(c) != coord_placeholder for c in coords_list)
++def _clamp_boxes(coords_list, frames):
++    """Clip every crop box to its frame. The landmark box puts the forehead
++    above the frame when the face sits high (y1 < 0); numpy then wraps
++    frame[y1:y2] into an empty crop and cv2.resize asserts. Boxes still empty
++    after clipping become coord_placeholder, which the node skips."""
++    out = []
++    for c, frame in zip(coords_list, frames):
++        if tuple(c) == coord_placeholder:
++            out.append(coord_placeholder)
++            continue
++        h, w = frame.shape[:2]
++        x1, y1, x2, y2 = (int(v) for v in c)
++        x1, y1, x2, y2 = max(0, x1), max(0, y1), min(w, x2), min(h, y2)
++        out.append((x1, y1, x2, y2) if x2 - x1 > 1 and y2 - y1 > 1 else coord_placeholder)
++    return out
++
+ 
+ # maker if the bbox is not sufficient 
+ coord_placeholder = (0.0,0.0,0.0,0.0)
+@@ -64,46 +150,38 @@ def get_landmark_and_bbox_frames(frames,upperbondrange =0):
+     average_range_plus = []
+     pbar = comfy.utils.ProgressBar(len(batches))
+     for fb in tqdm(batches):
+-        results = inference_topdown(model, np.asarray(fb)[0])
+-        results = merge_data_samples(results)
+-        keypoints = results.pred_instances.keypoints
+-        face_land_mark= keypoints[0][23:91]
+-        face_land_mark = face_land_mark.astype(np.int32)
+-        
+-        # get bounding boxes by face detetion
+-        bbox = fa.get_detections_for_batch(np.asarray(fb))
+-        
++        face_land_mark, det = _face_detect(np.asarray(fb)[0])
++
++        # bounding box from the same DWPose detection (S3FD removed)
++        bbox = [det]
++
+         # adjust the bounding box refer to landmark
+         # Add the bounding box to a tuple and append it to the coordinates list
+         for j, f in enumerate(bbox):
+             if f is None: # no face in the image
+                 coords_list += [coord_placeholder]
+                 continue
+-            
+-            half_face_coord =  face_land_mark[29]#np.mean([face_land_mark[28], face_land_mark[29]], axis=0)
+-            range_minus = (face_land_mark[30]- face_land_mark[29])[1]
+-            range_plus = (face_land_mark[29]- face_land_mark[28])[1]
+-            average_range_minus.append(range_minus)
+-            average_range_plus.append(range_plus)
+-            if upperbondrange != 0:
+-                half_face_coord[1] = upperbondrange+half_face_coord[1] #手动调整  + 向下（偏29）  - 向上（偏28）
+-            half_face_dist = np.max(face_land_mark[:,1]) - half_face_coord[1]
+-            upper_bond = half_face_coord[1]-half_face_dist
+-            
+-            f_landmark = (np.min(face_land_mark[:, 0]),int(upper_bond),np.max(face_land_mark[:, 0]),np.max(face_land_mark[:,1]))
++            if face_land_mark is None: # pose model found no face — reuse the detector box
++                coords_list += [f]
++                continue
++
++            f_landmark = _landmark_bbox(face_land_mark, f, upperbondrange, average_range_minus, average_range_plus)
+             x1, y1, x2, y2 = f_landmark
+-            
++
+             if y2-y1<=0 or x2-x1<=0 or x1<0: # if the landmark bbox is not suitable, reuse the bbox
+                 coords_list += [f]
+-                w,h = f[2]-f[0], f[3]-f[1]
+                 print("error bbox:",f)
+             else:
+                 coords_list += [f_landmark]
+         pbar.update(1)
+     
+     print("********************************************bbox_shift parameter adjustment**********************************************************")
+-    print(f"Total frame:「{len(frames)}」 Manually adjust range : [ -{int(sum(average_range_minus) / len(average_range_minus))}~{int(sum(average_range_plus) / len(average_range_plus))} ] , the current value: {upperbondrange}")
++    if average_range_minus:
++        print(f"Total frame:「{len(frames)}」 Manually adjust range : [ -{int(sum(average_range_minus) / len(average_range_minus))}~{int(sum(average_range_plus) / len(average_range_plus))} ] , the current value: {upperbondrange}")
+     print("*************************************************************************************************************************************")
++    coords_list = _clamp_boxes(coords_list, frames)
++    if _all_blank(coords_list):
++        raise RuntimeError("MuseTalk: DWPose found no usable face in any frame — check the input shows a clear, front-ish face")
+     return coords_list,frames
+ 
+ def get_landmark_and_bbox(img_list,upperbondrange =0):
+@@ -120,46 +198,38 @@ def get_landmark_and_bbox(img_list,upperbondrange =0):
+     average_range_plus = []
+     pbar = comfy.utils.ProgressBar(len(batches))
+     for fb in tqdm(batches):
+-        results = inference_topdown(model, np.asarray(fb)[0])
+-        results = merge_data_samples(results)
+-        keypoints = results.pred_instances.keypoints
+-        face_land_mark= keypoints[0][23:91]
+-        face_land_mark = face_land_mark.astype(np.int32)
+-        
+-        # get bounding boxes by face detetion
+-        bbox = fa.get_detections_for_batch(np.asarray(fb))
+-        
++        face_land_mark, det = _face_detect(np.asarray(fb)[0])
++
++        # bounding box from the same DWPose detection (S3FD removed)
++        bbox = [det]
++
+         # adjust the bounding box refer to landmark
+         # Add the bounding box to a tuple and append it to the coordinates list
+         for j, f in enumerate(bbox):
+             if f is None: # no face in the image
+                 coords_list += [coord_placeholder]
+                 continue
+-            
+-            half_face_coord =  face_land_mark[29]#np.mean([face_land_mark[28], face_land_mark[29]], axis=0)
+-            range_minus = (face_land_mark[30]- face_land_mark[29])[1]
+-            range_plus = (face_land_mark[29]- face_land_mark[28])[1]
+-            average_range_minus.append(range_minus)
+-            average_range_plus.append(range_plus)
+-            if upperbondrange != 0:
+-                half_face_coord[1] = upperbondrange+half_face_coord[1] #手动调整  + 向下（偏29）  - 向上（偏28）
+-            half_face_dist = np.max(face_land_mark[:,1]) - half_face_coord[1]
+-            upper_bond = half_face_coord[1]-half_face_dist
+-            
+-            f_landmark = (np.min(face_land_mark[:, 0]),int(upper_bond),np.max(face_land_mark[:, 0]),np.max(face_land_mark[:,1]))
++            if face_land_mark is None: # pose model found no face — reuse the detector box
++                coords_list += [f]
++                continue
++
++            f_landmark = _landmark_bbox(face_land_mark, f, upperbondrange, average_range_minus, average_range_plus)
+             x1, y1, x2, y2 = f_landmark
+-            
++
+             if y2-y1<=0 or x2-x1<=0 or x1<0: # if the landmark bbox is not suitable, reuse the bbox
+                 coords_list += [f]
+-                w,h = f[2]-f[0], f[3]-f[1]
+                 print("error bbox:",f)
+             else:
+                 coords_list += [f_landmark]
+         pbar.update(1)
+     
+     print("********************************************bbox_shift parameter adjustment**********************************************************")
+-    print(f"Total frame:「{len(frames)}」 Manually adjust range : [ -{int(sum(average_range_minus) / len(average_range_minus))}~{int(sum(average_range_plus) / len(average_range_plus))} ] , the current value: {upperbondrange}")
++    if average_range_minus:
++        print(f"Total frame:「{len(frames)}」 Manually adjust range : [ -{int(sum(average_range_minus) / len(average_range_minus))}~{int(sum(average_range_plus) / len(average_range_plus))} ] , the current value: {upperbondrange}")
+     print("*************************************************************************************************************************************")
++    coords_list = _clamp_boxes(coords_list, frames)
++    if _all_blank(coords_list):
++        raise RuntimeError("MuseTalk: DWPose found no usable face in any frame — check the input shows a clear, front-ish face")
+     return coords_list,frames
+     
+ 
+diff --git a/musetalk/whisper/whisper/__init__.py b/musetalk/whisper/whisper/__init__.py
+index b925553..b47a6d3 100644
+--- a/musetalk/whisper/whisper/__init__.py
++++ b/musetalk/whisper/whisper/__init__.py
+@@ -106,7 +106,7 @@ def load_model(name: str, device: Optional[Union[str, torch.device]] = None, dow
+         raise RuntimeError(f"Model {name} not found; available models = {available_models()}")
+ 
+     with (io.BytesIO(checkpoint_file) if in_memory else open(checkpoint_file, "rb")) as fp:
+-        checkpoint = torch.load(fp, map_location=device)
++        checkpoint = torch.load(fp, map_location=device, weights_only=False)
+     del checkpoint_file
+ 
+     dims = ModelDimensions(**checkpoint["dims"])
+diff --git a/nodes.py b/nodes.py
+index e1cdf92..2b69a7b 100644
+--- a/nodes.py
++++ b/nodes.py
+@@ -1,5 +1,7 @@
+ import argparse
+ import os
++import shutil
++import tempfile
+ from omegaconf import OmegaConf
+ import numpy as np
+ import cv2
+@@ -30,10 +32,32 @@ from musetalk.utils.utils import load_all_model
+ from pydub import AudioSegment
+ import time
+ 
+-# load model weights
+-audio_processor,vae,unet,pe  = load_all_model()
+-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+-timesteps = torch.tensor([0], device=device)
++# MotionField patch — the upstream file loads ~4 GB of weights at import time and
++# hard-codes CUDA. We lazy-load on first run and prefer MPS on Apple Silicon.
++_device = "cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu")
++_models = None
++def _load():
++    global _models
++    if _models is None:
++        audio_processor, vae, unet, pe = load_all_model()
++        _models = (audio_processor, vae, unet, pe, torch.tensor([0], device=_device))
++    return _models
++
++def _resolve_media(p):
++    """Bare filenames (e.g. uploaded inputs) resolve against ComfyUI's input dir."""
++    if not p or os.path.exists(p):
++        return p
++    try:
++        return folder_paths.get_annotated_filepath(p)
++    except Exception:
++        return p
++
++def _ffmpeg():
++    exe = os.getenv("FFMPEG_PATH") or shutil.which("ffmpeg")
++    if exe:
++        return exe if os.path.isdir(exe) is False else os.path.join(exe, "ffmpeg")
++    import imageio_ffmpeg
++    return imageio_ffmpeg.get_ffmpeg_exe()
+ 
+ class MuseTalkCupAudio:
+     @classmethod
+@@ -51,7 +75,7 @@ class MuseTalkCupAudio:
+     CATEGORY = "MuseTalk"
+ 
+     def run(self,audio_path,start,end):
+-        sound = AudioSegment.from_file(audio_path)
++        sound = AudioSegment.from_file(_resolve_media(audio_path))
+         sound=sound[start:end]
+         t=int(time.time())
+         sound.export(f'{comfy_path}/output/{t}.wav', format="wav")
+@@ -63,17 +87,45 @@ class MuseTalkRun:
+         return {
+             "required": {
+                 "video_path":("STRING",{"default":""}),
+-                "audio_path":("STRING",{"default":""}),
++                "mouth_masks":("MASK",),
+                 "bbox_shift":("INT",{"default":0}),
+                 "batch_size":("INT",{"default":8}),
+             },
++            "optional": {
++                "audio_path":("STRING",{"default":""}),
++                "audio":("AUDIO",),
++            },
+         }
+ 
+     RETURN_TYPES = ("IMAGE",)
+     FUNCTION = "run"
+     CATEGORY = "MuseTalk"
+ 
+-    def run(self, video_path,audio_path,bbox_shift,batch_size):
++    def run(self, video_path, mouth_masks, bbox_shift, batch_size, audio_path="", audio=None):
++        audio_processor,vae,unet,pe,timesteps = _load()
++        # MotionField patch: accept a ComfyUI AUDIO tensor (uploaded via LoadAudio
++        # or produced by a TTS node) — dumped to a temp wav for the pipeline.
++        tmp_audio = None
++        if audio is not None:
++            import soundfile as sf
++            wav = audio["waveform"][0].transpose(0, 1).cpu().numpy()  # T x C
++            fd, tmp_audio = tempfile.mkstemp(suffix=".wav")
++            os.close(fd)
++            sf.write(tmp_audio, wav, int(audio["sample_rate"]))
++            audio_path = tmp_audio
++        video_path = _resolve_media(video_path)
++        audio_path = _resolve_media(audio_path)
++        if not video_path or not os.path.exists(video_path):
++            raise FileNotFoundError(f"MuseTalkRun: video not found: {video_path}")
++        if not audio_path or not os.path.exists(audio_path):
++            raise FileNotFoundError(f"MuseTalkRun: audio not found: {audio_path}")
++        try:
++            return (self._lip_sync(video_path, audio_path, bbox_shift, batch_size, audio_processor, vae, unet, pe, timesteps, mouth_masks),)
++        finally:
++            if tmp_audio and os.path.exists(tmp_audio):
++                os.remove(tmp_audio)
++
++    def _lip_sync(self, video_path, audio_path, bbox_shift, batch_size, audio_processor, vae, unet, pe, timesteps, mouth_masks):
+         parser = argparse.ArgumentParser()
+         parser.add_argument("--bbox_shift",type=int, default=bbox_shift)
+         parser.add_argument("--result_dir", default=f'{comfy_path}/output', help="path to output")
+@@ -103,8 +155,9 @@ class MuseTalkRun:
+         if get_file_type(video_path)=="video":
+             save_dir_full = os.path.join(args.result_dir, input_basename)
+             os.makedirs(save_dir_full,exist_ok = True)
+-            cmd = f"ffmpeg -i {video_path} -start_number 0 {save_dir_full}/%08d.png"
+-            os.system(cmd)
++            cmd = f'"{_ffmpeg()}" -y -i "{video_path}" -start_number 0 "{save_dir_full}/%08d.png"'
++            if os.system(cmd) != 0 or not glob.glob(os.path.join(save_dir_full, '*.png')):
++                raise RuntimeError(f"MuseTalkRun: ffmpeg failed to decode {video_path}")
+             input_img_list = sorted(glob.glob(os.path.join(save_dir_full, '*.[jpJP][pnPN]*[gG]')))
+             fps = get_video_fps(video_path)
+         else: # input img folder
+@@ -142,6 +195,18 @@ class MuseTalkRun:
+         frame_list_cycle = frame_list + frame_list[::-1]
+         coord_list_cycle = coord_list + coord_list[::-1]
+         input_latent_list_cycle = input_latent_list + input_latent_list[::-1]
++        # OF_MouthMask frames (HxW float 0..1) — aligned to the decoded video
++        # frames by index; the graph wires it off the same video input
++        mask_list = [np.asarray(m.cpu().numpy(), dtype=np.float32) for m in mouth_masks]
++        if not mask_list:
++            raise ValueError("MuseTalkRun: mouth_masks batch is empty — wire an OF_MouthMask node off the same video")
++        if len(mask_list) != len(frame_list):
++            # loader/decoder disagreement — resample the mask stream onto the
++            # decoded frame indices instead of silently drifting the blend
++            print(f"MuseTalkRun: mouth_masks {len(mask_list)}f vs decoded {len(frame_list)}f — resampling masks")
++            idx = np.linspace(0, len(mask_list) - 1, len(frame_list)).round().astype(int)
++            mask_list = [mask_list[i] for i in idx]
++        mask_list_cycle = mask_list + mask_list[::-1]
+         ############################################## inference batch by batch ##############################################
+         print("start inference")
+         video_num = len(whisper_chunks)
+@@ -155,7 +214,7 @@ class MuseTalkRun:
+             audio_feature_batch = torch.stack(tensor_list).to(unet.device) # torch, B, 5*N,384
+             audio_feature_batch = pe(audio_feature_batch)
+             
+-            pred_latents = unet.model(latent_batch, timesteps, encoder_hidden_states=audio_feature_batch).sample
++            pred_latents = unet.model(latent_batch.to(unet.device), timesteps, encoder_hidden_states=audio_feature_batch).sample
+             recon = vae.decode_latents(pred_latents)
+             for res_frame in recon:
+                 res_frame_list.append(res_frame)
+@@ -175,7 +234,7 @@ class MuseTalkRun:
+     #                 print(bbox)
+                 continue
+             
+-            combine_frame = get_image(ori_frame,res_frame,bbox)
++            combine_frame = get_image(ori_frame,res_frame,bbox,mask_list_cycle[i%(len(mask_list_cycle))])
+             #cv2.imwrite(f"{result_img_save_path}/{str(i).zfill(8)}.png",combine_frame)
+             image=Image.fromarray(cv2.cvtColor(combine_frame,cv2.COLOR_BGR2RGB))
+             #image=Image.fromarray(np.clip(combine_frame, 0, 255).astype(np.uint8))
+@@ -184,7 +243,7 @@ class MuseTalkRun:
+             outframes.append(image_tensor_out)
+             pbar.update(1)
+ 
+-        return (torch.cat(tuple(outframes), dim=0),) 
++        return torch.cat(tuple(outframes), dim=0)
+ 
+ class VHS_FILENAMES_STRING_MuseTalk:
+     @classmethod

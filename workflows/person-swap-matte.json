@@ -1,0 +1,159 @@
+{
+  "_meta": {
+    "name": "PersonSwap matte coverage preflight",
+    "placeholders": {
+      "INPUT_VIDEO": "source clip, comfy input/ filename",
+      "MASK_W": "loader custom_width — 512 portrait / 0 landscape (server-computed via probe)",
+      "MASK_H": "loader custom_height — 512 landscape / 0 portrait (server-computed via probe)",
+      "EVIDENCE_FRAME": "batch index of the matte frame kept as refusal evidence",
+      "PREFIX": "output filename prefix"
+    },
+    "requires": [
+      "birefnet.safetensors (models/birefnet, MIT)",
+      "dwpose onnx weights (models/motionfield/dwpose, Apache-2.0)",
+      "custom-nodes: VideoHelperSuite (VHS_LoadVideo), motionfield_nodes (OF_DWPose, OF_MatteCoverage)"
+    ],
+    "nodes": "core + VHS + motionfield_nodes",
+    "notes": "Cheap person-coverage preflight for the person-swap recipe — runs before any VACE window so a personless clip refuses fast instead of burning a window per 5 s segment. BiRefNet matte per frame (person region); OF_MatteCoverage emits a 1xN strip of per-frame coverage (read back by the recipe from the saved PNG) and the raw mask passes through to a single-frame SaveImage kept as matte evidence. A second face-only OF_DWPose pass → ImageToMask(red) → GrowMask → OF_MatteCoverage gives the lip-sync gate its per-frame face presence — the GrowMask dilates the sparse keypoint dots into a measurable region so coverage isn't drowned by pixel noise — the recipe stitches person coverage (row 0) and face coverage (row 1) into one saved 2xN strip."
+  },
+  "1": {
+    "class_type": "LoadBackgroundRemovalModel",
+    "inputs": {
+      "bg_removal_name": "birefnet.safetensors"
+    }
+  },
+  "2": {
+    "class_type": "VHS_LoadVideo",
+    "inputs": {
+      "video": "{{INPUT_VIDEO}}",
+      "force_rate": 2,
+      "custom_width": "{{MASK_W}}",
+      "custom_height": "{{MASK_H}}",
+      "frame_load_cap": 90,
+      "skip_first_frames": 0,
+      "select_every_nth": 1
+    }
+  },
+  "3": {
+    "class_type": "RemoveBackground",
+    "inputs": {
+      "bg_removal_model": [
+        "1",
+        0
+      ],
+      "image": [
+        "2",
+        0
+      ]
+    }
+  },
+  "4": {
+    "class_type": "OF_MatteCoverage",
+    "inputs": {
+      "mask": [
+        "3",
+        0
+      ]
+    }
+  },
+  "5": {
+    "class_type": "MaskToImage",
+    "inputs": {
+      "mask": [
+        "3",
+        0
+      ]
+    }
+  },
+  "6": {
+    "class_type": "ImageFromBatch",
+    "inputs": {
+      "image": [
+        "5",
+        0
+      ],
+      "batch_index": "{{EVIDENCE_FRAME}}",
+      "length": 1
+    }
+  },
+  "7": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "6",
+        0
+      ],
+      "filename_prefix": "{{PREFIX}}"
+    }
+  },
+  "8": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "12",
+        0
+      ],
+      "filename_prefix": "{{PREFIX}}"
+    }
+  },
+  "9": {
+    "class_type": "OF_DWPose",
+    "inputs": {
+      "image": [
+        "2",
+        0
+      ],
+      "detect_body": false,
+      "detect_hands": false,
+      "detect_face": true,
+      "resolution": 512
+    }
+  },
+  "10": {
+    "class_type": "ImageToMask",
+    "inputs": {
+      "image": [
+        "9",
+        0
+      ],
+      "channel": "red"
+    }
+  },
+  "13": {
+    "class_type": "GrowMask",
+    "inputs": {
+      "mask": [
+        "10",
+        0
+      ],
+      "expand": 4,
+      "tapered_corners": true
+    }
+  },
+  "11": {
+    "class_type": "OF_MatteCoverage",
+    "inputs": {
+      "mask": [
+        "13",
+        0
+      ]
+    }
+  },
+  "12": {
+    "class_type": "ImageStitch",
+    "inputs": {
+      "image1": [
+        "4",
+        1
+      ],
+      "image2": [
+        "11",
+        1
+      ],
+      "direction": "down",
+      "match_image_size": true,
+      "spacing_width": 0,
+      "spacing_color": "black"
+    }
+  }
+}

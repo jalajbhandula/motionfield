@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "width": 1920,
+  "height": 1080,
+  "fps": 24,
+  "duration": 5,
+  "seed": 9701,
+  "background": { "color": "#0a0a0b" },
+  "camera": { "fov": 50, "keyframes": [{ "t": 0, "position": [0, 0, 1500], "target": [0, 0, 0] }] },
+  "layers": [
+    {
+      "id": "head",
+      "type": "text3d",
+      "props": { "text": "the weights that ran", "size": 120, "depth": 18, "bevelSize": 2, "curveSegments": 6, "color": "#f2f5ff", "metalness": 0.2, "roughness": 0.5 },
+      "transform": { "position": [0, 330, 0] },
+      "keyframes": [
+        { "t": 0, "path": "opacity", "value": 0 },
+        { "t": 0.5, "path": "opacity", "value": 1 }
+      ]
+    },
+    {
+      "id": "rule",
+      "type": "line",
+      "props": { "points": [[-380, 220, 0], [380, 220, 0]], "width": 4, "color": "#d4ff3f", "progress": 1 },
+      "keyframes": [
+        { "t": 0.2, "path": "props.progress", "value": 0 },
+        { "t": 0.9, "path": "props.progress", "value": 1, "ease": "easeInOut" }
+      ]
+    },
+    "__BADGE_LINES__",
+    {
+      "id": "music",
+      "type": "text",
+      "props": { "text": "{{MUSIC}}", "size": 30, "weight": 500, "color": "#9c9ca6" },
+      "transform": { "position": [0, -300, 0] },
+      "keyframes": [
+        { "t": 0, "path": "opacity", "value": 0 },
+        { "t": 2.4, "path": "opacity", "value": 1 }
+      ]
+    },
+    {
+      "id": "tail",
+      "type": "text",
+      "props": { "text": "npm run demo:dry — MIT · local-first · motionfield.dev", "size": 28, "weight": 500, "color": "#63636c" },
+      "transform": { "position": [0, -380, 0] },
+      "keyframes": [
+        { "t": 0, "path": "opacity", "value": 0 },
+        { "t": 3.0, "path": "opacity", "value": 1 }
+      ]
+    }
+  ]
+}

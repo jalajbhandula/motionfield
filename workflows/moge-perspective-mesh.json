@@ -1,0 +1,28 @@
+{
+  "_meta": {
+    "name": "MoGe-2 geometry scan (image to textured point-mesh GLB)",
+    "placeholders": {
+      "INPUT_IMAGE": "uploaded subject or scene image",
+      "RESOLUTION_LEVEL": "MoGe detail 0-9 (9 most detail)",
+      "DECIMATION": "vertex stride (1 = full resolution)",
+      "PREFIX": "output filename prefix"
+    },
+    "requires": [
+      "moge_2_vitl_normal_fp16.safetensors (geometry_estimation)",
+      "birefnet.safetensors (background_removal)"
+    ],
+    "nodes": "core (ComfyUI 0.41 native MoGe stack)",
+    "notes": "Monocular geometry estimation per the official 3d_moge_perspective_to_mesh template: BiRefNet mask -> ImageCropToMask (square subject) -> MoGeInference -> MoGePointMapToMesh carries the source image through as the baseColor texture -> MeshToFile3D -> Save3DAdvanced (GLB) + RenderMesh preview. No diffusion — this is the fast/draft path; TRELLIS.2 (trellis2-image-to-3d.json) is the quality path. apply_mask=true culls the cut-out background from the point cloud."
+  },
+  "1": { "class_type": "LoadImage", "inputs": { "image": "{{INPUT_IMAGE}}" } },
+  "2": { "class_type": "LoadBackgroundRemovalModel", "inputs": { "bg_removal_name": "birefnet.safetensors" } },
+  "3": { "class_type": "RemoveBackground", "inputs": { "bg_removal_model": ["2", 0], "image": ["1", 0] } },
+  "4": { "class_type": "ImageCropToMask", "inputs": { "images": ["1", 0], "masks": ["3", 0], "width": 1024, "height": 1024, "pad_factor": 1.05, "grow_mask": 0, "background": "#000000" } },
+  "5": { "class_type": "LoadMoGeModel", "inputs": { "model_name": "moge_2_vitl_normal_fp16.safetensors" } },
+  "6": { "class_type": "MoGeInference", "inputs": { "moge_model": ["5", 0], "image": ["4", 0], "resolution_level": "{{RESOLUTION_LEVEL}}", "fov_x_degrees": 0.0, "batch_size": 4, "force_projection": true, "apply_mask": true, "refine_steps": 3 } },
+  "7": { "class_type": "MoGePointMapToMesh", "inputs": { "moge_geometry": ["6", 0], "batch_index": 0, "decimation": "{{DECIMATION}}", "discontinuity_threshold": 0.04, "texture": true } },
+  "8": { "class_type": "MeshToFile3D", "inputs": { "mesh": ["7", 0] } },
+  "9": { "class_type": "Save3DAdvanced", "inputs": { "model_3d": ["8", 0], "filename_prefix": "{{PREFIX}}", "viewport_state": "", "width": 1024, "height": 1024 } },
+  "10": { "class_type": "RenderMesh", "inputs": { "mesh": ["7", 0], "mode": "auto", "width": 1024, "height": 1024, "background": "#101018" } },
+  "11": { "class_type": "SaveImage", "inputs": { "images": ["10", 0], "filename_prefix": "{{PREFIX}}" } }
+}

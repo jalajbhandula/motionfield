@@ -1,0 +1,121 @@
+{
+  "version": 1,
+  "records": {
+    "comic-panel": {
+      "mechanism_hash": "d177c318568dd8cbf0f5780fe837c466bd0696235ef99f1d08125809626dfd2d",
+      "status": "failed",
+      "seeds": [
+        1000,
+        1001
+      ],
+      "runs": [
+        {
+          "seed": 1000,
+          "ok": false,
+          "msg": "job timed out"
+        },
+        {
+          "seed": 1001,
+          "ok": false,
+          "msg": "job timed out"
+        }
+      ],
+      "checker": "vision",
+      "date": "2026-10-22"
+    },
+    "marble-gold": {
+      "mechanism_hash": "d177c318568dd8cbf0f5780fe837c466bd0696235ef99f1d08125809626dfd2d",
+      "status": "failed",
+      "seeds": [
+        1000,
+        1001
+      ],
+      "runs": [
+        {
+          "seed": 1000,
+          "ok": false,
+          "msg": "job failed: HTTP 405"
+        },
+        {
+          "seed": 1001,
+          "ok": false,
+          "msg": "job failed: HTTP 405"
+        }
+      ],
+      "checker": "vision",
+      "date": "2026-10-21"
+    },
+    "candid-take": {
+      "mechanism_hash": "e8d1ece9145fe257dd548baf97d3b1b6a42a3fd06353cf56c0027166542b8774",
+      "status": "failed",
+      "seeds": [
+        1000,
+        1001
+      ],
+      "runs": [
+        {
+          "seed": 1000,
+          "ok": true,
+          "msg": "job completed → /files/generated/d2a8f435-cf65-4b3b-8cd4-4dfc42eab08a.mp4"
+        },
+        {
+          "seed": 1001,
+          "ok": true,
+          "msg": "job completed → /files/generated/59eb0c0a-fc7d-49b5-9eb0-79c0ba09e3de.mp4"
+        }
+      ],
+      "checker": "vision",
+      "judge": false,
+      "artifact_sha256": "2c7acc8a085d0f501de49ea8812f52c5993df5cd25627ec52f95bcc4cc81199f",
+      "date": "2026-10-22",
+      "note": "wall time not captured — record predates per-seed wall_s tracking"
+    },
+    "photo-face-swap": {
+      "mechanism_hash": "6899178189805c5e9f98db6a3b4aba3bb394598b45419b4640e310ce929a26d0",
+      "status": "failed",
+      "seeds": [
+        1000,
+        1001
+      ],
+      "runs": [
+        {
+          "seed": 1000,
+          "ok": false,
+          "msg": "judge: identity not transferred — face region reinterpreted (klein steps=4), docs/SMOKE.md"
+        },
+        {
+          "seed": 1001,
+          "ok": false,
+          "msg": "judge: identity not transferred — face region reinterpreted (klein steps=6), docs/SMOKE.md"
+        }
+      ],
+      "checker": "vision",
+      "judge": true,
+      "date": "2026-10-25",
+      "note": "earlier verified record predated real GPU evidence; both recorded klein runs failed identity transfer — hidden until a fresh run passes 2/2"
+    },
+    "cel-shade": {
+      "mechanism_hash": "4147fd977973c1539170e6e1329a976a7a21bda52d5665df8bfc301102191ef2",
+      "status": "verified",
+      "seeds": [
+        1000,
+        1001
+      ],
+      "runs": [
+        {
+          "seed": 1000,
+          "ok": true,
+          "msg": "judge: flat cel regions + inked outlines"
+        },
+        {
+          "seed": 1001,
+          "ok": true,
+          "msg": "judge: flat cel regions + inked outlines"
+        }
+      ],
+      "checker": "vision",
+      "judge": true,
+      "date": "2026-10-24"
+    }
+  }
+}

@@ -1,0 +1,150 @@
+@import "tailwindcss";
+
+/* true-black-flat: #000 ground, #111 surfaces, elevation by lightness alone.
+   The lime accent lives on data only - never on buttons, tabs or nav. */
+@theme {
+  --color-bg: #000000;
+  --color-panel: #111111;
+  --color-panel2: #1a1a1a;
+  --color-raised: #242424;
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-rule: #1a1a1a;
+  --color-text: #f5f5f5;
+  --color-dim: #b4b4b4;
+  --color-faint: #767676;
+  --color-accent: #d4ff3f;
+  --color-accent-dim: #b7e02e;
+  --color-danger: #ff5c5c;
+  --color-warn: #ffb547;
+  /* aliases used across components (were undefined → borders fell back to
+     currentColor, i.e. bright white) */
+  --color-line: rgba(255, 255, 255, 0.08);
+  --color-fg: #f5f5f5;
+  --color-ink: #e8e8e8;
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-geist-sans), var(--font-sans);
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* { box-sizing: border-box; }
+/* Tailwind 4 defaults a bare `border` to currentColor (bright white on this
+   theme) - every unspecified border gets the subtle hairline instead */
+@layer base {
+  *, ::before, ::after, ::backdrop, ::file-selector-button { border-color: var(--color-border); }
+}
+html, body { height: 100%; }
+:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+}
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-display { font-family: var(--font-display); }
+.font-mono { font-family: var(--font-mono); font-feature-settings: "tnum"; }
+
+/* Scrollbars */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #262626; border-radius: 8px; border: 2px solid var(--color-bg); }
+::-webkit-scrollbar-thumb:hover { background: #383838; }
+
+/* Surfaces: flat - a lightness step, never a bordered card */
+.panel { background: var(--color-panel); border-radius: 14px; }
+
+.input {
+  background: var(--color-panel2); border: 1px solid #262626; border-radius: 10px;
+  padding: 10px 12px; font-size: 14px; color: var(--color-text); width: 100%;
+  outline: none; transition: border-color .2s var(--ease-out-expo);
+}
+.input:focus { border-color: #4d4d4d; }
+.input::placeholder { color: var(--color-faint); }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border-radius: 10px; font-size: 14px; font-weight: 600; padding: 10px 18px;
+  transition: background-color .2s var(--ease-out-expo), color .2s var(--ease-out-expo), border-color .2s var(--ease-out-expo), transform .12s var(--ease-out-expo), opacity .2s var(--ease-out-expo);
+  cursor: pointer; border: 1px solid transparent; white-space: nowrap;
+}
+.btn:active { transform: scale(.98); }
+/* Primary = inversion: a white pill, not the accent */
+.btn-primary { background: #f5f5f5; color: #0a0a0a; }
+.btn-primary:hover { background: #ffffff; }
+.btn-primary:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+.btn-ghost { background: var(--color-panel2); color: var(--color-text); border-color: #2a2a2a; }
+.btn-ghost:hover { background: var(--color-raised); }
+.btn-sm { padding: 6px 12px; font-size: 13px; border-radius: 8px; }
+
+.chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px;
+  border-radius: 999px; font-size: 12px; font-weight: 500;
+  background: var(--color-panel2); border: 1px solid transparent; color: var(--color-dim);
+  transition: background-color .2s var(--ease-out-expo), color .2s var(--ease-out-expo), border-color .2s var(--ease-out-expo);
+  white-space: nowrap;
+}
+/* Selection is a lightness step + brightening text, not a colour pill */
+.chip-on { background: var(--color-raised); color: var(--color-text); }
+
+.media-tile { position: relative; overflow: hidden; border-radius: 12px; background: var(--color-panel2); }
+.media-tile img, .media-tile video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.media-tile .hover-ui { position: absolute; inset: 0; opacity: 0; transition: opacity .2s var(--ease-out-expo); pointer-events: none; background: linear-gradient(to top, rgba(0,0,0,.75), transparent 50%); /* taste-skill-ignore - neutral scrim over media, the one allowed gradient */ }
+.media-tile .hover-ui a, .media-tile .hover-ui button { pointer-events: auto; }
+.media-tile:hover .hover-ui { opacity: 1; }
+
+/* Infinite canvas (React Flow) */
+.canvas-node { width: 260px; border-radius: 12px; border: 1px solid var(--color-border); background: var(--color-panel); padding: 12px; box-shadow: 0 8px 28px rgba(0,0,0,.35); }
+.canvas-node-sel { border-color: var(--color-accent); box-shadow: 0 0 0 1px var(--color-accent), 0 8px 28px rgba(0,0,0,.35); }
+.react-flow__handle.canvas-handle { width: 10px; height: 10px; background: var(--color-panel2); border: 2px solid var(--color-dim); }
+.react-flow__handle.canvas-handle:hover { border-color: var(--color-accent); }
+.react-flow__handle.connectingto { border-color: var(--color-accent); }
+.react-flow__edge-path { stroke: var(--color-dim); stroke-width: 1.5; }
+.react-flow__edge.selected .react-flow__edge-path { stroke: var(--color-accent); }
+.react-flow__connection-path { stroke: var(--color-accent); stroke-width: 1.5; }
+.react-flow__controls { border: 1px solid var(--color-border); border-radius: 10px; overflow: hidden; box-shadow: 0 8px 28px rgba(0,0,0,.35); }
+.react-flow__controls-button { background: var(--color-panel); border-bottom: 1px solid var(--color-border); }
+.react-flow__controls-button:hover { background: var(--color-panel2); }
+.react-flow__controls-button svg { fill: var(--color-dim); }
+.react-flow__minimap { border: 1px solid var(--color-border); border-radius: 10px; overflow: hidden; }
+.react-flow__panel .chip { background: var(--color-panel); border: 1px solid var(--color-border); }
+
+@keyframes pulse-soft { 0%,100% { opacity: .55 } 50% { opacity: 1 } }
+.skeleton { animation: pulse-soft 1.6s ease-in-out infinite; background: var(--color-panel2); }
+
+/* Effect poster - a flat hue-coded field, not a gradient */
+.poster-gradient { position: relative; overflow: hidden; }
+.poster-gradient::before {
+  content: ""; position: absolute; inset: 0;
+  background: hsl(var(--h, 200) 34% 13%);
+}
+
+.noise::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .05; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Native controls follow the dark theme (popups, scrollbars, date pickers). */
+:root { color-scheme: dark; }
+
+/* Every native single-select gets the same chevron and room for it, so no
+   page shows the browser's default arrow jammed against the edge. The
+   :not() chain lifts specificity above one-class `background:` shorthands
+   (e.g. .input) that would otherwise wipe the image. */
+select:not([multiple]):not([size]) {
+  appearance: none; -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b4b4b4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center; background-size: 14px 14px;
+  padding-right: 36px !important; cursor: pointer; text-overflow: ellipsis;
+}
+select:not([multiple]):not([size]):hover { border-color: #383838; }
+select:not([multiple]):not([size]):disabled { cursor: not-allowed; opacity: .55; }
+select option { background: var(--color-panel); color: var(--color-text); }
+
+/* Header menus: a short fade + rise on open. */
+@keyframes menu-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+.menu-in { animation: menu-in .2s var(--ease-out-expo); }
+@media (prefers-reduced-motion: reduce) { .menu-in { animation: none; } }

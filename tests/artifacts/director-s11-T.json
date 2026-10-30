@@ -1,0 +1,262 @@
+{
+ "ok": true,
+ "workflow": "director-wan-txt.json",
+ "params": {
+  "prompt": "a lighthouse at dusk, slow reveal",
+  "duration": 1,
+  "aspect_ratio": "16:9",
+  "seed": 42,
+  "steps": 6,
+  "fps": 16,
+  "moves": "orbit-right",
+  "camera_aperture": "f2.8"
+ },
+ "job_id": "989ab4eb-3f76-44c3-b860-2086b1d48bcc",
+ "status": "succeeded",
+ "elapsed_s": 266,
+ "base_url": "http://127.0.0.1:8189",
+ "ran_at": "2026-10-23T15:09:43.859Z",
+ "outputs": [
+  {
+   "nodeId": "30",
+   "name": "of_dir_feadacdf-keyframe_00001_.png",
+   "type": "image",
+   "bytes": 573041,
+   "path": "/tmp/of-evidence/media/of_dir_feadacdf-keyframe_00001_.png",
+   "sha256": "a6a11e9c129a55afc520fbe92429a7b087c1a64e822497c4bbdad5ecc4242142",
+   "graded": false
+  },
+  {
+   "nodeId": "35",
+   "name": "of_dir_4b9974be-refgrid_00001_.png",
+   "type": "image",
+   "bytes": 102600,
+   "path": "/tmp/of-evidence/media/of_dir_4b9974be-refgrid_00001_.png",
+   "sha256": "562555ce541dce280fc5376bcd9154f5df1d306806d9a3656a7db8cd358d18eb",
+   "graded": false
+  },
+  {
+   "nodeId": "22",
+   "name": "of_smoke-7c_00001.mp4",
+   "type": "video",
+   "bytes": 22215,
+   "path": "/tmp/of-evidence/media/of_smoke-7c_00001.mp4",
+   "sha256": "075ea7815e91ee4548109861a5b40fb9936d0ee787670867ed40ae62dc7d50af",
+   "graded": false
+  }
+ ],
+ "poses": {
+  "moves": [
+   "locked-off"
+  ],
+  "frames": [
+   {
+    "t": 0,
+    "pos": [
+     0,
+     0,
+     0
+    ],
+    "yaw": 0,
+    "pitch": 0,
+    "roll": 0,
+    "fov": 54.4
+   },
+   {
+    "t": 0.0625,
+    "pos": [
+     0,
+     0,
+     0
+    ],
+    "yaw": 0,
+    "pitch": 0,
+    "roll": 0,
+    "fov": 54.4
+   },
+   {
+    "t": 0.125,
+    "pos": [
+     0,
+     0,
+     0
+    ],
+    "yaw": 0,
+    "pitch": 0,
+    "roll": 0,
+    "fov": 54.4
+   },
+   {
+    "t": 0.1875,
+    "pos": [
+     0,
+     0,
+     0
+    ],
+    "yaw": 0,
+    "pitch": 0,
+    "roll": 0,
+    "fov": 54.4
+   },
+   {
+    "t": 0.25,
+    "pos": [
+     0,
+     0,
+     0
+    ],
+    "yaw": 0,
+    "pitch": 0,
+    "roll": 0,
+    "fov": 54.4
+   },
+   {
+    "t": 0.3125,
+    "pos": [
+     0,
+     0,
+     0
+    ],
+    "yaw": 0,
+    "pitch": 0,
+    "roll": 0,
+    "fov": 54.4
+   },
+   {
+    "t": 0.375,
+    "pos": [
+     0,
+     0,
+     0
+    ],
+    "yaw": 0,
+    "pitch": 0,
+    "roll": 0,
+    "fov": 54.4
+   },
+   {
+    "t": 0.4375,
+    "pos": [
+     0,
+     0,
+     0
+    ],
+    "yaw": 0,
+    "pitch": 0,
+    "roll": 0,
+    "fov": 54.4
+   },
+   {
+    "t": 0.5,
+    "pos": [
+     0,
+     0,
+     0
+    ],
+    "yaw": 0,
+    "pitch": 0,
+    "roll": 0,
+    "fov": 54.4
+   },
+   {
+    "t": 0.5625,
+    "pos": [
+     0,
+     0,
+     0
+    ],
+    "yaw": 0,
+    "pitch": 0,
+    "roll": 0,
+    "fov": 54.4
+   },
+   {
+    "t": 0.625,
+    "pos": [
+     0,
+     0,
+     0
+    ],
+    "yaw": 0,
+    "pitch": 0,
+    "roll": 0,
+    "fov": 54.4
+   },
+   {
+    "t": 0.6875,
+    "pos": [
+     0,
+     0,
+     0
+    ],
+    "yaw": 0,
+    "pitch": 0,
+    "roll": 0,
+    "fov": 54.4
+   },
+   {
+    "t": 0.75,
+    "pos": [
+     0,
+     0,
+     0
+    ],
+    "yaw": 0,
+    "pitch": 0,
+    "roll": 0,
+    "fov": 54.4
+   },
+   {
+    "t": 0.8125,
+    "pos": [
+     0,
+     0,
+     0
+    ],
+    "yaw": 0,
+    "pitch": 0,
+    "roll": 0,
+    "fov": 54.4
+   },
+   {
+    "t": 0.875,
+    "pos": [
+     0,
+     0,
+     0
+    ],
+    "yaw": 0,
+    "pitch": 0,
+    "roll": 0,
+    "fov": 54.4
+   },
+   {
+    "t": 0.9375,
+    "pos": [
+     0,
+     0,
+     0
+    ],
+    "yaw": 0,
+    "pitch": 0,
+    "roll": 0,
+    "fov": 54.4
+   },
+   {
+    "t": 1,
+    "pos": [
+     0,
+     0,
+     0
+    ],
+    "yaw": 0,
+    "pitch": 0,
+    "roll": 0,
+    "fov": 54.4
+   }
+  ],
+  "layer": "scene"
+ },
+ "superseded_by": "director-s11fix-T.json",
+ "superseded_note": "params.moves=\"orbit-right\" is not a catalog id \u2014 the run stayed locked-off; the s11fix re-run uses a resolvable move phrase."
+}

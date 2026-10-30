@@ -1,0 +1,131 @@
+{
+  "version": 1,
+  "generated": "2026-10-22T19:56:34.682Z",
+  "records": {
+    "lead-swap": {
+      "mechanism_hash": "27adc04ace3a1b6ff596b5b4baa1dc4ca7d2b19d191d0bcf5456fce7e9b5989d",
+      "status": "verified",
+      "seeds": [
+        7
+      ],
+      "runs": [
+        {
+          "seed": 7,
+          "ok": true,
+          "msg": "fabricated e2e record — hash is real, artifact is not"
+        }
+      ],
+      "checker": "vision",
+      "note": "fabricated e2e record",
+      "artifact_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "date": "2026-10-22"
+    },
+    "dolly-in": {
+      "mechanism_hash": "9f3c5d0d5b31ef4f2cb8d6293becda047047f137c7f9a198d9aa50bc0c4b7cc5",
+      "status": "verified",
+      "seeds": [
+        7
+      ],
+      "runs": [
+        {
+          "seed": 7,
+          "ok": true,
+          "msg": "fabricated e2e record — hash is real, artifact is not"
+        }
+      ],
+      "checker": "vision",
+      "note": "fabricated e2e record",
+      "artifact_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "date": "2026-10-22"
+    },
+    "candid-take": {
+      "mechanism_hash": "f3adb6d4407bb5e3eeedc6d47dcb67529638ceef11e0e91a464ae3df74924749",
+      "status": "verified",
+      "seeds": [
+        7
+      ],
+      "runs": [
+        {
+          "seed": 7,
+          "ok": true,
+          "msg": "fabricated e2e record — hash is real, artifact is not"
+        }
+      ],
+      "checker": "vision",
+      "note": "fabricated e2e record",
+      "artifact_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "date": "2026-10-22"
+    },
+    "comic-panel": {
+      "mechanism_hash": "06b6c9dde09b3b8029e89c66328776fb9d55af3d99efed011c78406b5c366aa8",
+      "status": "verified",
+      "seeds": [
+        7
+      ],
+      "runs": [
+        {
+          "seed": 7,
+          "ok": true,
+          "msg": "fabricated e2e record — hash is real, artifact is not"
+        }
+      ],
+      "checker": "vision",
+      "note": "fabricated e2e record",
+      "artifact_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "date": "2026-10-22"
+    },
+    "marble-gold": {
+      "mechanism_hash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "status": "verified",
+      "seeds": [
+        7
+      ],
+      "runs": [
+        {
+          "seed": 7,
+          "ok": true
+        }
+      ],
+      "checker": "vision",
+      "note": "hash predates a mechanism edit — record must be treated as stale",
+      "artifact_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "date": "2026-10-22"
+    },
+    "photo-face-swap": {
+      "mechanism_hash": "6899178189805c5e9f98db6a3b4aba3bb394598b45419b4640e310ce929a26d0",
+      "status": "verified",
+      "seeds": [
+        7
+      ],
+      "runs": [
+        {
+          "seed": 7,
+          "ok": true,
+          "msg": "fabricated e2e record — hash is real, artifact is not"
+        }
+      ],
+      "checker": "vision",
+      "note": "fabricated e2e record",
+      "artifact_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "date": "2026-10-24"
+    },
+    "cel-shade": {
+      "mechanism_hash": "4147fd977973c1539170e6e1329a976a7a21bda52d5665df8bfc301102191ef2",
+      "status": "verified",
+      "seeds": [
+        7
+      ],
+      "runs": [
+        {
+          "seed": 7,
+          "ok": true,
+          "msg": "fabricated e2e record — hash is real, artifact is not"
+        }
+      ],
+      "checker": "vision",
+      "note": "fabricated e2e record",
+      "artifact_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "date": "2026-10-24"
+    }
+  }
+}

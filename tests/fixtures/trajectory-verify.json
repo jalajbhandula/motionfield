@@ -1,0 +1,1027 @@
+{
+  "cases": {
+    "arc-left-45": {
+      "ledger": [
+        "OF-0183"
+      ],
+      "metric": "orbit+parallax",
+      "pass": true,
+      "value": {
+        "c0": {
+          "drift": 0.03869686506274128,
+          "sweep": 45.0
+        },
+        "c1": -43.985212973188595
+      }
+    },
+    "arc-right-45": {
+      "ledger": [
+        "OF-0183"
+      ],
+      "metric": "orbit+parallax",
+      "pass": true,
+      "value": {
+        "c0": {
+          "drift": 0.0386968650627411,
+          "sweep": 45.0
+        },
+        "c1": 43.985212973188595
+      }
+    },
+    "auto-move": {
+      "ledger": [
+        "OF-0179"
+      ],
+      "metric": "auto",
+      "pass": true,
+      "value": {
+        "landscape": [
+          "drone-flyover"
+        ],
+        "person": [
+          "eye-push"
+        ],
+        "product": [
+          "turntable-180"
+        ],
+        "vehicle": [
+          "side-track-left"
+        ]
+      }
+    },
+    "beauty-arc": {
+      "ledger": [
+        "OF-0201"
+      ],
+      "metric": "orbit+grow",
+      "pass": true,
+      "value": {
+        "c0": {
+          "drift": 0.03303243477021187,
+          "sweep": 25.0
+        },
+        "c1": 1.2106634125727218
+      }
+    },
+    "body-mount": {
+      "ledger": [
+        "OF-0217"
+      ],
+      "metric": "locked",
+      "pass": true,
+      "value": {
+        "bg_flow_px": 7.960027602163783,
+        "subject_drift_px": 2.2737367544323206e-13
+      }
+    },
+    "car-mount": {
+      "ledger": [
+        "OF-0187"
+      ],
+      "metric": "locked",
+      "pass": true,
+      "value": {
+        "bg_flow_px": 10.793674475418044,
+        "subject_drift_px": 1.1457157353758233e-13
+      }
+    },
+    "chase-follow": {
+      "ledger": [
+        "OF-0186"
+      ],
+      "metric": "chase",
+      "pass": true,
+      "value": {
+        "sway_sign_changes": 2,
+        "travel": 2.7
+      }
+    },
+    "corkscrew-down": {
+      "ledger": [
+        "OF-0139"
+      ],
+      "metric": "orbit+parallax",
+      "pass": true,
+      "value": {
+        "c0": {
+          "drift": 0.04001597316343357,
+          "sweep": 150.0
+        },
+        "c1": 155.14082216066322
+      }
+    },
+    "crane-down": {
+      "ledger": [
+        "OF-0188"
+      ],
+      "metric": "height+vflow",
+      "pass": true,
+      "value": {
+        "c0": -1.0499999999999998,
+        "c1": 113.4929447782001
+      }
+    },
+    "crane-up": {
+      "ledger": [
+        "OF-0188"
+      ],
+      "metric": "height+vflow",
+      "pass": true,
+      "value": {
+        "c0": 1.0499999999999998,
+        "c1": -139.39967095805235
+      }
+    },
+    "crash-zoom-in": {
+      "ledger": [
+        "OF-0190",
+        "OF-0214"
+      ],
+      "metric": "zoom",
+      "pass": true,
+      "value": {
+        "parallax_diff": 2.220446049250313e-16,
+        "scale": 2.484804284636916
+      }
+    },
+    "crash-zoom-out": {
+      "ledger": [
+        "OF-0190",
+        "OF-0214"
+      ],
+      "metric": "zoom",
+      "pass": true,
+      "value": {
+        "parallax_diff": 4.440892098500626e-16,
+        "scale": 0.3277202709373208
+      }
+    },
+    "dolly-in": {
+      "ledger": [
+        "OF-0191"
+      ],
+      "metric": "grow+parallax",
+      "pass": true,
+      "value": {
+        "c0": 1.6666666666666663,
+        "c1": 0.5303030303030298
+      }
+    },
+    "dolly-in-max": {
+      "ledger": [
+        "OF-0219"
+      ],
+      "metric": "grow",
+      "pass": true,
+      "value": 5.000000000000002
+    },
+    "dolly-out": {
+      "ledger": [
+        "OF-0191"
+      ],
+      "metric": "shrink",
+      "pass": true,
+      "value": 0.7142857142857141
+    },
+    "dolly-out-max": {
+      "ledger": [
+        "OF-0219"
+      ],
+      "metric": "shrink",
+      "pass": true,
+      "value": 0.45454545454545453
+    },
+    "dolly-zoom-in": {
+      "ledger": [
+        "OF-0193"
+      ],
+      "metric": "dolly-zoom",
+      "pass": true,
+      "value": {
+        "bg_scale_dev": 0.4117647058823529,
+        "subject_scale_dev": 0.0
+      }
+    },
+    "dolly-zoom-out": {
+      "ledger": [
+        "OF-0193"
+      ],
+      "metric": "dolly-zoom",
+      "pass": true,
+      "value": {
+        "bg_scale_dev": 0.304347826086957,
+        "subject_scale_dev": 0.0
+      }
+    },
+    "drone-flyover": {
+      "ledger": [
+        "OF-0139"
+      ],
+      "metric": "travel",
+      "pass": true,
+      "value": 2.896981187374195
+    },
+    "dutch-roll-ccw": {
+      "ledger": [
+        "OF-0195"
+      ],
+      "metric": "roll",
+      "pass": true,
+      "value": -9.199408150692648
+    },
+    "dutch-roll-cw": {
+      "ledger": [
+        "OF-0195"
+      ],
+      "metric": "roll",
+      "pass": true,
+      "value": 9.199408150692648
+    },
+    "eye-push": {
+      "ledger": [
+        "OF-0180"
+      ],
+      "metric": "eye-push",
+      "pass": true,
+      "value": {
+        "max_off_centre": 1.5789838572446671e-16,
+        "scale": 1.8224275826057792
+      }
+    },
+    "fisheye-lens": {
+      "ledger": [
+        "OF-0197"
+      ],
+      "metric": "curve",
+      "pass": true,
+      "value": {
+        "edge_bend": 66.0,
+        "tag": "lens"
+      }
+    },
+    "fly-through-transition": {
+      "ledger": [
+        "OF-0198"
+      ],
+      "metric": "holes",
+      "pass": true,
+      "value": {
+        "crossing": 0.9727777777777777,
+        "edge": 0.0,
+        "locked_off": 0.0
+      }
+    },
+    "follow-behind": {
+      "ledger": [
+        "OF-0139"
+      ],
+      "metric": "grow",
+      "pass": true,
+      "value": 5.000000000000002
+    },
+    "fpv-dive": {
+      "ledger": [
+        "OF-0200"
+      ],
+      "metric": "grow",
+      "pass": true,
+      "value": 26.12519733763189
+    },
+    "fpv-rise": {
+      "ledger": [
+        "OF-0200"
+      ],
+      "metric": "grow",
+      "pass": true,
+      "value": 374.41226398059655
+    },
+    "frozen-moment-arc": {
+      "ledger": [
+        "OF-0181"
+      ],
+      "metric": "post+orbit+parallax",
+      "pass": true,
+      "value": "time_sample"
+    },
+    "ground-rush": {
+      "ledger": [
+        "OF-0215"
+      ],
+      "metric": "rush",
+      "pass": true,
+      "value": {
+        "height_span": 0.0,
+        "travel": 3.9000000000000004
+      }
+    },
+    "handheld-run": {
+      "ledger": [
+        "OF-0202"
+      ],
+      "metric": "noise",
+      "pass": true,
+      "value": 3.337629162831336
+    },
+    "handheld-subtle": {
+      "ledger": [
+        "OF-0202"
+      ],
+      "metric": "noise",
+      "pass": true,
+      "value": 0.3399893904325398
+    },
+    "head-lock-follow": {
+      "ledger": [
+        "OF-0203"
+      ],
+      "metric": "locked",
+      "pass": true,
+      "value": {
+        "bg_flow_px": 7.132198222212564,
+        "subject_drift_px": 1.1368683772161603e-13
+      }
+    },
+    "high-angle-pull": {
+      "ledger": [
+        "OF-0139"
+      ],
+      "metric": "shrink",
+      "pass": true,
+      "value": 0.768257365803659
+    },
+    "hyperlapse": {
+      "ledger": [
+        "OF-0205"
+      ],
+      "metric": "post+travel",
+      "pass": true,
+      "value": "time_sample"
+    },
+    "impact-shake": {
+      "ledger": [
+        "OF-0139"
+      ],
+      "metric": "decay",
+      "pass": true,
+      "value": {
+        "early": 2.639661119082028,
+        "late": 0.34536751232830576
+      }
+    },
+    "jib-down": {
+      "ledger": [
+        "OF-0207"
+      ],
+      "metric": "height+vflow",
+      "pass": true,
+      "value": {
+        "c0": -0.8999999999999999,
+        "c1": 96.68358516268387
+      }
+    },
+    "jib-over-foreground": {
+      "ledger": [
+        "OF-0139"
+      ],
+      "metric": "height-bump",
+      "pass": true,
+      "value": {
+        "amp": 0.75,
+        "net": 9.184850993605148e-17
+      }
+    },
+    "jib-up": {
+      "ledger": [
+        "OF-0207"
+      ],
+      "metric": "height+vflow",
+      "pass": true,
+      "value": {
+        "c0": 0.8999999999999999,
+        "c1": -114.53047922735328
+      }
+    },
+    "jitter-shake": {
+      "ledger": [
+        "OF-0226"
+      ],
+      "metric": "hf-noise",
+      "pass": true,
+      "value": 0.9952298487945747
+    },
+    "lead-backward": {
+      "ledger": [
+        "OF-0139"
+      ],
+      "metric": "shrink",
+      "pass": true,
+      "value": 0.5555555555555555
+    },
+    "locked-off": {
+      "ledger": [
+        "OF-0218"
+      ],
+      "metric": "static",
+      "pass": true,
+      "value": 0.0
+    },
+    "low-angle-push": {
+      "ledger": [
+        "OF-0204"
+      ],
+      "metric": "low-angle",
+      "pass": true,
+      "value": {
+        "end_y": 0.0,
+        "scale": 1.8736405638807319,
+        "start_y": -0.54
+      }
+    },
+    "making-of-pullback": {
+      "ledger": [
+        "OF-0184"
+      ],
+      "metric": "shrink+hh-band",
+      "pass": true,
+      "value": {
+        "band_frac": 0.957876763337065,
+        "scale": 0.6768838312326974
+      }
+    },
+    "motion-control-sweep": {
+      "ledger": [
+        "OF-0216"
+      ],
+      "metric": "sweep",
+      "pass": true,
+      "value": {
+        "centroid_drift": 0.03861941648714655,
+        "yaw_sweep": 95.0
+      }
+    },
+    "mouth-push": {
+      "ledger": [
+        "OF-0210"
+      ],
+      "metric": "target-mouth",
+      "pass": true,
+      "value": {
+        "c0": 0.0,
+        "c1": 1.5
+      }
+    },
+    "mouth-snap-zoom": {
+      "ledger": [
+        "OF-0196"
+      ],
+      "metric": "target-mouth",
+      "pass": true,
+      "value": {
+        "c0": 0.0,
+        "c1": 2.7984359896036746
+      }
+    },
+    "object-pov": {
+      "ledger": [
+        "OF-0211"
+      ],
+      "metric": "cross",
+      "pass": true,
+      "value": {
+        "z0": 0.0,
+        "z1": 3.0
+      }
+    },
+    "orbit-360": {
+      "ledger": [
+        "OF-0228",
+        "OF-0230"
+      ],
+      "metric": "orbit+parallax",
+      "pass": true,
+      "value": {
+        "c0": {
+          "drift": 0.0382024062271654,
+          "sweep": 350.0
+        },
+        "c1": -1700.37452086534
+      }
+    },
+    "overhead-crane-pass": {
+      "ledger": [
+        "OF-0189"
+      ],
+      "metric": "crane-pass",
+      "pass": true,
+      "value": {
+        "mid_pass": true,
+        "pitch_min": -80.0,
+        "travel": 3.5654592972014143
+      }
+    },
+    "overhead-drop": {
+      "ledger": [
+        "OF-0212"
+      ],
+      "metric": "height+vflow",
+      "pass": true,
+      "value": {
+        "c0": -1.5,
+        "c1": 168.14591809545715
+      }
+    },
+    "overhead-rise": {
+      "ledger": [
+        "OF-0212"
+      ],
+      "metric": "height+vflow",
+      "pass": true,
+      "value": {
+        "c0": 1.5,
+        "c1": -168.14591809545715
+      }
+    },
+    "pan-left": {
+      "ledger": [
+        "OF-0213"
+      ],
+      "metric": "flow-x",
+      "pass": true,
+      "value": 55.94814774106737
+    },
+    "pan-right": {
+      "ledger": [
+        "OF-0213"
+      ],
+      "metric": "flow-x",
+      "pass": true,
+      "value": -51.43363565110769
+    },
+    "parallax-slide": {
+      "ledger": [
+        "OF-0139"
+      ],
+      "metric": "parallax+dir",
+      "pass": true,
+      "value": {
+        "c0": 63.74888131678516,
+        "c1": 28.667028958060854
+      }
+    },
+    "pass-through-in": {
+      "ledger": [
+        "OF-0220"
+      ],
+      "metric": "holes",
+      "pass": true,
+      "value": {
+        "crossing": 0.9729861111111111,
+        "edge": 0.0,
+        "locked_off": 0.0
+      }
+    },
+    "pass-through-out": {
+      "ledger": [
+        "OF-0220"
+      ],
+      "metric": "holes",
+      "pass": true,
+      "value": {
+        "crossing": 0.9729861111111111,
+        "edge": 0.0,
+        "locked_off": 0.0
+      }
+    },
+    "pedestal-down": {
+      "ledger": [
+        "OF-0139"
+      ],
+      "metric": "flow-y",
+      "pass": true,
+      "value": -19.781837420073316
+    },
+    "pedestal-up": {
+      "ledger": [
+        "OF-0139"
+      ],
+      "metric": "flow-y",
+      "pass": true,
+      "value": 19.781837420073288
+    },
+    "pull-back-reveal": {
+      "ledger": [
+        "OF-0182"
+      ],
+      "metric": "shrink",
+      "pass": true,
+      "value": 0.7359715883982707
+    },
+    "rack-focus-near-to-far": {
+      "ledger": [
+        "OF-0199"
+      ],
+      "metric": "focus",
+      "pass": true,
+      "value": {
+        "from": 0.9,
+        "to": 5.4
+      }
+    },
+    "shutter-drag": {
+      "ledger": [
+        "OF-0209"
+      ],
+      "metric": "blur",
+      "pass": true,
+      "value": {
+        "smear": 0.0441363509700215,
+        "tag": "shutter"
+      }
+    },
+    "side-track-left": {
+      "ledger": [
+        "OF-0139"
+      ],
+      "metric": "parallax+dx",
+      "pass": true,
+      "value": {
+        "c0": 76.92936774472942,
+        "c1": 219.79819355636982
+      }
+    },
+    "side-track-right": {
+      "ledger": [
+        "OF-0139"
+      ],
+      "metric": "parallax+dx",
+      "pass": true,
+      "value": {
+        "c0": 76.92936774472942,
+        "c1": -219.7981935563698
+      }
+    },
+    "slow-creep-in": {
+      "ledger": [
+        "OF-0139"
+      ],
+      "metric": "grow",
+      "pass": true,
+      "value": 1.176470588235294
+    },
+    "snap-tilt-down": {
+      "ledger": [
+        "OF-0139"
+      ],
+      "metric": "flow-y",
+      "pass": true,
+      "value": -424.7315592362857
+    },
+    "spiral-up": {
+      "ledger": [
+        "OF-0139"
+      ],
+      "metric": "orbit+parallax",
+      "pass": true,
+      "value": {
+        "c0": {
+          "drift": 0.038266354699669235,
+          "sweep": 150.0
+        },
+        "c1": -154.19318027104873
+      }
+    },
+    "tilt-down": {
+      "ledger": [
+        "OF-0221"
+      ],
+      "metric": "flow-y",
+      "pass": true,
+      "value": -43.05101619639359
+    },
+    "tilt-rise": {
+      "ledger": [
+        "OF-0206"
+      ],
+      "metric": "tilt+y",
+      "pass": true,
+      "value": {
+        "c0": 70.4947176468408,
+        "c1": 0.66
+      }
+    },
+    "tilt-up": {
+      "ledger": [
+        "OF-0221"
+      ],
+      "metric": "flow-y",
+      "pass": true,
+      "value": 40.848928000098326
+    },
+    "timelapse-crowd": {
+      "ledger": [
+        "OF-0223"
+      ],
+      "metric": "post+travel",
+      "pass": true,
+      "value": "time_sample"
+    },
+    "timelapse-landscape": {
+      "ledger": [
+        "OF-0224"
+      ],
+      "metric": "post+pan",
+      "pass": true,
+      "value": "time_sample"
+    },
+    "timelapse-studio": {
+      "ledger": [
+        "OF-0222"
+      ],
+      "metric": "post+static",
+      "pass": true,
+      "value": "time_sample"
+    },
+    "truck-left": {
+      "ledger": [
+        "OF-0192"
+      ],
+      "metric": "parallax+dx",
+      "pass": true,
+      "value": {
+        "c0": 38.46468387236473,
+        "c1": 109.89909677818491
+      }
+    },
+    "truck-right": {
+      "ledger": [
+        "OF-0192"
+      ],
+      "metric": "parallax+dx",
+      "pass": true,
+      "value": {
+        "c0": 38.46468387236473,
+        "c1": -109.89909677818488
+      }
+    },
+    "turntable-180": {
+      "ledger": [
+        "OF-0139"
+      ],
+      "metric": "orbit+parallax",
+      "pass": true,
+      "value": {
+        "c0": {
+          "drift": 0.038663058865500234,
+          "sweep": 359.59104938271605
+        },
+        "c1": -189.4345146668748
+      }
+    },
+    "turntable-360": {
+      "ledger": [
+        "OF-0208"
+      ],
+      "metric": "orbit+parallax",
+      "pass": true,
+      "value": {
+        "c0": {
+          "drift": 0.03870068456530351,
+          "sweep": 345.01543209876536
+        },
+        "c1": -501.74613464981235
+      }
+    },
+    "whip-pan-left": {
+      "ledger": [
+        "OF-0225"
+      ],
+      "metric": "whip",
+      "pass": true,
+      "value": {
+        "peak_dps_frame": 4.677863868884316,
+        "sweep": 90.0
+      }
+    },
+    "whip-pan-right": {
+      "ledger": [
+        "OF-0225"
+      ],
+      "metric": "whip",
+      "pass": true,
+      "value": {
+        "peak_dps_frame": 4.677863868884316,
+        "sweep": 90.0
+      }
+    },
+    "zoom-in": {
+      "ledger": [
+        "OF-0229"
+      ],
+      "metric": "zoom",
+      "pass": true,
+      "value": {
+        "parallax_diff": 4.440892098500626e-16,
+        "scale": 1.6417636307844294
+      }
+    },
+    "zoom-out": {
+      "ledger": [
+        "OF-0229"
+      ],
+      "metric": "zoom",
+      "pass": true,
+      "value": {
+        "parallax_diff": 0.0,
+        "scale": 0.5824741334393637
+      }
+    },
+    "zoom-pulse": {
+      "ledger": [
+        "OF-0227"
+      ],
+      "metric": "fov-dips",
+      "pass": true,
+      "value": 3
+    }
+  },
+  "extras": {
+    "camera_embed": {
+      "ledger": [],
+      "pass": true,
+      "value": {
+        "f0_moment_max": 0.0,
+        "pack_eq_max_abs_diff": 0.0,
+        "packed": [
+          1,
+          24,
+          5,
+          33,
+          49
+        ],
+        "shape": [
+          17,
+          33,
+          49,
+          6
+        ],
+        "truck_moment_s1": 0.13602502644062042,
+        "truck_moment_s2": 0.27205005288124084
+      }
+    },
+    "core_rig_split": {
+      "ledger": [
+        "OF-0136"
+      ],
+      "pass": true,
+      "value": {
+        "core": [
+          "locked-off",
+          "dolly-in",
+          "dolly-out",
+          "slow-creep-in",
+          "pull-back-reveal",
+          "truck-left",
+          "truck-right",
+          "pedestal-up",
+          "pedestal-down",
+          "pan-left",
+          "pan-right",
+          "tilt-up",
+          "tilt-down",
+          "dutch-roll-cw",
+          "dutch-roll-ccw",
+          "follow-behind",
+          "lead-backward",
+          "side-track-left",
+          "side-track-right",
+          "auto-move",
+          "arc-left-45",
+          "arc-right-45",
+          "orbit-360",
+          "turntable-180",
+          "crane-up",
+          "crane-down",
+          "jib-over-foreground",
+          "overhead-rise",
+          "overhead-drop",
+          "handheld-subtle",
+          "low-angle-push",
+          "high-angle-pull",
+          "parallax-slide",
+          "motion-control-sweep",
+          "making-of-pullback",
+          "overhead-crane-pass",
+          "beauty-arc",
+          "tilt-rise",
+          "jib-up",
+          "jib-down",
+          "turntable-360",
+          "spiral-up",
+          "crash-zoom-in",
+          "crash-zoom-out",
+          "handheld-run",
+          "fpv-dive",
+          "fpv-rise",
+          "drone-flyover",
+          "corkscrew-down",
+          "snap-tilt-down",
+          "impact-shake",
+          "chase-follow",
+          "ground-rush",
+          "dolly-in-max",
+          "dolly-out-max",
+          "jitter-shake",
+          "zoom-in",
+          "zoom-out",
+          "dolly-zoom-in",
+          "dolly-zoom-out",
+          "zoom-pulse",
+          "whip-pan-left",
+          "whip-pan-right"
+        ],
+        "counts": [
+          63,
+          18
+        ],
+        "rig": [
+          "eye-push",
+          "mouth-push",
+          "head-lock-follow",
+          "body-mount",
+          "car-mount",
+          "object-pov",
+          "mouth-snap-zoom",
+          "rack-focus-near-to-far",
+          "fisheye-lens",
+          "shutter-drag",
+          "frozen-moment-arc",
+          "hyperlapse",
+          "timelapse-studio",
+          "timelapse-crowd",
+          "timelapse-landscape",
+          "fly-through-transition",
+          "pass-through-in",
+          "pass-through-out"
+        ]
+      }
+    },
+    "lock_base_heading_90": {
+      "ledger": [
+        "OF-0143"
+      ],
+      "pass": true,
+      "value": {
+        "max_pos_err": 0.0,
+        "max_yaw_err": 0.0,
+        "subject_yaw": 90.0
+      }
+    },
+    "rig_cpu": {
+      "ledger": [
+        "OF-0191"
+      ],
+      "pass": true,
+      "value": {
+        "dolly_corr": 0.2653,
+        "dolly_scale": 1.675,
+        "frames": 17,
+        "locked_hole_frac": 0.0,
+        "pass": true
+      }
+    },
+    "stack_order": {
+      "ledger": [
+        "OF-0143"
+      ],
+      "pass": true,
+      "value": {
+        "additive_max_err": 0.0,
+        "last_wins": {
+          "eye_then_mouth": "mouth",
+          "mouth_then_eye": "eyes"
+        },
+        "orders": [
+          [
+            "dolly-in",
+            "pan-left"
+          ],
+          [
+            "pan-left",
+            "dolly-in"
+          ]
+        ]
+      }
+    }
+  },
+  "summary": {
+    "checked": 81,
+    "extras": {
+      "camera_embed": true,
+      "core_rig_split": true,
+      "lock_base_heading_90": true,
+      "rig_cpu": true,
+      "stack_order": true
+    },
+    "passed": 81
+  }
+}

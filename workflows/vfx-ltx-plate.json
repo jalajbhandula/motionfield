@@ -1,0 +1,395 @@
+{
+  "_meta": {
+    "name": "VFX Lab · LTX-2.5 distilled plate pass",
+    "placeholders": {
+      "INPUT_VIDEO": "plate clip, comfy input/ filename — resampled to FPS inside the loader",
+      "PROMPT": "effect prompt",
+      "END_IMAGE": "optional last-frame keyframe, comfy input/ filename",
+      "END_FRAME": "pixel frame the end keyframe pins (frames-1; only resolved with END_IMAGE)",
+      "TARGET_STRENGTH": "how hard the end keyframe pulls",
+      "HOLD_FRAMES": "plate frames pinned as the opening guide — unresolved drops the hold branch",
+      "HOLD_IDX": "start frame of the hold guide (0)",
+      "SIGMAS": "comma-separated distilled sigma tail — the plate_lock level",
+      "WIDTH": "multiple of 32",
+      "HEIGHT": "multiple of 32",
+      "FRAMES": "8n+1",
+      "FPS": "fps",
+      "SEED": "noise seed",
+      "PREFIX": "filename prefix"
+    },
+    "optional": [
+      "HOLD_FRAMES",
+      "HOLD_IDX",
+      "END_IMAGE",
+      "END_FRAME"
+    ],
+    "passthrough": {
+      "9": [
+        "positive",
+        "negative",
+        "latent"
+      ],
+      "12": [
+        "positive",
+        "negative",
+        "latent"
+      ]
+    },
+    "requires": [
+      "ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors (diffusion_models)",
+      "gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors (text_encoders)",
+      "ltx-2.5-video-vae-bf16.safetensors (vae)",
+      "ltx-2.5-audio-vae-bf16.safetensors (vae)",
+      "ComfyUI-VideoHelperSuite",
+      "motionfield_nodes pack (OF_PlateAudio)"
+    ],
+    "nodes": "core + VHS + OF_PlateAudio",
+    "notes": "Plate pass on the LTX-2.5 distilled transformer (cfg-free schedule). The plate encodes to latents via VAEEncodeTiled; LTXVAddGuide pins the first HOLD_FRAMES plate frames at frame 0 (drops entirely at hold=0 — its consumers splice to the bare plate latent through _meta.passthrough) and an optional end keyframe pins FRAMES-1. ManualSigmas carries the lock-level sigma tail into SamplerCustomAdvanced. The plate latent rides the joint AV latent (silent empty audio side); LTXVCropGuides strips guide conditioning + appended latents before decode, and OF_PlateAudio muxes the plate's original soundtrack back over the output — the generated audio half is discarded, unlike the official V2V template which ref-conditions it. The old {{LTX098_CKPT}} placeholder is gone — a stray LTX098_CKPT mapping is ignored."
+  },
+  "1": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors",
+      "weight_dtype": "default"
+    }
+  },
+  "2": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors",
+      "type": "ltxv",
+      "device": "default"
+    }
+  },
+  "3": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "2",
+        0
+      ],
+      "text": "{{PROMPT}}"
+    }
+  },
+  "4": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "2",
+        0
+      ],
+      "text": "blur, distortion, low quality, watermark"
+    }
+  },
+  "5": {
+    "class_type": "LTXVConditioning",
+    "inputs": {
+      "positive": [
+        "3",
+        0
+      ],
+      "negative": [
+        "4",
+        0
+      ],
+      "frame_rate": "{{FPS}}"
+    }
+  },
+  "6": {
+    "class_type": "VHS_LoadVideo",
+    "inputs": {
+      "video": "{{INPUT_VIDEO}}",
+      "force_rate": "{{FPS}}",
+      "custom_width": "{{WIDTH}}",
+      "custom_height": "{{HEIGHT}}",
+      "frame_load_cap": "{{FRAMES}}",
+      "skip_first_frames": 0,
+      "select_every_nth": 1
+    }
+  },
+  "7": {
+    "class_type": "VAEEncodeTiled",
+    "inputs": {
+      "pixels": [
+        "6",
+        0
+      ],
+      "vae": [
+        "20",
+        0
+      ],
+      "tile_size": 512,
+      "overlap": 64,
+      "temporal_size": 64,
+      "temporal_overlap": 8
+    }
+  },
+  "8": {
+    "class_type": "ImageFromBatch",
+    "inputs": {
+      "image": [
+        "6",
+        0
+      ],
+      "batch_index": 0,
+      "length": "{{HOLD_FRAMES}}"
+    }
+  },
+  "9": {
+    "class_type": "LTXVAddGuide",
+    "inputs": {
+      "positive": [
+        "5",
+        0
+      ],
+      "negative": [
+        "5",
+        1
+      ],
+      "vae": [
+        "20",
+        0
+      ],
+      "latent": [
+        "7",
+        0
+      ],
+      "image": [
+        "8",
+        0
+      ],
+      "frame_idx": "{{HOLD_IDX}}",
+      "strength": 1.0
+    }
+  },
+  "10": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "{{END_IMAGE}}"
+    }
+  },
+  "11": {
+    "class_type": "ImageScale",
+    "inputs": {
+      "image": [
+        "10",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "width": "{{WIDTH}}",
+      "height": "{{HEIGHT}}",
+      "crop": "disabled"
+    }
+  },
+  "24": {
+    "class_type": "LTXVPreprocess",
+    "inputs": {
+      "image": [
+        "11",
+        0
+      ],
+      "img_compression": 18
+    }
+  },
+  "12": {
+    "class_type": "LTXVAddGuide",
+    "inputs": {
+      "positive": [
+        "9",
+        0
+      ],
+      "negative": [
+        "9",
+        1
+      ],
+      "vae": [
+        "20",
+        0
+      ],
+      "latent": [
+        "9",
+        2
+      ],
+      "image": [
+        "24",
+        0
+      ],
+      "frame_idx": "{{END_FRAME}}",
+      "strength": "{{TARGET_STRENGTH}}"
+    }
+  },
+  "14": {
+    "class_type": "KSamplerSelect",
+    "inputs": {
+      "sampler_name": "euler_ancestral"
+    }
+  },
+  "15": {
+    "class_type": "ManualSigmas",
+    "inputs": {
+      "sigmas": "{{SIGMAS}}"
+    }
+  },
+  "20": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "ltx-2.5-video-vae-bf16.safetensors"
+    }
+  },
+  "21": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "ltx-2.5-audio-vae-bf16.safetensors"
+    }
+  },
+  "22": {
+    "class_type": "LTXVEmptyLatentAudio",
+    "inputs": {
+      "audio_vae": [
+        "21",
+        0
+      ],
+      "frames_number": [
+        "6",
+        1
+      ],
+      "frame_rate": "{{FPS}}",
+      "batch_size": 1
+    }
+  },
+  "23": {
+    "class_type": "LTXVConcatAVLatent",
+    "inputs": {
+      "video_latent": [
+        "12",
+        2
+      ],
+      "audio_latent": [
+        "22",
+        0
+      ]
+    }
+  },
+  "25": {
+    "class_type": "RandomNoise",
+    "inputs": {
+      "noise_seed": "{{SEED}}"
+    }
+  },
+  "26": {
+    "class_type": "CFGGuider",
+    "inputs": {
+      "model": [
+        "1",
+        0
+      ],
+      "positive": [
+        "12",
+        0
+      ],
+      "negative": [
+        "12",
+        1
+      ],
+      "cfg": 1.0
+    }
+  },
+  "16": {
+    "class_type": "SamplerCustomAdvanced",
+    "inputs": {
+      "noise": [
+        "25",
+        0
+      ],
+      "guider": [
+        "26",
+        0
+      ],
+      "sampler": [
+        "14",
+        0
+      ],
+      "sigmas": [
+        "15",
+        0
+      ],
+      "latent_image": [
+        "23",
+        0
+      ]
+    }
+  },
+  "27": {
+    "class_type": "LTXVSeparateAVLatent",
+    "inputs": {
+      "av_latent": [
+        "16",
+        0
+      ]
+    }
+  },
+  "17": {
+    "class_type": "LTXVCropGuides",
+    "inputs": {
+      "positive": [
+        "12",
+        0
+      ],
+      "negative": [
+        "12",
+        1
+      ],
+      "latent": [
+        "27",
+        0
+      ]
+    }
+  },
+  "18": {
+    "class_type": "VAEDecodeTiled",
+    "inputs": {
+      "samples": [
+        "17",
+        2
+      ],
+      "vae": [
+        "20",
+        0
+      ],
+      "tile_size": 512,
+      "overlap": 64,
+      "temporal_size": 64,
+      "temporal_overlap": 8
+    }
+  },
+  "19": {
+    "class_type": "VHS_VideoCombine",
+    "inputs": {
+      "images": [
+        "18",
+        0
+      ],
+      "frame_rate": "{{FPS}}",
+      "loop_count": 0,
+      "audio": [
+        "40",
+        0
+      ],
+      "filename_prefix": "{{PREFIX}}",
+      "format": "video/h264-mp4",
+      "pingpong": false,
+      "save_output": true
+    }
+  },
+  "40": {
+    "class_type": "OF_PlateAudio",
+    "_meta": {
+      "title": "plate audio (silent-safe)"
+    },
+    "inputs": {
+      "video": "{{INPUT_VIDEO}}",
+      "start_time": 0,
+      "duration": 0
+    }
+  }
+}

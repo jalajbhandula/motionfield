@@ -1,0 +1,61 @@
+{
+  "_meta": {
+    "name": "Image upscale (Real-ESRGAN x4plus)",
+    "placeholders": {
+      "INPUT_IMAGE": "uploaded filename",
+      "MODEL": "upscale model filename",
+      "PREFIX": "filename prefix",
+      "SCALE_BY": "resize after the native 4x upscale: 1 for 4x, 0.5 for 2x"
+    },
+    "requires": [
+      "RealESRGAN_x4plus.pth"
+    ],
+    "nodes": "core"
+  },
+  "1": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "{{INPUT_IMAGE}}"
+    }
+  },
+  "2": {
+    "class_type": "UpscaleModelLoader",
+    "inputs": {
+      "model_name": "{{MODEL}}"
+    }
+  },
+  "3": {
+    "class_type": "ImageUpscaleWithModel",
+    "inputs": {
+      "upscale_model": [
+        "2",
+        0
+      ],
+      "image": [
+        "1",
+        0
+      ]
+    }
+  },
+  "4": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "5",
+        0
+      ],
+      "filename_prefix": "{{PREFIX}}"
+    }
+  },
+  "5": {
+    "class_type": "ImageScaleBy",
+    "inputs": {
+      "image": [
+        "3",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "scale_by": "{{SCALE_BY}}"
+    }
+  }
+}

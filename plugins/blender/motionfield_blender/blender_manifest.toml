@@ -1,0 +1,18 @@
+schema_version = "1.0.0"
+
+id = "motionfield_blender"
+version = "0.1.0"
+name = "MotionField"
+tagline = "Generate textures and video from your scene with a local MotionField server"
+maintainer = "MotionField contributors"
+type = "add-on"
+
+tags = ["3D View", "Node", "Render"]
+
+blender_version_min = "4.2.0"
+
+license = ["SPDX:GPL-2.0-or-later"]
+
+[permissions]
+network = "Talks to your MotionField server"
+files = "Saves generated media next to your .blend"

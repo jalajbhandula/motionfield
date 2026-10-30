@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "width": 1280,
+  "height": 720,
+  "fps": 24,
+  "duration": 3.5,
+  "seed": 7755,
+  "background": { "color": "#f7f5ef" },
+  "camera": {
+    "fov": 50,
+    "keyframes": [{ "t": 0, "position": [0, 0, 1000], "target": [0, 0, 0] }]
+  },
+  "layers": [
+    {
+      "id": "circle",
+      "type": "line",
+      "props": {
+        "points": [[170, 60, 0], [120, 110, 0], [50, 130, 0], [-30, 115, 0], [-90, 70, 0], [-120, 10, 0], [-115, -60, 0], [-70, -110, 0], [0, -135, 0], [80, -120, 0], [140, -75, 0], [170, -15, 0], [170, 60, 0]],
+        "width": 6, "color": "#2b2f38", "progress": 1
+      },
+      "transform": { "position": [-300, 20, 0] },
+      "keyframes": [
+        { "t": 0.1, "path": "props.progress", "value": 0 },
+        { "t": 1.1, "path": "props.progress", "value": 1, "ease": "easeInOut" }
+      ]
+    },
+    {
+      "id": "arrow",
+      "type": "line",
+      "props": {
+        "points": [[-90, -20, 0], [-10, 0, 0], [60, 10, 0], [110, 5, 0], [96, 25, 0], [110, 5, 0], [92, -14, 0]],
+        "width": 6, "hue": 12, "progress": 1
+      },
+      "transform": { "position": [-60, -60, 0] },
+      "keyframes": [
+        { "t": 1.2, "path": "props.progress", "value": 0 },
+        { "t": 1.9, "path": "props.progress", "value": 1, "ease": "easeInOut" }
+      ]
+    },
+    {
+      "id": "underline",
+      "type": "line",
+      "props": {
+        "points": [[-180, 0, 0], [-60, 8, 0], [80, -4, 0], [210, 6, 0]],
+        "width": 7, "hue": 12, "progress": 1
+      },
+      "transform": { "position": [200, 130, 0] },
+      "keyframes": [
+        { "t": 2.2, "path": "props.progress", "value": 0 },
+        { "t": 2.8, "path": "props.progress", "value": 1, "ease": "easeInOut" }
+      ]
+    },
+    {
+      "id": "note",
+      "type": "text",
+      "props": { "text": "here's the idea", "size": 58, "weight": 700, "color": "#2b2f38" },
+      "transform": { "position": [200, 190, 0] },
+      "keyframes": [
+        { "t": 2.0, "path": "opacity", "value": 0 },
+        { "t": 2.4, "path": "opacity", "value": 1 }
+      ]
+    }
+  ],
+  "params": [
+    { "id": "markerHue", "label": "Marker hue", "min": 0, "max": 360, "step": 1, "default": 12, "bind": "arrow.props.hue" },
+    { "id": "strokeW", "label": "Stroke width", "min": 2, "max": 14, "step": 0.5, "default": 6, "bind": "circle.props.width" }
+  ]
+}

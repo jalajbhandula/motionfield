@@ -1,0 +1,234 @@
+{
+  "_meta": {
+    "name": "Wan VACE restyle",
+    "placeholders": {
+      "PROMPT": "target style description (preset-injected)",
+      "NEGATIVE": "negative prompt",
+      "WIDTH": "multiple of 32",
+      "HEIGHT": "multiple of 32",
+      "FRAMES": "8n+1",
+      "SEED": "noise seed",
+      "STEPS": "20-30",
+      "INPUT_VIDEO": "source video, comfy input/ filename",
+      "REF_IMAGE": "optional style reference image, comfy input/ filename (fallback: prompt-only style)",
+      "PREFIX": "output filename prefix"
+    },
+    "optional": [
+      "REF_IMAGE"
+    ],
+    "requires": [
+      "wan2.1_vace_1.3B_fp16.safetensors (upgrade: wan2.1_vace_14B_fp8scaled.safetensors on a GPU / Comfy Cloud)",
+      "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "wan_2.1_vae.safetensors",
+      "depth_anything_3_mono_large.safetensors (Comfy-Org/Depth-Anything-3 — Apache-2.0; models/geometry_estimation/)",
+      "custom-nodes: VideoHelperSuite (VHS_LoadVideo, VHS_VideoCombine), motionfield_nodes (OF_PlateAudio)"
+    ],
+    "nodes": "core + VHS",
+    "notes": "Depth-guided V2V preserves composition + timing; depth comes from the native DA3 chain (LoadDA3Model -> DA3Inference -> DA3Render). Style comes from prompt (preset) or reference image. The source soundtrack is muxed back through OF_PlateAudio — a clip with no audio stream stays silent instead of failing the job. Default weights target the 1.3B VACE (832x480-class output, cfg ~5, 20-30 steps); point COMFY_MODEL_MAP at wan2.1_vace_14B_fp8scaled.safetensors on a GPU or Comfy Cloud for the 14B upgrade. TrimVideoLatent strips the prepended reference latent (0 when no ref)."
+  },
+  "1": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "wan2.1_vace_1.3B_fp16.safetensors",
+      "weight_dtype": "default"
+    }
+  },
+  "2": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "type": "wan"
+    }
+  },
+  "3": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "wan_2.1_vae.safetensors"
+    }
+  },
+  "4": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "2",
+        0
+      ],
+      "text": "{{PROMPT}}"
+    }
+  },
+  "5": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "2",
+        0
+      ],
+      "text": "{{NEGATIVE}}"
+    }
+  },
+  "6": {
+    "class_type": "VHS_LoadVideo",
+    "inputs": {
+      "video": "{{INPUT_VIDEO}}",
+      "force_rate": 16,
+      "custom_width": "{{WIDTH}}",
+      "custom_height": "{{HEIGHT}}",
+      "frame_load_cap": "{{FRAMES}}",
+      "skip_first_frames": 0,
+      "select_every_nth": 1
+    }
+  },
+  "7": {
+    "class_type": "LoadDA3Model",
+    "inputs": {
+      "model_name": "depth_anything_3_mono_large.safetensors",
+      "weight_dtype": "default"
+    }
+  },
+  "13": {
+    "class_type": "DA3Inference",
+    "inputs": {
+      "da3_model": [
+        "7",
+        0
+      ],
+      "image": [
+        "6",
+        0
+      ],
+      "resolution": 518,
+      "resize_method": "upper_bound_resize",
+      "mode": "mono"
+    }
+  },
+  "14": {
+    "class_type": "DA3Render",
+    "inputs": {
+      "da3_geometry": [
+        "13",
+        0
+      ],
+      "output": "depth",
+      "output.normalization": "v2_style",
+      "output.apply_sky_clip": false
+    }
+  },
+  "8": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "{{REF_IMAGE}}"
+    }
+  },
+  "9": {
+    "class_type": "WanVaceToVideo",
+    "inputs": {
+      "positive": [
+        "4",
+        0
+      ],
+      "negative": [
+        "5",
+        0
+      ],
+      "vae": [
+        "3",
+        0
+      ],
+      "width": "{{WIDTH}}",
+      "height": "{{HEIGHT}}",
+      "length": "{{FRAMES}}",
+      "batch_size": 1,
+      "strength": 1.0,
+      "control_video": [
+        "14",
+        0
+      ],
+      "reference_image": [
+        "8",
+        0
+      ]
+    }
+  },
+  "10": {
+    "class_type": "KSampler",
+    "inputs": {
+      "model": [
+        "1",
+        0
+      ],
+      "positive": [
+        "9",
+        0
+      ],
+      "negative": [
+        "9",
+        1
+      ],
+      "latent_image": [
+        "9",
+        2
+      ],
+      "seed": "{{SEED}}",
+      "steps": "{{STEPS}}",
+      "cfg": 5.0,
+      "sampler_name": "uni_pc",
+      "scheduler": "simple",
+      "denoise": 0.9
+    }
+  },
+  "11": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "15",
+        0
+      ],
+      "vae": [
+        "3",
+        0
+      ]
+    }
+  },
+  "12": {
+    "class_type": "VHS_VideoCombine",
+    "inputs": {
+      "images": [
+        "11",
+        0
+      ],
+      "audio": [
+        "16",
+        0
+      ],
+      "frame_rate": 16,
+      "loop_count": 0,
+      "filename_prefix": "{{PREFIX}}",
+      "format": "video/h264-mp4",
+      "pix_fmt": "yuv420p",
+      "save_output": true,
+      "pingpong": false
+    }
+  },
+  "15": {
+    "class_type": "TrimVideoLatent",
+    "inputs": {
+      "samples": [
+        "10",
+        0
+      ],
+      "trim_amount": [
+        "9",
+        3
+      ]
+    }
+  },
+  "16": {
+    "class_type": "OF_PlateAudio",
+    "_meta": { "title": "source audio (silent-safe)" },
+    "inputs": {
+      "video": "{{INPUT_VIDEO}}",
+      "start_time": 0,
+      "duration": 0
+    }
+  }
+}

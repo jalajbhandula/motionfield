@@ -1,0 +1,34 @@
+{
+  "_meta": {
+    "name": "FLUX.2 klein 4B — text-to-image (distilled)",
+    "placeholders": {
+      "PROMPT": "image description",
+      "WIDTH": "multiple of 32",
+      "HEIGHT": "multiple of 32",
+      "STEPS": "4 (distilled)",
+      "SEED": "noise seed",
+      "BATCH": "images per run",
+      "PREFIX": "output filename prefix"
+    },
+    "requires": [
+      "flux-2-klein-4b.safetensors",
+      "qwen_3_4b_fp8_mixed.safetensors",
+      "flux2-vae.safetensors"
+    ],
+    "nodes": "core only",
+    "notes": "Native FLUX.2 klein 4B distilled stack (ComfyUI 0.41): Flux2Scheduler + CFGGuider cfg=1 + SamplerCustomAdvanced, mirroring the official image_flux2_klein templates. 4 steps is the distilled sweet spot; Z-Image-Turbo stays the default t2i — klein is the extra local option and the edit backbone."
+  },
+  "1": { "class_type": "UNETLoader", "inputs": { "unet_name": "flux-2-klein-4b.safetensors", "weight_dtype": "default" } },
+  "2": { "class_type": "CLIPLoader", "inputs": { "clip_name": "qwen_3_4b_fp8_mixed.safetensors", "type": "flux2" } },
+  "3": { "class_type": "VAELoader", "inputs": { "vae_name": "flux2-vae.safetensors" } },
+  "4": { "class_type": "CLIPTextEncode", "inputs": { "clip": ["2", 0], "text": "{{PROMPT}}" } },
+  "5": { "class_type": "ConditioningZeroOut", "inputs": { "conditioning": ["4", 0] } },
+  "6": { "class_type": "EmptyFlux2LatentImage", "inputs": { "width": "{{WIDTH}}", "height": "{{HEIGHT}}", "batch_size": "{{BATCH}}" } },
+  "7": { "class_type": "Flux2Scheduler", "inputs": { "steps": "{{STEPS}}", "width": "{{WIDTH}}", "height": "{{HEIGHT}}" } },
+  "8": { "class_type": "RandomNoise", "inputs": { "noise_seed": "{{SEED}}" } },
+  "9": { "class_type": "KSamplerSelect", "inputs": { "sampler_name": "euler" } },
+  "10": { "class_type": "CFGGuider", "inputs": { "model": ["1", 0], "positive": ["4", 0], "negative": ["5", 0], "cfg": 1.0 } },
+  "11": { "class_type": "SamplerCustomAdvanced", "inputs": { "noise": ["8", 0], "guider": ["10", 0], "sampler": ["9", 0], "sigmas": ["7", 0], "latent_image": ["6", 0] } },
+  "12": { "class_type": "VAEDecode", "inputs": { "samples": ["11", 0], "vae": ["3", 0] } },
+  "13": { "class_type": "SaveImage", "inputs": { "images": ["12", 0], "filename_prefix": "{{PREFIX}}" } }
+}

@@ -1,0 +1,212 @@
+{
+  "_meta": {
+    "name": "VFX Lab \u00b7 Wan VACE alt \u2014 edges",
+    "placeholders": {
+      "INPUT_VIDEO": "plate clip, comfy input/ filename \u2014 resampled to 16 fps inside the loader",
+      "PROMPT": "effect prompt",
+      "NEGATIVE": "negative prompt",
+      "WIDTH": "multiple of 16",
+      "HEIGHT": "multiple of 16",
+      "FRAMES": "4n+1",
+      "FPS": "fps (16)",
+      "SEED": "noise seed",
+      "STEPS": "steps",
+      "PREFIX": "filename prefix"
+    },
+    "requires": [
+      "wan2.1_vace_1.3B_fp16.safetensors",
+      "wan_2.1_vae.safetensors",
+      "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "ComfyUI-VideoHelperSuite"
+    ],
+    "nodes": "core + VHS",
+    "notes": "The Apache alternative with the lightest control: Canny edge frames drive the VACE generation, plate frame 0 is the reference image. Output carries the plate's own audio."
+  },
+  "1": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "wan2.1_vace_1.3B_fp16.safetensors",
+      "weight_dtype": "default"
+    }
+  },
+  "2": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "type": "wan"
+    }
+  },
+  "3": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "wan_2.1_vae.safetensors"
+    }
+  },
+  "4": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "2",
+        0
+      ],
+      "text": "{{PROMPT}}"
+    }
+  },
+  "5": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "2",
+        0
+      ],
+      "text": "{{NEGATIVE}}"
+    }
+  },
+  "6": {
+    "class_type": "VHS_LoadVideo",
+    "inputs": {
+      "video": "{{INPUT_VIDEO}}",
+      "force_rate": "{{FPS}}",
+      "custom_width": "{{WIDTH}}",
+      "custom_height": "{{HEIGHT}}",
+      "frame_load_cap": "{{FRAMES}}",
+      "skip_first_frames": 0,
+      "select_every_nth": 1
+    }
+  },
+  "7": {
+    "class_type": "Canny",
+    "inputs": {
+      "image": [
+        "6",
+        0
+      ],
+      "low_threshold": 0.4,
+      "high_threshold": 0.8
+    }
+  },
+  "8": {
+    "class_type": "ImageFromBatch",
+    "inputs": {
+      "image": [
+        "6",
+        0
+      ],
+      "batch_index": 0,
+      "length": 1
+    }
+  },
+  "9": {
+    "class_type": "WanVaceToVideo",
+    "inputs": {
+      "positive": [
+        "4",
+        0
+      ],
+      "negative": [
+        "5",
+        0
+      ],
+      "vae": [
+        "3",
+        0
+      ],
+      "width": "{{WIDTH}}",
+      "height": "{{HEIGHT}}",
+      "length": "{{FRAMES}}",
+      "batch_size": 1,
+      "strength": 1.0,
+      "control_video": [
+        "7",
+        0
+      ],
+      "reference_image": [
+        "8",
+        0
+      ]
+    }
+  },
+  "10": {
+    "class_type": "KSampler",
+    "inputs": {
+      "model": [
+        "1",
+        0
+      ],
+      "seed": "{{SEED}}",
+      "steps": "{{STEPS}}",
+      "cfg": 5.0,
+      "sampler_name": "uni_pc",
+      "scheduler": "simple",
+      "positive": [
+        "9",
+        0
+      ],
+      "negative": [
+        "9",
+        1
+      ],
+      "latent_image": [
+        "9",
+        2
+      ],
+      "denoise": 1.0
+    }
+  },
+  "11": {
+    "class_type": "TrimVideoLatent",
+    "inputs": {
+      "samples": [
+        "10",
+        0
+      ],
+      "trim_amount": [
+        "9",
+        3
+      ]
+    }
+  },
+  "12": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "11",
+        0
+      ],
+      "vae": [
+        "3",
+        0
+      ]
+    }
+  },
+  "13": {
+    "class_type": "VHS_VideoCombine",
+    "inputs": {
+      "images": [
+        "12",
+        0
+      ],
+      "frame_rate": "{{FPS}}",
+      "loop_count": 0,
+      "audio": [
+        "40",
+        0
+      ],
+      "filename_prefix": "{{PREFIX}}",
+      "format": "video/h264-mp4",
+      "pingpong": false,
+      "save_output": true
+    }
+  },
+  "40": {
+    "class_type": "OF_PlateAudio",
+    "_meta": {
+      "title": "plate audio (silent-safe)"
+    },
+    "inputs": {
+      "video": "{{INPUT_VIDEO}}",
+      "start_time": 0,
+      "duration": 0
+    }
+  }
+}

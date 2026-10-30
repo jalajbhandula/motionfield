@@ -1,0 +1,354 @@
+{
+ "_meta": {
+  "name": "MotionField Director — text to video (Z-Image keyframe → Wan VACE 1.3B rig)",
+  "placeholders": {
+   "KEYFRAME_PROMPT": "start-frame prompt — the user's scene text",
+   "PROMPT": "assembled scene prompt (user text + style clauses)",
+   "NEGATIVE": "negative prompt",
+   "REF_IMAGE": "optional reference image 1 — stitched onto the keyframe",
+   "REF_IMAGE_2": "optional reference image 2",
+   "REF_IMAGE_3": "optional reference image 3",
+   "MOVES": "'+'-joined executable trajectory stack (1-3 catalog ids)",
+   "DURATION": "shot length, seconds (integer 1-5)",
+   "STRENGTH": "trajectory strength 0.25-2",
+   "DISTANCE": "subject distance, metres (depth scale + DoF focus)",
+   "FOV": "camera horizontal fov, degrees (lens mm + sensor)",
+   "APERTURE": "OF_DepthBlur blur strength (f-stop preset, 0-24)",
+   "KF_W": "keyframe width (2x cam width, multiple of 16)",
+   "KF_H": "keyframe height (2x cam height, multiple of 16)",
+   "CAM_W": "rig/vace width (multiple of 16, 480p)",
+   "CAM_H": "rig/vace height (multiple of 16, 480p)",
+   "CAM_FRAMES": "frame count = duration*16+1 (VACE 4n+1)",
+   "SEED": "noise seed",
+   "STEPS": "sampler steps",
+   "FPS": "output fps (16 — matches the pose stream)",
+   "PREFIX": "filename prefix",
+   "REFGRID_PREFIX": "refgrid SaveImage filename prefix (job-unique, from directorPlaceholders — never PREFIX)",
+   "KEYFRAME_PREFIX": "keyframe SaveImage filename prefix (job-unique, from directorPlaceholders — never PREFIX)"
+  },
+  "optional": ["REF_IMAGE", "REF_IMAGE_2", "REF_IMAGE_3"],
+  "requires": [
+   "z_image_turbo_int8_convrot.safetensors (diffusion_models — keyframe)",
+   "qwen_3_4b_fp8_mixed.safetensors (text_encoders — keyframe)",
+   "ae.safetensors (vae — keyframe)",
+   "wan2.1_vace_1.3B_fp16.safetensors (diffusion_models)",
+   "umt5_xxl_fp8_e4m3fn_scaled.safetensors (text_encoders)",
+   "wan_2.1_vae.safetensors (vae)",
+   "depth_anything_3_mono_large.safetensors (geometry_estimation)",
+   "custom-nodes: VideoHelperSuite (VHS_VideoCombine)",
+   "custom-nodes: motionfield_nodes (OF_Trajectory, OF_DirectorRig, OF_DepthBlur)"
+  ],
+  "nodes": "text-only director: Z-Image-Turbo renders the first frame at 2x the rig size (its own VAE + qwen encoder), then the whole image-anchored chain runs — DA3 depth, OF_Trajectory poses, OF_DirectorRig re-render with depth-edge filtering + pinhole fill into VACE control, Wan VACE 1.3B generation, OF_DepthBlur aperture/focus DoF, references stitched in a row after the keyframe (dropped optional loaders pass the chain through, so 0 refs leaves the bare keyframe) and ResizeAndPadImage-letterboxed to CAM_W×CAM_H before reference_image. Everything in the graph is Apache-2.0.",
+  "drop_outputs": ["30", "35"]
+ },
+ "1": {
+  "class_type": "UNETLoader",
+  "inputs": {
+   "unet_name": "wan2.1_vace_1.3B_fp16.safetensors",
+   "weight_dtype": "default"
+  }
+ },
+ "2": {
+  "class_type": "CLIPLoader",
+  "inputs": {
+   "clip_name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+   "type": "wan",
+   "device": "default"
+  }
+ },
+ "3": {
+  "class_type": "VAELoader",
+  "inputs": {
+   "vae_name": "wan_2.1_vae.safetensors"
+  }
+ },
+ "4": {
+  "class_type": "CLIPTextEncode",
+  "inputs": {
+   "clip": ["2", 0],
+   "text": "{{PROMPT}}"
+  }
+ },
+ "5": {
+  "class_type": "CLIPTextEncode",
+  "inputs": {
+   "clip": ["2", 0],
+   "text": "{{NEGATIVE}}"
+  }
+ },
+ "6": {
+  "class_type": "OF_Trajectory",
+  "inputs": {
+   "trajectory": "locked-off",
+   "moves": "{{MOVES}}",
+   "strength": "{{STRENGTH}}",
+   "duration": "{{DURATION}}",
+   "fps": "{{FPS}}",
+   "seed": "{{SEED}}",
+   "target": "auto",
+   "layer": "auto",
+   "post": "auto",
+   "subject_class": "person",
+   "distance": "{{DISTANCE}}",
+   "fov": "{{FOV}}"
+  }
+ },
+ "7": {
+  "class_type": "LoadDA3Model",
+  "inputs": {
+   "model_name": "depth_anything_3_mono_large.safetensors",
+   "weight_dtype": "default"
+  }
+ },
+ "8": {
+  "class_type": "DA3Inference",
+  "inputs": {
+   "da3_model": ["7", 0],
+   "image": ["23", 0],
+   "resolution": 518,
+   "resize_method": "upper_bound_resize",
+   "mode": "mono"
+  }
+ },
+ "9": {
+  "class_type": "DA3Render",
+  "inputs": {
+   "da3_geometry": ["8", 0],
+   "output": "depth",
+   "output.normalization": "raw",
+   "output.apply_sky_clip": true
+  }
+ },
+ "10": {
+  "class_type": "OF_DirectorRig",
+  "inputs": {
+   "source": ["23", 0],
+   "depth": ["9", 0],
+   "poses_json": ["6", 0],
+   "near": 0.05,
+   "hole_dilate": 6,
+   "distance": "{{DISTANCE}}",
+   "width": "{{CAM_W}}",
+   "height": "{{CAM_H}}",
+   "depth_mode": "auto",
+   "edge_ratio": 1.8,
+   "spike_ratio": 2.2,
+   "fill_iters": 8,
+   "radius_max": 10
+  }
+ },
+ "11": {
+  "class_type": "WanVaceToVideo",
+  "inputs": {
+   "positive": ["4", 0],
+   "negative": ["5", 0],
+   "vae": ["3", 0],
+   "width": "{{CAM_W}}",
+   "height": "{{CAM_H}}",
+   "length": "{{CAM_FRAMES}}",
+   "batch_size": 1,
+   "strength": 1.0,
+   "control_video": ["10", 2],
+   "control_masks": ["10", 1],
+   "reference_image": ["34", 0]
+  }
+ },
+ "12": {
+  "class_type": "KSampler",
+  "inputs": {
+   "model": ["1", 0],
+   "positive": ["11", 0],
+   "negative": ["11", 1],
+   "latent_image": ["11", 2],
+   "seed": "{{SEED}}",
+   "steps": "{{STEPS}}",
+   "cfg": 5.0,
+   "sampler_name": "uni_pc",
+   "scheduler": "simple",
+   "denoise": 1.0
+  }
+ },
+ "13": {
+  "class_type": "TrimVideoLatent",
+  "inputs": {
+   "samples": ["12", 0],
+   "trim_amount": ["11", 3]
+  }
+ },
+ "14": {
+  "class_type": "ImageStitch",
+  "inputs": {
+   "image1": ["23", 0],
+   "image2": ["15", 0],
+   "direction": "right",
+   "match_image_size": true,
+   "spacing_width": 0,
+   "spacing_color": "black"
+  }
+ },
+ "15": {
+  "class_type": "LoadImage",
+  "inputs": {
+   "image": "{{REF_IMAGE}}"
+  }
+ },
+ "16": {
+  "class_type": "LoadImage",
+  "inputs": {
+   "image": "{{REF_IMAGE_2}}"
+  }
+ },
+ "17": {
+  "class_type": "LoadImage",
+  "inputs": {
+   "image": "{{REF_IMAGE_3}}"
+  }
+ },
+ "18": {
+  "class_type": "ImageStitch",
+  "inputs": {
+   "image1": ["14", 0],
+   "image2": ["16", 0],
+   "direction": "right",
+   "match_image_size": true,
+   "spacing_width": 0,
+   "spacing_color": "black"
+  }
+ },
+ "19": {
+  "class_type": "ImageStitch",
+  "inputs": {
+   "image1": ["18", 0],
+   "image2": ["17", 0],
+   "direction": "right",
+   "match_image_size": true,
+   "spacing_width": 0,
+   "spacing_color": "black"
+  }
+ },
+ "34": {
+  "class_type": "ResizeAndPadImage",
+  "inputs": {
+   "image": ["19", 0],
+   "target_width": "{{CAM_W}}",
+   "target_height": "{{CAM_H}}",
+   "padding_color": "white",
+   "interpolation": "lanczos"
+  }
+ },
+ "35": {
+  "class_type": "SaveImage",
+  "inputs": {
+   "images": ["34", 0],
+   "filename_prefix": "{{REFGRID_PREFIX}}"
+  }
+ },
+ "20": {
+  "class_type": "VAEDecode",
+  "inputs": {
+   "samples": ["13", 0],
+   "vae": ["3", 0]
+  }
+ },
+ "21": {
+  "class_type": "OF_DepthBlur",
+  "inputs": {
+   "image": ["20", 0],
+   "depth": ["9", 0],
+   "aperture": "{{APERTURE}}",
+   "focus_distance": "{{DISTANCE}}",
+   "distance": "{{DISTANCE}}",
+   "poses_json": ["6", 0]
+  }
+ },
+ "22": {
+  "class_type": "VHS_VideoCombine",
+  "inputs": {
+   "images": ["21", 0],
+   "frame_rate": "{{FPS}}",
+   "loop_count": 0,
+   "filename_prefix": "{{PREFIX}}",
+   "format": "video/h264-mp4",
+   "save_output": true,
+   "pingpong": false
+  }
+ },
+ "23": {
+  "class_type": "VAEDecode",
+  "inputs": {
+   "samples": ["29", 0],
+   "vae": ["26", 0]
+  }
+ },
+ "24": {
+  "class_type": "UNETLoader",
+  "inputs": {
+   "unet_name": "z_image_turbo_int8_convrot.safetensors",
+   "weight_dtype": "default"
+  }
+ },
+ "25": {
+  "class_type": "CLIPLoader",
+  "inputs": {
+   "clip_name": "qwen_3_4b_fp8_mixed.safetensors",
+   "type": "lumina2",
+   "device": "default"
+  }
+ },
+ "26": {
+  "class_type": "VAELoader",
+  "inputs": {
+   "vae_name": "ae.safetensors"
+  }
+ },
+ "27": {
+  "class_type": "CLIPTextEncode",
+  "inputs": {
+   "clip": ["25", 0],
+   "text": "{{KEYFRAME_PROMPT}}"
+  }
+ },
+ "28": {
+  "class_type": "ConditioningZeroOut",
+  "inputs": {
+   "conditioning": ["27", 0]
+  }
+ },
+ "29": {
+  "class_type": "KSampler",
+  "inputs": {
+   "model": ["31", 0],
+   "positive": ["27", 0],
+   "negative": ["28", 0],
+   "latent_image": ["32", 0],
+   "seed": "{{SEED}}",
+   "steps": 8,
+   "cfg": 1.0,
+   "sampler_name": "res_multistep",
+   "scheduler": "simple",
+   "denoise": 1.0
+  }
+ },
+ "30": {
+  "class_type": "SaveImage",
+  "inputs": {
+   "images": ["23", 0],
+   "filename_prefix": "{{KEYFRAME_PREFIX}}"
+  }
+ },
+ "31": {
+  "class_type": "ModelSamplingAuraFlow",
+  "inputs": {
+   "model": ["24", 0],
+   "shift": 3
+  }
+ },
+ "32": {
+  "class_type": "EmptySD3LatentImage",
+  "inputs": {
+   "width": "{{KF_W}}",
+   "height": "{{KF_H}}",
+   "batch_size": 1
+  }
+ }
+}

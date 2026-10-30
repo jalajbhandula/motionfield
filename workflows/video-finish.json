@@ -1,0 +1,18 @@
+{
+  "_meta": {
+    "name": "Video finish — 2x RealESRGAN sharpen + RIFE 2x frame interpolation",
+    "placeholders": { "INPUT_VIDEO": "uploaded filename", "OUT_FPS": "output frame rate (source fps x 2)", "PREFIX": "filename prefix" },
+    "requires": ["RealESRGAN_x4plus.pth", "rife_v4.26.safetensors"],
+    "nodes": "core",
+    "notes": "Order chosen by measurement on this Mac (see docs/SMOKE.md): upscale 4x -> lanczos to 2x, then RIFE x2 on the finished-resolution frames. LoadVideo decodes; GetVideoComponents carries the audio track through to CreateVideo; OUT_FPS is source fps x 2 supplied by the caller (src/lib/generation/finish.ts probes it)."
+  },
+  "1": { "class_type": "LoadVideo", "inputs": { "file": "{{INPUT_VIDEO}}" } },
+  "2": { "class_type": "GetVideoComponents", "inputs": { "video": ["1", 0] } },
+  "3": { "class_type": "UpscaleModelLoader", "inputs": { "model_name": "RealESRGAN_x4plus.pth" } },
+  "4": { "class_type": "ImageUpscaleWithModel", "inputs": { "upscale_model": ["3", 0], "image": ["2", 0] } },
+  "5": { "class_type": "ImageScaleBy", "inputs": { "image": ["4", 0], "upscale_method": "lanczos", "scale_by": 0.5 } },
+  "6": { "class_type": "FrameInterpolationModelLoader", "inputs": { "model_name": "rife_v4.26.safetensors" } },
+  "7": { "class_type": "FrameInterpolate", "inputs": { "interp_model": ["6", 0], "images": ["5", 0], "multiplier": 2 } },
+  "8": { "class_type": "CreateVideo", "inputs": { "images": ["7", 0], "fps": "{{OUT_FPS}}", "audio": ["2", 1] } },
+  "9": { "class_type": "SaveVideo", "inputs": { "video": ["8", 0], "filename_prefix": "{{PREFIX}}", "format": "mp4", "format.codec": "h264" } }
+}

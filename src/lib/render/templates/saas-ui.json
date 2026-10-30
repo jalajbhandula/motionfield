@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "width": 1280,
+  "height": 720,
+  "fps": 24,
+  "duration": 3,
+  "seed": 1177,
+  "background": { "color": "#0b0d12" },
+  "camera": {
+    "fov": 50,
+    "keyframes": [{ "t": 0, "position": [0, 0, 1000], "target": [0, 0, 0] }]
+  },
+  "layers": [
+    {
+      "id": "window",
+      "type": "plane",
+      "props": { "width": 900, "height": 540, "color": "#131722", "cornerRadius": 20, "roughness": 0.85, "metalness": 0.15 },
+      "transform": { "position": [0, 0, -80] }
+    },
+    {
+      "id": "sidebar",
+      "type": "plane",
+      "props": { "width": 190, "height": 540, "color": "#0f131c", "cornerRadius": 20, "roughness": 0.9, "metalness": 0.1 },
+      "transform": { "position": [-355, 0, -60] }
+    },
+    {
+      "id": "chart",
+      "type": "line",
+      "props": {
+        "points": [[-190, -40, 0], [-120, -10, 0], [-50, -60, 0], [20, 10, 0], [90, -20, 0], [160, 60, 0], [230, 30, 0], [300, 95, 0]],
+        "width": 7, "hue": 160, "progress": 1
+      },
+      "transform": { "position": [60, -60, 0] },
+      "keyframes": [
+        { "t": 0.3, "path": "props.progress", "value": 0 },
+        { "t": 1.9, "path": "props.progress", "value": 1, "ease": "easeInOut" }
+      ]
+    },
+    {
+      "id": "stat-a",
+      "type": "plane",
+      "props": { "width": 250, "height": 90, "color": "#1d2432", "cornerRadius": 14, "roughness": 0.9 },
+      "transform": { "position": [-90, 190, -40] }
+    },
+    {
+      "id": "stat-b",
+      "type": "plane",
+      "props": { "width": 250, "height": 90, "color": "#1d2432", "cornerRadius": 14, "roughness": 0.9 },
+      "transform": { "position": [190, 190, -40] }
+    },
+    {
+      "id": "stat-fill",
+      "type": "plane",
+      "props": { "width": 210, "height": 16, "hue": 160, "cornerRadius": 8, "roughness": 0.8 },
+      "transform": { "position": [-90, 168, -30] },
+      "keyframes": [
+        { "t": 0.5, "path": "scale.x", "value": 0.02 },
+        { "t": 1.6, "path": "scale.x", "value": 1, "ease": "easeOut" }
+      ]
+    },
+    {
+      "id": "headline",
+      "type": "text",
+      "props": { "text": "Weekly active users", "size": 44, "weight": 700, "color": "#eef2ff" },
+      "transform": { "position": [60, 95, 0] },
+      "keyframes": [
+        { "t": 0.15, "path": "opacity", "value": 0 },
+        { "t": 0.6, "path": "opacity", "value": 1 }
+      ]
+    }
+  ],
+  "params": [
+    { "id": "accentHue", "label": "Accent hue", "min": 0, "max": 360, "step": 1, "default": 160, "bind": "stat-fill.props.hue" },
+    { "id": "strokeWidth", "label": "Chart stroke", "min": 2, "max": 18, "step": 0.5, "default": 7, "bind": "chart.props.width" }
+  ]
+}

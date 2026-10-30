@@ -1,0 +1,357 @@
+{
+  "_meta": {
+    "name": "VFX Lab · LTX-2.5 distilled image plate",
+    "placeholders": {
+      "INPUT_IMAGE": "plate still, comfy input/ filename",
+      "PROMPT": "effect prompt",
+      "END_IMAGE": "optional last-frame keyframe, comfy input/ filename",
+      "END_FRAME": "pixel frame the end keyframe pins (frames-1; only resolved with END_IMAGE)",
+      "TARGET_STRENGTH": "how hard the end keyframe pulls",
+      "SIGMAS": "comma-separated distilled sigma schedule (image plates run the full schedule)",
+      "WIDTH": "multiple of 32",
+      "HEIGHT": "multiple of 32",
+      "FRAMES": "8n+1",
+      "FPS": "fps",
+      "SEED": "noise seed",
+      "PREFIX": "filename prefix"
+    },
+    "optional": [
+      "END_IMAGE",
+      "END_FRAME"
+    ],
+    "passthrough": {
+      "9": [
+        "positive",
+        "negative",
+        "latent"
+      ]
+    },
+    "requires": [
+      "ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors (diffusion_models)",
+      "gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors (text_encoders)",
+      "ltx-2.5-video-vae-bf16.safetensors (vae)",
+      "ltx-2.5-audio-vae-bf16.safetensors (vae)",
+      "ComfyUI-VideoHelperSuite"
+    ],
+    "nodes": "core + VHS",
+    "notes": "Image plate on the LTX-2.5 distilled transformer: the still (scaled to the fitted dims, LTXVPreprocess'd) is written into frame 0 by LTXVImgToVideoInplace at strength 1.0, an optional end keyframe pins FRAMES-1 via LTXVAddGuide at TARGET_STRENGTH, and the {{SIGMAS}} lock-tail animates between them. Joint AV latent — the audio side is silent and discarded (silent output, no audio node is wired into the combine, matching the old plate). The old {{LTX098_CKPT}} checkpoint placeholder is gone — the engine pick is now a no-op over the same 2.5 distilled weights; a stray LTX098_CKPT mapping is ignored."
+  },
+  "1": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors",
+      "weight_dtype": "default"
+    }
+  },
+  "2": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors",
+      "type": "ltxv",
+      "device": "default"
+    }
+  },
+  "3": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "2",
+        0
+      ],
+      "text": "{{PROMPT}}"
+    }
+  },
+  "4": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "2",
+        0
+      ],
+      "text": "blur, distortion, low quality, watermark"
+    }
+  },
+  "5": {
+    "class_type": "LTXVConditioning",
+    "inputs": {
+      "positive": [
+        "3",
+        0
+      ],
+      "negative": [
+        "4",
+        0
+      ],
+      "frame_rate": "{{FPS}}"
+    }
+  },
+  "6": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "{{INPUT_IMAGE}}"
+    }
+  },
+  "7": {
+    "class_type": "ImageScale",
+    "inputs": {
+      "image": [
+        "6",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "width": "{{WIDTH}}",
+      "height": "{{HEIGHT}}",
+      "crop": "disabled"
+    }
+  },
+  "8": {
+    "class_type": "EmptyLTXVLatentVideo",
+    "inputs": {
+      "width": "{{WIDTH}}",
+      "height": "{{HEIGHT}}",
+      "length": "{{FRAMES}}",
+      "batch_size": 1
+    }
+  },
+  "10": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "{{END_IMAGE}}"
+    }
+  },
+  "11": {
+    "class_type": "ImageScale",
+    "inputs": {
+      "image": [
+        "10",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "width": "{{WIDTH}}",
+      "height": "{{HEIGHT}}",
+      "crop": "disabled"
+    }
+  },
+  "24": {
+    "class_type": "LTXVPreprocess",
+    "inputs": {
+      "image": [
+        "7",
+        0
+      ],
+      "img_compression": 18
+    }
+  },
+  "25": {
+    "class_type": "LTXVImgToVideoInplace",
+    "inputs": {
+      "vae": [
+        "20",
+        0
+      ],
+      "image": [
+        "24",
+        0
+      ],
+      "latent": [
+        "8",
+        0
+      ],
+      "strength": 1.0,
+      "bypass": false
+    }
+  },
+  "26": {
+    "class_type": "LTXVPreprocess",
+    "inputs": {
+      "image": [
+        "11",
+        0
+      ],
+      "img_compression": 18
+    }
+  },
+  "9": {
+    "class_type": "LTXVAddGuide",
+    "inputs": {
+      "positive": [
+        "5",
+        0
+      ],
+      "negative": [
+        "5",
+        1
+      ],
+      "vae": [
+        "20",
+        0
+      ],
+      "latent": [
+        "25",
+        0
+      ],
+      "image": [
+        "26",
+        0
+      ],
+      "frame_idx": "{{END_FRAME}}",
+      "strength": "{{TARGET_STRENGTH}}"
+    }
+  },
+  "14": {
+    "class_type": "KSamplerSelect",
+    "inputs": {
+      "sampler_name": "euler_ancestral"
+    }
+  },
+  "15": {
+    "class_type": "ManualSigmas",
+    "inputs": {
+      "sigmas": "{{SIGMAS}}"
+    }
+  },
+  "20": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "ltx-2.5-video-vae-bf16.safetensors"
+    }
+  },
+  "21": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "ltx-2.5-audio-vae-bf16.safetensors"
+    }
+  },
+  "22": {
+    "class_type": "LTXVEmptyLatentAudio",
+    "inputs": {
+      "audio_vae": [
+        "21",
+        0
+      ],
+      "frames_number": "{{FRAMES}}",
+      "frame_rate": "{{FPS}}",
+      "batch_size": 1
+    }
+  },
+  "23": {
+    "class_type": "LTXVConcatAVLatent",
+    "inputs": {
+      "video_latent": [
+        "9",
+        2
+      ],
+      "audio_latent": [
+        "22",
+        0
+      ]
+    }
+  },
+  "27": {
+    "class_type": "RandomNoise",
+    "inputs": {
+      "noise_seed": "{{SEED}}"
+    }
+  },
+  "29": {
+    "class_type": "CFGGuider",
+    "inputs": {
+      "model": [
+        "1",
+        0
+      ],
+      "positive": [
+        "9",
+        0
+      ],
+      "negative": [
+        "9",
+        1
+      ],
+      "cfg": 1.0
+    }
+  },
+  "16": {
+    "class_type": "SamplerCustomAdvanced",
+    "inputs": {
+      "noise": [
+        "27",
+        0
+      ],
+      "guider": [
+        "29",
+        0
+      ],
+      "sampler": [
+        "14",
+        0
+      ],
+      "sigmas": [
+        "15",
+        0
+      ],
+      "latent_image": [
+        "23",
+        0
+      ]
+    }
+  },
+  "28": {
+    "class_type": "LTXVSeparateAVLatent",
+    "inputs": {
+      "av_latent": [
+        "16",
+        0
+      ]
+    }
+  },
+  "17": {
+    "class_type": "LTXVCropGuides",
+    "inputs": {
+      "positive": [
+        "9",
+        0
+      ],
+      "negative": [
+        "9",
+        1
+      ],
+      "latent": [
+        "28",
+        0
+      ]
+    }
+  },
+  "18": {
+    "class_type": "VAEDecodeTiled",
+    "inputs": {
+      "samples": [
+        "17",
+        2
+      ],
+      "vae": [
+        "20",
+        0
+      ],
+      "tile_size": 512,
+      "overlap": 64,
+      "temporal_size": 64,
+      "temporal_overlap": 8
+    }
+  },
+  "19": {
+    "class_type": "VHS_VideoCombine",
+    "inputs": {
+      "images": [
+        "18",
+        0
+      ],
+      "frame_rate": "{{FPS}}",
+      "loop_count": 0,
+      "filename_prefix": "{{PREFIX}}",
+      "format": "video/h264-mp4",
+      "pingpong": false,
+      "save_output": true
+    }
+  }
+}

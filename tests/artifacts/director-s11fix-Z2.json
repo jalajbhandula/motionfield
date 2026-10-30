@@ -1,0 +1,251 @@
+{
+  "ok": true,
+  "workflow": "director-wan.json",
+  "params": {
+    "prompt": "480x272",
+    "duration": 1,
+    "aspect_ratio": "16:9",
+    "seed": 42,
+    "steps": 6,
+    "fps": 16,
+    "moves": "dolly-in",
+    "image_url": "__asset_INPUT_IMAGE__"
+  },
+  "job_id": "d569d3de-42d8-4667-8da5-7d7dbcb7df3e",
+  "status": "succeeded",
+  "elapsed_s": 131,
+  "base_url": "http://127.0.0.1:8189",
+  "ran_at": "2026-10-23T18:03:18.168Z",
+  "outputs": [
+    {
+      "nodeId": "26",
+      "name": "of_dir_9a02e9c7-refgrid_00001_.png",
+      "type": "image",
+      "bytes": 29665,
+      "path": "/tmp/of-evidence/media/of_dir_9a02e9c7-refgrid_00001_.png",
+      "sha256": "d9458ea50f99c110b4fe8e47408c2b0784666b5daafe89156c5bc8c18a003d37",
+      "graded": false
+    },
+    {
+      "nodeId": "23",
+      "name": "of_smoke-02_00001.mp4",
+      "type": "video",
+      "bytes": 122506,
+      "path": "/tmp/of-evidence/media/of_smoke-02_00001.mp4",
+      "sha256": "3835f9b95b822af5be6fad7807109eafea4ab4810838fd9a60e7ff1828efe3ec",
+      "graded": false
+    }
+  ],
+  "poses": {
+    "moves": [
+      "dolly-in"
+    ],
+    "frames": [
+      {
+        "t": 0,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "yaw": 0,
+        "pitch": 0,
+        "roll": 0,
+        "fov": 54.4
+      },
+      {
+        "t": 0.0625,
+        "pos": [
+          0,
+          0,
+          0.017968750000000002
+        ],
+        "yaw": 0,
+        "pitch": 0,
+        "roll": 0,
+        "fov": 54.4
+      },
+      {
+        "t": 0.125,
+        "pos": [
+          0,
+          0,
+          0.06875
+        ],
+        "yaw": 0,
+        "pitch": 0,
+        "roll": 0,
+        "fov": 54.4
+      },
+      {
+        "t": 0.1875,
+        "pos": [
+          0,
+          0,
+          0.14765625000000002
+        ],
+        "yaw": 0,
+        "pitch": 0,
+        "roll": 0,
+        "fov": 54.4
+      },
+      {
+        "t": 0.25,
+        "pos": [
+          0,
+          0,
+          0.25
+        ],
+        "yaw": 0,
+        "pitch": 0,
+        "roll": 0,
+        "fov": 54.4
+      },
+      {
+        "t": 0.3125,
+        "pos": [
+          0,
+          0,
+          0.37109375
+        ],
+        "yaw": 0,
+        "pitch": 0,
+        "roll": 0,
+        "fov": 54.4
+      },
+      {
+        "t": 0.375,
+        "pos": [
+          0,
+          0,
+          0.50625
+        ],
+        "yaw": 0,
+        "pitch": 0,
+        "roll": 0,
+        "fov": 54.4
+      },
+      {
+        "t": 0.4375,
+        "pos": [
+          0,
+          0,
+          0.6507812500000001
+        ],
+        "yaw": 0,
+        "pitch": 0,
+        "roll": 0,
+        "fov": 54.4
+      },
+      {
+        "t": 0.5,
+        "pos": [
+          0,
+          0,
+          0.8
+        ],
+        "yaw": 0,
+        "pitch": 0,
+        "roll": 0,
+        "fov": 54.4
+      },
+      {
+        "t": 0.5625,
+        "pos": [
+          0,
+          0,
+          0.94921875
+        ],
+        "yaw": 0,
+        "pitch": 0,
+        "roll": 0,
+        "fov": 54.4
+      },
+      {
+        "t": 0.625,
+        "pos": [
+          0,
+          0,
+          1.09375
+        ],
+        "yaw": 0,
+        "pitch": 0,
+        "roll": 0,
+        "fov": 54.4
+      },
+      {
+        "t": 0.6875,
+        "pos": [
+          0,
+          0,
+          1.22890625
+        ],
+        "yaw": 0,
+        "pitch": 0,
+        "roll": 0,
+        "fov": 54.4
+      },
+      {
+        "t": 0.75,
+        "pos": [
+          0,
+          0,
+          1.35
+        ],
+        "yaw": 0,
+        "pitch": 0,
+        "roll": 0,
+        "fov": 54.4
+      },
+      {
+        "t": 0.8125,
+        "pos": [
+          0,
+          0,
+          1.45234375
+        ],
+        "yaw": 0,
+        "pitch": 0,
+        "roll": 0,
+        "fov": 54.4
+      },
+      {
+        "t": 0.875,
+        "pos": [
+          0,
+          0,
+          1.53125
+        ],
+        "yaw": 0,
+        "pitch": 0,
+        "roll": 0,
+        "fov": 54.4
+      },
+      {
+        "t": 0.9375,
+        "pos": [
+          0,
+          0,
+          1.58203125
+        ],
+        "yaw": 0,
+        "pitch": 0,
+        "roll": 0,
+        "fov": 54.4
+      },
+      {
+        "t": 1,
+        "pos": [
+          0,
+          0,
+          1.6
+        ],
+        "yaw": 0,
+        "pitch": 0,
+        "roll": 0,
+        "fov": 54.4
+      }
+    ],
+    "layer": "scene"
+  }
+}

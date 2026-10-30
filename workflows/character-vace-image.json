@@ -1,0 +1,254 @@
+{
+  "_meta": {
+    "name": "Character \u2014 Wan VACE reference-to-image (single frame)",
+    "placeholders": {
+      "PROMPT": "new scene/outfit description for the character",
+      "NEGATIVE": "negative prompt",
+      "WIDTH": "multiple of 32",
+      "HEIGHT": "multiple of 32",
+      "SEED": "noise seed",
+      "STEPS": "20-30",
+      "BATCH": "images per run",
+      "REF_IMAGE": "character reference image, comfy input/ filename",
+      "REF_IMAGE_2": "optional second character ref (stitched onto REF_IMAGE)",
+      "REF_IMAGE_3": "optional third character ref",
+      "POSE_IMAGE": "optional pose/framing guide frame (pose render or target image), comfy input/ filename",
+      "PREFIX": "output filename prefix"
+    },
+    "optional": [
+      "REF_IMAGE_2",
+      "REF_IMAGE_3",
+      "POSE_IMAGE"
+    ],
+    "requires": [
+      "wan2.1_vace_1.3B_fp16.safetensors",
+      "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "wan_2.1_vae.safetensors",
+      "motionfield_nodes: OF_BoxPlace"
+    ],
+    "nodes": "core + motionfield_nodes OF_BoxPlace",
+    "notes": "VACE as a still-image generator: length=1, no control video (neutral 0.5 control), identity comes from the reference_image conditioning. Extra refs stitch into one composite (WanVaceToVideo consumes reference_image[:1]). The sampled latent carries the ref frame up front \u2014 TrimVideoLatent removes it so only generated frames decode. batch_size>1 yields several character shots per run. Identity caveat: references are contain-padded to output WxH before WanVaceToVideo center-crops, preserving the full reference \u2014 a wide stitched composite in a portrait frame weakens the identity signal (measured: single square ref at 1:1 holds the face well at 12 steps / 480p). For higher-fidelity multi-reference characters run the Qwen-Image-Edit-2511 character workflow (cloud/GPU)."
+  },
+  "1": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "wan2.1_vace_1.3B_fp16.safetensors",
+      "weight_dtype": "default"
+    }
+  },
+  "2": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "type": "wan"
+    }
+  },
+  "3": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "wan_2.1_vae.safetensors"
+    }
+  },
+  "4": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "2",
+        0
+      ],
+      "text": "{{PROMPT}}"
+    }
+  },
+  "5": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "2",
+        0
+      ],
+      "text": "{{NEGATIVE}}"
+    }
+  },
+  "6": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "{{REF_IMAGE}}"
+    }
+  },
+  "7": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "{{REF_IMAGE_2}}"
+    }
+  },
+  "8": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "{{REF_IMAGE_3}}"
+    }
+  },
+  "9": {
+    "class_type": "ImageStitch",
+    "inputs": {
+      "image1": [
+        "6",
+        0
+      ],
+      "image2": [
+        "7",
+        0
+      ],
+      "direction": "right",
+      "match_image_size": true,
+      "spacing_width": 0,
+      "spacing_color": "black"
+    }
+  },
+  "10": {
+    "class_type": "ImageStitch",
+    "inputs": {
+      "image1": [
+        "9",
+        0
+      ],
+      "image2": [
+        "8",
+        0
+      ],
+      "direction": "right",
+      "match_image_size": true,
+      "spacing_width": 0,
+      "spacing_color": "black"
+    }
+  },
+  "11": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "{{POSE_IMAGE}}"
+    }
+  },
+  "12": {
+    "class_type": "WanVaceToVideo",
+    "inputs": {
+      "positive": [
+        "4",
+        0
+      ],
+      "negative": [
+        "5",
+        0
+      ],
+      "vae": [
+        "3",
+        0
+      ],
+      "width": "{{WIDTH}}",
+      "height": "{{HEIGHT}}",
+      "length": 1,
+      "batch_size": "{{BATCH}}",
+      "strength": 1.0,
+      "control_video": [
+        "11",
+        0
+      ],
+      "reference_image": [
+        "31",
+        0
+      ]
+    }
+  },
+  "13": {
+    "class_type": "KSampler",
+    "inputs": {
+      "model": [
+        "1",
+        0
+      ],
+      "positive": [
+        "12",
+        0
+      ],
+      "negative": [
+        "12",
+        1
+      ],
+      "latent_image": [
+        "12",
+        2
+      ],
+      "seed": "{{SEED}}",
+      "steps": "{{STEPS}}",
+      "cfg": 5.0,
+      "sampler_name": "uni_pc",
+      "scheduler": "simple",
+      "denoise": 1.0
+    }
+  },
+  "14": {
+    "class_type": "TrimVideoLatent",
+    "inputs": {
+      "samples": [
+        "13",
+        0
+      ],
+      "trim_amount": [
+        "12",
+        3
+      ]
+    }
+  },
+  "15": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "14",
+        0
+      ],
+      "vae": [
+        "3",
+        0
+      ]
+    }
+  },
+  "16": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "15",
+        0
+      ],
+      "filename_prefix": "{{PREFIX}}"
+    }
+  },
+  "30": {
+    "class_type": "EmptyImage",
+    "inputs": {
+      "width": "{{WIDTH}}",
+      "height": "{{HEIGHT}}",
+      "batch_size": 1,
+      "color": 8421504
+    }
+  },
+  "31": {
+    "class_type": "OF_BoxPlace",
+    "inputs": {
+      "image": [
+        "30",
+        0
+      ],
+      "overlay": [
+        "10",
+        0
+      ],
+      "bbox_x": 0,
+      "bbox_y": 0,
+      "bbox_w": 1,
+      "bbox_h": 1,
+      "grow": 0,
+      "feather": 0
+    },
+    "_meta": {
+      "title": "contain-fit complete references before VACE center cropping"
+    }
+  }
+}

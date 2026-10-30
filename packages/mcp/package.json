@@ -1,0 +1,22 @@
+{
+  "name": "motionfield-mcp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "MotionField MCP server - exposes the v1 API to MCP clients over stdio and Streamable HTTP",
+  "bin": {
+    "motionfield-mcp": "bin/motionfield-mcp.mjs",
+    "motionfield-mcp-http": "bin/motionfield-mcp-http.mjs"
+  },
+  "engines": {
+    "node": ">=22.18"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "zod": "4.6.5"
+  },
+  "files": [
+    "bin",
+    "src"
+  ]
+}

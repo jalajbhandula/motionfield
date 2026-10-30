@@ -1,0 +1,23 @@
+{
+  "_meta": {
+    "name": "Z-Image-Turbo image-to-image",
+    "placeholders": { "PROMPT": "prompt text", "INPUT_IMAGE": "uploaded source filename", "SEED": "randomized by provider", "STEPS": "sampler steps (Turbo wants ~8)", "DENOISE": "0..1 — how far to move from the source", "PREFIX": "filename prefix" },
+    "requires": ["z_image_turbo_int8_convrot.safetensors (diffusion_models)", "qwen_3_4b_fp8_mixed.safetensors (text_encoders)", "ae.safetensors (vae)"],
+    "nodes": "core",
+    "notes": "Same sampler settings as zimage-txt2img; the empty latent is swapped for VAEEncode(source) and denoise < 1.0. Output size follows the source image."
+  },
+  "1": { "class_type": "UNETLoader", "inputs": { "unet_name": "z_image_turbo_int8_convrot.safetensors", "weight_dtype": "default" } },
+  "2": { "class_type": "CLIPLoader", "inputs": { "clip_name": "qwen_3_4b_fp8_mixed.safetensors", "type": "lumina2" } },
+  "3": { "class_type": "VAELoader", "inputs": { "vae_name": "ae.safetensors" } },
+  "4": { "class_type": "CLIPTextEncode", "inputs": { "clip": ["2", 0], "text": "{{PROMPT}}" } },
+  "5": { "class_type": "ConditioningZeroOut", "inputs": { "conditioning": ["4", 0] } },
+  "6": { "class_type": "LoadImage", "inputs": { "image": "{{INPUT_IMAGE}}" } },
+  "7": { "class_type": "VAEEncode", "inputs": { "pixels": ["6", 0], "vae": ["3", 0] } },
+  "8": { "class_type": "ModelSamplingAuraFlow", "inputs": { "model": ["1", 0], "shift": 3 } },
+  "9": { "class_type": "KSampler", "inputs": {
+    "model": ["8", 0], "positive": ["4", 0], "negative": ["5", 0], "latent_image": ["7", 0],
+    "seed": "{{SEED}}", "steps": "{{STEPS}}", "cfg": 1.0, "sampler_name": "res_multistep", "scheduler": "simple", "denoise": "{{DENOISE}}"
+  } },
+  "10": { "class_type": "VAEDecode", "inputs": { "samples": ["9", 0], "vae": ["3", 0] } },
+  "11": { "class_type": "SaveImage", "inputs": { "images": ["10", 0], "filename_prefix": "{{PREFIX}}" } }
+}

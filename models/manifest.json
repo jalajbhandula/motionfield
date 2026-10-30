@@ -1,0 +1,1365 @@
+{
+  "version": "of-licenses-v1",
+  "generated_by": "scripts/gen-manifest.ts",
+  "totals": {
+    "count": 95,
+    "bytes": 262953189414
+  },
+  "weights": [
+    {
+      "name": "ace_1.5_vae.safetensors",
+      "file": "ace_1.5_vae.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/ACE-Step/Ace-Step1.5",
+      "bytes": null,
+      "workflows": []
+    },
+    {
+      "name": "acestep_v1.5_turbo.safetensors",
+      "file": "acestep_v1.5_turbo.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/ACE-Step/Ace-Step1.5",
+      "bytes": null,
+      "workflows": []
+    },
+    {
+      "name": "ae.safetensors",
+      "file": "ae.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/Comfy-Org/z_image_turbo",
+      "bytes": 335304388,
+      "sha256": "afc8e28272cd15db3919bacdb6918ce9c1ed22e96cb12c4d5ed0fba823529e38",
+      "workflows": [
+        "director-wan-fun-txt.json",
+        "director-wan-txt.json",
+        "ltx-lens-t2v.json",
+        "zimage-img2img.json",
+        "zimage-txt2img.json"
+      ]
+    },
+    {
+      "name": "birefnet.safetensors",
+      "file": "birefnet.safetensors",
+      "license": "MIT",
+      "class": "open",
+      "url": "https://huggingface.co/ZhengPeng7/BiRefNet",
+      "bytes": null,
+      "workflows": [
+        "birefnet-remove-bg.json",
+        "klein-faceswap.json",
+        "klein-product-compose.json",
+        "moge-perspective-mesh.json",
+        "person-swap-environment.json",
+        "person-swap-matte.json",
+        "person-swap-person.json",
+        "person-swap-refcut.json",
+        "recipe:person-swap",
+        "recipe:re-edit-assemble",
+        "reshoot-uni3c.json",
+        "reshoot-video.json",
+        "trellis2-image-to-3d.json",
+        "vace-object-swap.json",
+        "wan-animate-character-swap.json"
+      ]
+    },
+    {
+      "name": "Chatterbox pack (s3gen + ve)",
+      "file": null,
+      "license": "MIT",
+      "class": "open",
+      "url": "https://huggingface.co/ResembleAI/chatterbox",
+      "bytes": null,
+      "workflows": [
+        "dub-voice.json",
+        "recipe:dub"
+      ]
+    },
+    {
+      "name": "Chatterbox pack (ve/t3_cfg/s3gen + conds.pt)",
+      "file": "conds.pt",
+      "license": "MIT",
+      "class": "open",
+      "url": "https://huggingface.co/ResembleAI/chatterbox",
+      "bytes": 107374,
+      "workflows": [
+        "chatterbox-voice-clone.json"
+      ]
+    },
+    {
+      "name": "clip_l.safetensors",
+      "file": "clip_l.safetensors",
+      "license": "MIT",
+      "class": "open",
+      "url": "https://huggingface.co/Comfy-Org/flux1-schnell",
+      "bytes": null,
+      "workflows": []
+    },
+    {
+      "name": "clip_vision_h.safetensors",
+      "file": "clip_vision_h.safetensors",
+      "license": "MIT",
+      "class": "open",
+      "url": "https://github.com/openai/CLIP",
+      "bytes": 1264219396,
+      "sha256": "64a7ef761bfccbadbaa3da77366aac4185a6c58fa5de5f589b42a65bcc21f161",
+      "workflows": [
+        "cam-i2v-fun.json",
+        "cam-i2v-uni3c.json",
+        "flf2v-14b.json",
+        "reshoot-uni3c.json",
+        "wan-animate-character-swap.json",
+        "wan-img2video.json"
+      ]
+    },
+    {
+      "name": "comfyui_controlnet_aux dwpose preprocessor module",
+      "file": null,
+      "license": "non-commercial (OpenPose/CMU-derived code)",
+      "class": "banned-known",
+      "url": "https://github.com/Fannovel16/comfyui_controlnet_aux",
+      "bytes": null,
+      "workflows": []
+    },
+    {
+      "name": "comfyui_controlnet_aux pack (dwpose module ships OpenPose-derived code)",
+      "file": null,
+      "license": "non-commercial module in pack (see MODELS.md)",
+      "class": "banned-known",
+      "url": "https://github.com/Fannovel16/comfyui_controlnet_aux",
+      "bytes": null,
+      "workflows": []
+    },
+    {
+      "name": "depth_anything_3_base.safetensors",
+      "file": "depth_anything_3_base.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/depth-anything/DA3-BASE",
+      "bytes": null,
+      "workflows": [
+        "reshoot-uni3c.json",
+        "reshoot-video.json"
+      ]
+    },
+    {
+      "name": "depth_anything_3_mono_large.safetensors",
+      "file": "depth_anything_3_mono_large.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/depth-anything/DA3MONO-LARGE",
+      "bytes": 1336748056,
+      "sha256": "9b44eda5bedba5b4e125686fdb79d1db309c1b9785277576eb930f885b008f96",
+      "workflows": [
+        "cam-i2v-uni3c.json",
+        "cam-i2v.json",
+        "director-wan-txt.json",
+        "director-wan.json",
+        "recipe:re-edit-assemble",
+        "relight-klein.json",
+        "relight-normals.json",
+        "vace-restyle.json",
+        "vfx-wan-alt-depth.json"
+      ]
+    },
+    {
+      "name": "depth_anything_v2_vits.pth",
+      "file": "depth_anything_v2_vits.pth",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/depth-anything/Depth-Anything-V2-Small",
+      "bytes": 99218434,
+      "workflows": []
+    },
+    {
+      "name": "dino_v3_L_naf_fp32.safetensors",
+      "file": "dino_v3_L_naf_fp32.safetensors",
+      "license": "DINOv3",
+      "class": "restricted",
+      "url": "https://github.com/facebookresearch/dinov3/blob/main/LICENSE.md",
+      "bytes": null,
+      "workflows": [
+        "trellis2-image-to-3d.json"
+      ]
+    },
+    {
+      "name": "dino_v3_vit_h.safetensors",
+      "file": "dino_v3_vit_h.safetensors",
+      "license": "DINOv3",
+      "class": "restricted",
+      "url": "https://github.com/facebookresearch/dinov3/blob/main/LICENSE.md",
+      "bytes": null,
+      "workflows": []
+    },
+    {
+      "name": "dino_v3_vit_l.safetensors",
+      "file": "dino_v3_vit_l.safetensors",
+      "license": "DINOv3",
+      "class": "restricted",
+      "url": "https://github.com/facebookresearch/dinov3/blob/main/LICENSE.md",
+      "bytes": 1212559776,
+      "sha256": "5cb785e458de7c460579082418af81f5c62380c181599344bdc60898c63468ee",
+      "workflows": []
+    },
+    {
+      "name": "dw-ll_ucoco_384.onnx",
+      "file": "dw-ll_ucoco_384.onnx",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/yzd-v/DWPose",
+      "bytes": 134399116,
+      "workflows": []
+    },
+    {
+      "name": "DWPose ONNX (yolox_l.onnx + dw-ll_ucoco_384.onnx)",
+      "file": "yolox_l.onnx",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/yzd-v/DWPose",
+      "bytes": 216746733,
+      "workflows": [
+        "klein-faceswap.json",
+        "lipsync-talk-ltx.json",
+        "lipsync-talk.json",
+        "lipsync-talking-portrait-ltx.json",
+        "lipsync-talking-portrait.json",
+        "lipsync-video.json",
+        "person-swap-matte.json",
+        "person-swap-person.json",
+        "recipe:dub",
+        "recipe:person-swap",
+        "recipe:re-edit-assemble",
+        "vace-character-swap.json",
+        "vace-motion-transfer.json",
+        "vfx-wan-alt-pose.json",
+        "wan-animate-character-swap.json"
+      ]
+    },
+    {
+      "name": "DWPose ONNX weights (yolox_l.onnx + dw-ll_ucoco_384.onnx)",
+      "file": "yolox_l.onnx",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/yzd-v/DWPose",
+      "bytes": 216746733,
+      "workflows": []
+    },
+    {
+      "name": "ffmpeg",
+      "file": null,
+      "license": "user's system binary - not shipped",
+      "class": "open",
+      "url": "https://ffmpeg.org/legal.html",
+      "bytes": null,
+      "workflows": [
+        "recipe:audio-mix",
+        "recipe:beat-cut",
+        "recipe:dub",
+        "recipe:motion-render",
+        "recipe:person-swap",
+        "recipe:re-edit-assemble",
+        "recipe:stage-render",
+        "recipe:video-post"
+      ]
+    },
+    {
+      "name": "flux-2-klein-4b-bf16.safetensors",
+      "file": "flux-2-klein-4b-bf16.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/black-forest-labs/FLUX.2-klein-4b-fp8",
+      "bytes": null,
+      "workflows": []
+    },
+    {
+      "name": "flux-2-klein-4b-fp8.safetensors",
+      "file": "flux-2-klein-4b-fp8.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/black-forest-labs/FLUX.2-klein-4b-fp8",
+      "bytes": 4070624520,
+      "workflows": []
+    },
+    {
+      "name": "flux-2-klein-4b.safetensors",
+      "file": "flux-2-klein-4b.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/Comfy-Org/Flux-2-Klein-4B",
+      "bytes": null,
+      "workflows": [
+        "klein-edit.json",
+        "klein-faceswap.json",
+        "klein-inpaint.json",
+        "klein-product-compose.json",
+        "klein-product-scene.json",
+        "klein-txt2img.json",
+        "relight-klein.json"
+      ]
+    },
+    {
+      "name": "flux1-schnell-fp8.safetensors",
+      "file": "flux1-schnell-fp8.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/black-forest-labs/FLUX.1-schnell",
+      "bytes": null,
+      "workflows": []
+    },
+    {
+      "name": "flux2-vae.safetensors",
+      "file": "flux2-vae.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/Comfy-Org/Flux-2-Klein-4B",
+      "bytes": null,
+      "workflows": [
+        "klein-edit.json",
+        "klein-faceswap.json",
+        "klein-inpaint.json",
+        "klein-product-compose.json",
+        "klein-product-scene.json",
+        "klein-txt2img.json",
+        "relight-klein.json"
+      ]
+    },
+    {
+      "name": "game-build recipe - not implemented",
+      "file": null,
+      "license": "unlisted",
+      "class": "restricted",
+      "url": "",
+      "bytes": null,
+      "workflows": [
+        "recipe:game-build"
+      ]
+    },
+    {
+      "name": "gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors",
+      "file": "gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors",
+      "license": "LTX-2.x Community",
+      "class": "restricted",
+      "url": "https://huggingface.co/Lightricks/LTX-Video",
+      "bytes": null,
+      "workflows": [
+        "lipsync-talk-ltx.json",
+        "lipsync-talking-portrait-ltx.json",
+        "ltx-img2video.json",
+        "ltx-lens-t2v.json",
+        "ltx-txt2video.json",
+        "ltx-vfx-keyframe.json",
+        "vfx-ltx-image-classic.json",
+        "vfx-ltx-image.json",
+        "vfx-ltx-plate-classic.json",
+        "vfx-ltx-plate.json"
+      ]
+    },
+    {
+      "name": "hidream_o1_image_fp8_scaled.safetensors",
+      "file": "hidream_o1_image_fp8_scaled.safetensors",
+      "license": "MIT",
+      "class": "open",
+      "url": "https://huggingface.co/HiDream-ai/HiDream-O1-Image",
+      "bytes": 8067535296,
+      "sha256": "05ad98bc4a94557697f31b839f6dbf6dba293a353d9e3c52eef7818b5802d206",
+      "workflows": [
+        "hidream-t2i.json"
+      ]
+    },
+    {
+      "name": "In-repo beat tracker and edit planner (src/lib/beatcut.ts)",
+      "file": null,
+      "license": "MIT",
+      "class": "open",
+      "url": "LICENSE",
+      "bytes": null,
+      "workflows": [
+        "recipe:beat-cut"
+      ]
+    },
+    {
+      "name": "In-repo colour grade (src/lib/grade)",
+      "file": null,
+      "license": "MIT",
+      "class": "open",
+      "url": "LICENSE",
+      "bytes": null,
+      "workflows": [
+        "recipe:video-post"
+      ]
+    },
+    {
+      "name": "In-repo SceneSpec renderer (src/lib/render)",
+      "file": null,
+      "license": "MIT",
+      "class": "open",
+      "url": "LICENSE",
+      "bytes": null,
+      "workflows": [
+        "recipe:motion-render"
+      ]
+    },
+    {
+      "name": "In-repo Stage scene renderer (src/lib/stage)",
+      "file": null,
+      "license": "MIT",
+      "class": "open",
+      "url": "LICENSE",
+      "bytes": null,
+      "workflows": [
+        "recipe:stage-render"
+      ]
+    },
+    {
+      "name": "Kokoro-82M (kokoro_v1.onnx)",
+      "file": "kokoro_v1.onnx",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/hexgrad/Kokoro-82M",
+      "bytes": null,
+      "workflows": [
+        "dub-voice.json",
+        "kokoro-tts.json",
+        "lipsync-talk-ltx.json",
+        "lipsync-talk.json",
+        "recipe:dub"
+      ]
+    },
+    {
+      "name": "Kokoro-82M voices (voices_v1.bin)",
+      "file": "voices_v1.bin",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/hexgrad/Kokoro-82M",
+      "bytes": null,
+      "workflows": [
+        "dub-voice.json",
+        "kokoro-tts.json",
+        "lipsync-talk-ltx.json",
+        "lipsync-talk.json",
+        "recipe:dub"
+      ]
+    },
+    {
+      "name": "lightx2v_I2V_14B_480p_cfg_step_distill_rank64_bf16.safetensors",
+      "file": "lightx2v_I2V_14B_480p_cfg_step_distill_rank64_bf16.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/lightx2v/Wan2.1-I2V-14B-480P-StepDistill-CfgDistill-Lightx2v",
+      "bytes": null,
+      "workflows": [
+        "wan-animate-character-swap.json"
+      ]
+    },
+    {
+      "name": "ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors",
+      "file": "ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors",
+      "license": "LTX-2.x Community",
+      "class": "restricted",
+      "url": "https://huggingface.co/Lightricks/LTX-Video",
+      "bytes": null,
+      "workflows": [
+        "lipsync-talk-ltx.json",
+        "lipsync-talking-portrait-ltx.json",
+        "ltx-img2video.json",
+        "ltx-lens-t2v.json",
+        "ltx-txt2video.json",
+        "ltx-vfx-keyframe.json",
+        "vfx-ltx-image-classic.json",
+        "vfx-ltx-image.json",
+        "vfx-ltx-plate-classic.json",
+        "vfx-ltx-plate.json"
+      ]
+    },
+    {
+      "name": "ltx-2.5-audio-vae-bf16.safetensors",
+      "file": "ltx-2.5-audio-vae-bf16.safetensors",
+      "license": "LTX-2.x Community",
+      "class": "restricted",
+      "url": "https://huggingface.co/Lightricks/LTX-Video",
+      "bytes": null,
+      "workflows": [
+        "lipsync-talk-ltx.json",
+        "lipsync-talking-portrait-ltx.json",
+        "ltx-img2video.json",
+        "ltx-lens-t2v.json",
+        "ltx-txt2video.json",
+        "ltx-vfx-keyframe.json",
+        "vfx-ltx-image-classic.json",
+        "vfx-ltx-image.json",
+        "vfx-ltx-plate-classic.json",
+        "vfx-ltx-plate.json"
+      ]
+    },
+    {
+      "name": "ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors",
+      "file": "ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors",
+      "license": "LTX-2.x Community",
+      "class": "restricted",
+      "url": "https://huggingface.co/Lightricks/LTX-Video",
+      "bytes": null,
+      "workflows": [
+        "ltx-img2video.json",
+        "ltx-txt2video.json"
+      ]
+    },
+    {
+      "name": "ltx-2.5-latent-temporal-upscaler-x2-bf16-1.0.safetensors",
+      "file": "ltx-2.5-latent-temporal-upscaler-x2-bf16-1.0.safetensors",
+      "license": "LTX-2.x Community",
+      "class": "restricted",
+      "url": "https://huggingface.co/Lightricks/LTX-Video",
+      "bytes": null,
+      "workflows": []
+    },
+    {
+      "name": "ltx-2.5-video-vae-bf16.safetensors",
+      "file": "ltx-2.5-video-vae-bf16.safetensors",
+      "license": "LTX-2.x Community",
+      "class": "restricted",
+      "url": "https://huggingface.co/Lightricks/LTX-Video",
+      "bytes": null,
+      "workflows": [
+        "lipsync-talk-ltx.json",
+        "lipsync-talking-portrait-ltx.json",
+        "ltx-img2video.json",
+        "ltx-lens-t2v.json",
+        "ltx-txt2video.json",
+        "ltx-vfx-keyframe.json",
+        "vfx-ltx-image-classic.json",
+        "vfx-ltx-image.json",
+        "vfx-ltx-plate-classic.json",
+        "vfx-ltx-plate.json"
+      ]
+    },
+    {
+      "name": "ltx-video-2b-v0.9.5.safetensors",
+      "file": "ltx-video-2b-v0.9.5.safetensors",
+      "license": "Open RAIL-M",
+      "class": "restricted",
+      "url": "https://huggingface.co/Lightricks/LTX-Video/blob/main/ltx-video-2b-v0.9.5.license.txt",
+      "bytes": 6340729500,
+      "workflows": []
+    },
+    {
+      "name": "moge_2_vitl_normal_fp16.safetensors",
+      "file": "moge_2_vitl_normal_fp16.safetensors",
+      "license": "MIT",
+      "class": "open",
+      "url": "https://huggingface.co/Ruicheng/moge-2-vitl",
+      "bytes": null,
+      "workflows": [
+        "moge-perspective-mesh.json"
+      ]
+    },
+    {
+      "name": "MotionField node pack (comfy-nodes/motionfield_nodes)",
+      "file": null,
+      "license": "MIT",
+      "class": "open",
+      "url": "LICENSE",
+      "bytes": null,
+      "workflows": [
+        "cam-i2v-fun.json",
+        "cam-i2v-uni3c.json",
+        "cam-i2v.json",
+        "character-vace-image.json",
+        "director-wan-fun-txt.json",
+        "director-wan-fun.json",
+        "director-wan-txt.json",
+        "director-wan.json",
+        "klein-faceswap.json",
+        "klein-product-compose.json",
+        "lipsync-talk-ltx.json",
+        "lipsync-talk.json",
+        "lipsync-talking-portrait-ltx.json",
+        "lipsync-talking-portrait.json",
+        "lipsync-video.json",
+        "person-swap-environment.json",
+        "person-swap-matte.json",
+        "person-swap-person.json",
+        "person-swap-refcut.json",
+        "recipe:dub",
+        "recipe:person-swap",
+        "recipe:re-edit-assemble",
+        "relight-klein.json",
+        "relight-normals.json",
+        "reshoot-uni3c.json",
+        "reshoot-video.json",
+        "vace-draw.json",
+        "vace-object-swap.json",
+        "wan-animate-character-swap.json"
+      ]
+    },
+    {
+      "name": "MuseTalk UNet (musetalk/pytorch_model.bin)",
+      "file": "pytorch_model.bin",
+      "license": "MIT",
+      "class": "open",
+      "url": "https://huggingface.co/TMElyralab/MuseTalk",
+      "bytes": null,
+      "workflows": [
+        "lipsync-talk-ltx.json",
+        "lipsync-talk.json",
+        "lipsync-talking-portrait-ltx.json",
+        "lipsync-talking-portrait.json",
+        "lipsync-video.json",
+        "recipe:dub",
+        "recipe:person-swap"
+      ]
+    },
+    {
+      "name": "opentype.js",
+      "file": null,
+      "license": "MIT",
+      "class": "open",
+      "url": "https://github.com/opentypejs/opentype.js",
+      "bytes": null,
+      "workflows": [
+        "recipe:motion-render"
+      ]
+    },
+    {
+      "name": "Playwright Chromium (headless capture)",
+      "file": null,
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://github.com/microsoft/playwright",
+      "bytes": null,
+      "workflows": [
+        "recipe:motion-render",
+        "recipe:stage-render"
+      ]
+    },
+    {
+      "name": "qwen_0.6b_ace15.safetensors",
+      "file": "qwen_0.6b_ace15.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/ACE-Step/Ace-Step1.5",
+      "bytes": null,
+      "workflows": []
+    },
+    {
+      "name": "qwen_1.7b_ace15.safetensors",
+      "file": "qwen_1.7b_ace15.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/ACE-Step/Ace-Step1.5",
+      "bytes": null,
+      "workflows": []
+    },
+    {
+      "name": "qwen_2.5_vl_7b_fp8_scaled.safetensors",
+      "file": "qwen_2.5_vl_7b_fp8_scaled.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/Qwen/Qwen2.5-VL-7B-Instruct",
+      "bytes": 9384670680,
+      "sha256": "cb5636d852a0ea6a9075ab1bef496c0db7aef13c02350571e388aea959c5c0b4",
+      "workflows": [
+        "qwen-character-edit.json",
+        "qwenedit2511-angles.json",
+        "qwenedit2511-edit.json",
+        "qwenimg2512-t2i.json"
+      ]
+    },
+    {
+      "name": "qwen_3_4b_fp8_mixed.safetensors",
+      "file": "qwen_3_4b_fp8_mixed.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/Qwen/Qwen3-4B",
+      "bytes": 5631994051,
+      "sha256": "72450b19758172c5a7273cf7de729d1c17e7f434a104a00167624cba94f68f15",
+      "workflows": [
+        "director-wan-fun-txt.json",
+        "director-wan-txt.json",
+        "klein-edit.json",
+        "klein-faceswap.json",
+        "klein-inpaint.json",
+        "klein-product-compose.json",
+        "klein-product-scene.json",
+        "klein-txt2img.json",
+        "ltx-lens-t2v.json",
+        "relight-klein.json",
+        "zimage-img2img.json",
+        "zimage-txt2img.json"
+      ]
+    },
+    {
+      "name": "qwen_image_2512_fp8_e4m3fn.safetensors",
+      "file": "qwen_image_2512_fp8_e4m3fn.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/Qwen/Qwen-Image-2512",
+      "bytes": 20430679144,
+      "sha256": "5dc80554d5d83390046a2f4a94ece06afb7700bf7b0aaf8bde9769793875876b",
+      "workflows": [
+        "qwenimg2512-t2i.json"
+      ]
+    },
+    {
+      "name": "qwen_image_edit_2509_fp8_e4m3fn.safetensors",
+      "file": "qwen_image_edit_2509_fp8_e4m3fn.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/Qwen/Qwen-Image-Edit-2509",
+      "bytes": null,
+      "workflows": []
+    },
+    {
+      "name": "qwen_image_edit_2511_fp8mixed.safetensors",
+      "file": "qwen_image_edit_2511_fp8mixed.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/Qwen/Qwen-Image-Edit-2511",
+      "bytes": 20533762817,
+      "sha256": "c9fdc158e46d3b61ef75f21ae866ca2fe808bf4a53643120d1c1e87c19280a4e",
+      "workflows": [
+        "qwen-character-edit.json",
+        "qwenedit2511-angles.json",
+        "qwenedit2511-edit.json"
+      ]
+    },
+    {
+      "name": "qwen_image_vae.safetensors",
+      "file": "qwen_image_vae.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/Comfy-Org/Qwen-Image-Edit_ComfyUI",
+      "bytes": 253806246,
+      "sha256": "a70580f0213e67967ee9c95f05bb400e8fb08307e017a924bf3441223e023d1f",
+      "workflows": [
+        "qwen-character-edit.json",
+        "qwenedit2511-angles.json",
+        "qwenedit2511-edit.json",
+        "qwenimg2512-t2i.json"
+      ]
+    },
+    {
+      "name": "Qwen-Edit-2509-Multiple-angles.safetensors",
+      "file": "Qwen-Edit-2509-Multiple-angles.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/dx8152/Qwen-Edit-2509-Multiple-angles",
+      "bytes": 236117032,
+      "sha256": "e0cea9508025a39e41f50da0e7d10fbd9db182d057c745136a42ef8829914c8f",
+      "workflows": [
+        "qwenedit2511-angles.json"
+      ]
+    },
+    {
+      "name": "RealESRGAN_x4plus.pth",
+      "file": "RealESRGAN_x4plus.pth",
+      "license": "BSD-3-Clause",
+      "class": "open",
+      "url": "https://github.com/xinntao/Real-ESRGAN",
+      "bytes": null,
+      "workflows": [
+        "upscale-4x.json",
+        "video-finish.json"
+      ]
+    },
+    {
+      "name": "rife_v4.26.safetensors",
+      "file": "rife_v4.26.safetensors",
+      "license": "MIT",
+      "class": "open",
+      "url": "https://huggingface.co/Comfy-Org/frame_interpolation",
+      "bytes": null,
+      "workflows": [
+        "video-finish.json"
+      ]
+    },
+    {
+      "name": "sam3.1_multiplex_fp16.safetensors",
+      "file": "sam3.1_multiplex_fp16.safetensors",
+      "license": "Meta SAM License",
+      "class": "restricted",
+      "url": "https://huggingface.co/facebook/sam3.1/blob/main/LICENSE",
+      "bytes": null,
+      "workflows": [
+        "vace-object-swap-sam3.json"
+      ]
+    },
+    {
+      "name": "sd-vae-ft-mse",
+      "file": null,
+      "license": "MIT",
+      "class": "open",
+      "url": "https://huggingface.co/stabilityai/sd-vae-ft-mse",
+      "bytes": null,
+      "workflows": [
+        "lipsync-talk-ltx.json",
+        "lipsync-talk.json",
+        "lipsync-talking-portrait-ltx.json",
+        "lipsync-talking-portrait.json",
+        "lipsync-video.json",
+        "recipe:dub",
+        "recipe:person-swap"
+      ]
+    },
+    {
+      "name": "Space Grotesk font",
+      "file": null,
+      "license": "OFL-1.1",
+      "class": "open",
+      "url": "https://github.com/floriankarsten/space-grotesk",
+      "bytes": null,
+      "workflows": [
+        "recipe:motion-render"
+      ]
+    },
+    {
+      "name": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+      "file": "t5xxl_fp8_e4m3fn_scaled.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged",
+      "bytes": null,
+      "workflows": []
+    },
+    {
+      "name": "three.js",
+      "file": null,
+      "license": "MIT",
+      "class": "open",
+      "url": "https://github.com/mrdoob/three.js",
+      "bytes": null,
+      "workflows": [
+        "recipe:motion-render",
+        "recipe:stage-render"
+      ]
+    },
+    {
+      "name": "Translation - your own local LLM (default Qwen3.5 via Ollama)",
+      "file": null,
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/Qwen",
+      "bytes": null,
+      "workflows": [
+        "recipe:dub"
+      ]
+    },
+    {
+      "name": "trellis_2_int8_convrot.safetensors",
+      "file": "trellis_2_int8_convrot.safetensors",
+      "license": "MIT",
+      "class": "open",
+      "url": "https://huggingface.co/microsoft/TRELLIS.2-4B",
+      "bytes": 5253048192,
+      "sha256": "d01952ad137213f6a868f86b6b877026276f84af5eec23069217475a0bad3a31",
+      "workflows": [
+        "trellis2-image-to-3d.json"
+      ]
+    },
+    {
+      "name": "trellis_2_shape_vae_bf16.safetensors",
+      "file": "trellis_2_shape_vae_bf16.safetensors",
+      "license": "MIT",
+      "class": "open",
+      "url": "https://huggingface.co/microsoft/TRELLIS.2-4B",
+      "bytes": 1095844024,
+      "sha256": "de0cb4949a76c59ee5c091a995a69bcc8c51d5aeda939f0c641a50d2a72341f4",
+      "workflows": [
+        "trellis2-image-to-3d.json"
+      ]
+    },
+    {
+      "name": "trellis_2_texture_vae_bf16.safetensors",
+      "file": "trellis_2_texture_vae_bf16.safetensors",
+      "license": "MIT",
+      "class": "open",
+      "url": "https://huggingface.co/microsoft/TRELLIS.2-4B",
+      "bytes": 948461364,
+      "sha256": "714e5ebf094a610e12a8e3b5175c18a62f37f6ea4218acb6073644456b73ab0e",
+      "workflows": [
+        "trellis2-image-to-3d.json"
+      ]
+    },
+    {
+      "name": "TRELLIS.2 weights (trellis_2_*)",
+      "file": null,
+      "license": "MIT",
+      "class": "open",
+      "url": "https://huggingface.co/microsoft/TRELLIS.2-4B",
+      "bytes": null,
+      "workflows": [
+        "trellis2-image-to-3d.json"
+      ]
+    },
+    {
+      "name": "TripoSplat weights (triposplat_*)",
+      "file": null,
+      "license": "MIT",
+      "class": "open",
+      "url": "https://huggingface.co/VAST-AI/TripoSplat",
+      "bytes": null,
+      "workflows": []
+    },
+    {
+      "name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "file": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/google/umt5-xxl",
+      "bytes": 6735906897,
+      "sha256": "c3355d30191f1f066b26d93fba017ae9809dce6c627dda5f6a66eaa651204f68",
+      "workflows": [
+        "bernini-r2v.json",
+        "cam-i2v-fun.json",
+        "cam-i2v-uni3c.json",
+        "cam-i2v.json",
+        "character-vace-image.json",
+        "director-wan-fun-txt.json",
+        "director-wan-fun.json",
+        "director-wan-txt.json",
+        "director-wan.json",
+        "flf2v-14b.json",
+        "lipsync-s2v.json",
+        "lipsync-talk.json",
+        "lipsync-talking-portrait.json",
+        "person-swap-environment.json",
+        "person-swap-person.json",
+        "recipe:person-swap",
+        "recipe:re-edit-assemble",
+        "recipe:stage-render",
+        "reshoot-uni3c.json",
+        "reshoot-video.json",
+        "stage-render.json",
+        "vace-character-swap.json",
+        "vace-draw.json",
+        "vace-motion-transfer.json",
+        "vace-object-swap-sam3.json",
+        "vace-object-swap.json",
+        "vace-reframe.json",
+        "vace-restyle.json",
+        "vfx-wan-alt-depth.json",
+        "vfx-wan-alt-edges.json",
+        "vfx-wan-alt-image.json",
+        "vfx-wan-alt-pose.json",
+        "wan-animate-character-swap.json",
+        "wan-img2video.json",
+        "wan-txt2video.json",
+        "wan-vace-img2video.json",
+        "wan22-ti2v-img2video.json",
+        "wan22a14b-i2v.json",
+        "wan22a14b-t2v.json"
+      ]
+    },
+    {
+      "name": "wan_2.1_vae.safetensors",
+      "file": "wan_2.1_vae.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged",
+      "bytes": 253815318,
+      "sha256": "2fc39d31359a4b0a64f55876d8ff7fa8d780956ae2cb13463b0223e15148976b",
+      "workflows": [
+        "bernini-r2v.json",
+        "cam-i2v-fun.json",
+        "cam-i2v-uni3c.json",
+        "cam-i2v.json",
+        "character-vace-image.json",
+        "director-wan-fun-txt.json",
+        "director-wan-fun.json",
+        "director-wan-txt.json",
+        "director-wan.json",
+        "flf2v-14b.json",
+        "lipsync-s2v.json",
+        "lipsync-talk.json",
+        "lipsync-talking-portrait.json",
+        "person-swap-environment.json",
+        "person-swap-person.json",
+        "recipe:person-swap",
+        "recipe:re-edit-assemble",
+        "recipe:stage-render",
+        "reshoot-uni3c.json",
+        "reshoot-video.json",
+        "stage-render.json",
+        "vace-character-swap.json",
+        "vace-draw.json",
+        "vace-motion-transfer.json",
+        "vace-object-swap-sam3.json",
+        "vace-object-swap.json",
+        "vace-reframe.json",
+        "vace-restyle.json",
+        "vfx-wan-alt-depth.json",
+        "vfx-wan-alt-edges.json",
+        "vfx-wan-alt-image.json",
+        "vfx-wan-alt-pose.json",
+        "wan-animate-character-swap.json",
+        "wan-img2video.json",
+        "wan-txt2video.json",
+        "wan-vace-img2video.json",
+        "wan22a14b-i2v.json",
+        "wan22a14b-t2v.json"
+      ]
+    },
+    {
+      "name": "wan2.1_flf2v_720p_14B_fp8_e4m3fn.safetensors",
+      "file": "wan2.1_flf2v_720p_14B_fp8_e4m3fn.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/Wan-AI/Wan2.1-FLF2V-14B-720P",
+      "bytes": 16397952536,
+      "sha256": "d68ca694a695274e48e00974128337e06e497d95a1dc09e86fd2a01a405f455f",
+      "workflows": [
+        "flf2v-14b.json"
+      ]
+    },
+    {
+      "name": "wan2.1_fun_camera_v1.1_1.3B_bf16.safetensors",
+      "file": "wan2.1_fun_camera_v1.1_1.3B_bf16.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/alibaba-pai/Wan2.1-Fun-V1.1-1.3B-Control-Camera",
+      "bytes": 3232727784,
+      "sha256": "1a648f6fbb543dd6ac9f2f9af1ca4bc1bbe460482ee4d7984d50565699e97398",
+      "workflows": [
+        "cam-i2v-fun.json",
+        "director-wan-fun-txt.json",
+        "director-wan-fun.json"
+      ]
+    },
+    {
+      "name": "wan2.1_i2v_480p_14B_fp16.safetensors",
+      "file": "wan2.1_i2v_480p_14B_fp16.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/Wan-AI/Wan2.1-I2V-14B-480P",
+      "bytes": null,
+      "workflows": []
+    },
+    {
+      "name": "wan2.1_i2v_480p_14B_fp8_scaled.safetensors",
+      "file": "wan2.1_i2v_480p_14B_fp8_scaled.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/Wan-AI/Wan2.1-I2V-14B-480P",
+      "bytes": 16401356938,
+      "sha256": "b2de21b99b2e72cb0ff15253b07e926f26e7cf1b7e229efc32f94ad1f1ed9395",
+      "workflows": [
+        "cam-i2v-uni3c.json",
+        "reshoot-uni3c.json",
+        "wan-img2video.json"
+      ]
+    },
+    {
+      "name": "wan2.1_t2v_1.3B_fp16.safetensors",
+      "file": "wan2.1_t2v_1.3B_fp16.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/Wan-AI/Wan2.1-T2V-1.3B",
+      "bytes": null,
+      "workflows": [
+        "wan-txt2video.json"
+      ]
+    },
+    {
+      "name": "wan2.1_uni3c_controlnet.pth",
+      "file": "wan2.1_uni3c_controlnet.pth",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/ewrfcas/Uni3C",
+      "bytes": 3991711400,
+      "sha256": "57eb4f73aa5b58dd27c2fceb348697bd18a80163d0e647c3072e2f6dddfc54e4",
+      "workflows": [
+        "cam-i2v-uni3c.json",
+        "reshoot-uni3c.json"
+      ]
+    },
+    {
+      "name": "wan2.1_vace_1.3B_fp16.safetensors",
+      "file": "wan2.1_vace_1.3B_fp16.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/Wan-AI/Wan2.1-VACE-1.3B",
+      "bytes": 4309519800,
+      "sha256": "640ccc0577e6a5d4bb15cd91b11b699ef914fc55f126c5a1c544e152130784f2",
+      "workflows": [
+        "cam-i2v.json",
+        "character-vace-image.json",
+        "director-wan-txt.json",
+        "director-wan.json",
+        "lipsync-talk.json",
+        "lipsync-talking-portrait.json",
+        "person-swap-environment.json",
+        "person-swap-person.json",
+        "recipe:person-swap",
+        "recipe:re-edit-assemble",
+        "recipe:stage-render",
+        "reshoot-video.json",
+        "stage-render.json",
+        "vace-character-swap.json",
+        "vace-draw.json",
+        "vace-motion-transfer.json",
+        "vace-object-swap-sam3.json",
+        "vace-object-swap.json",
+        "vace-reframe.json",
+        "vace-restyle.json",
+        "vfx-wan-alt-depth.json",
+        "vfx-wan-alt-edges.json",
+        "vfx-wan-alt-image.json",
+        "vfx-wan-alt-pose.json",
+        "wan-vace-img2video.json"
+      ]
+    },
+    {
+      "name": "wan2.2_animate_14B_bf16.safetensors",
+      "file": "wan2.2_animate_14B_bf16.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/Wan-AI/Wan2.2-Animate-14B",
+      "bytes": null,
+      "workflows": [
+        "wan-animate-character-swap.json"
+      ]
+    },
+    {
+      "name": "wan2.2_animate_14B_int8_convrot.safetensors",
+      "file": "wan2.2_animate_14B_int8_convrot.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/Wan-AI/Wan2.2-Animate-14B",
+      "bytes": 18413068672,
+      "sha256": "419aa0b3d9079a8a39126f2894c3cb2427c288189d2dc8342c61cf0663731cb3",
+      "workflows": []
+    },
+    {
+      "name": "wan2.2_animate_14B_relight_lora_bf16.safetensors",
+      "file": "wan2.2_animate_14B_relight_lora_bf16.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/Comfy-Org/Wan-2.2",
+      "bytes": null,
+      "workflows": [
+        "wan-animate-character-swap.json"
+      ]
+    },
+    {
+      "name": "wan2.2_bernini_r_high_noise_fp8_scaled.safetensors",
+      "file": "wan2.2_bernini_r_high_noise_fp8_scaled.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/ByteDance/Bernini-R",
+      "bytes": 15574833216,
+      "sha256": "9ff3d7369da98f8eaf71045f7d0e99d5e344eea5e7dc934a930608786fe73f52",
+      "workflows": [
+        "bernini-r2v.json"
+      ]
+    },
+    {
+      "name": "wan2.2_bernini_r_low_noise_fp8_scaled.safetensors",
+      "file": "wan2.2_bernini_r_low_noise_fp8_scaled.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/ByteDance/Bernini-R",
+      "bytes": 15574833216,
+      "sha256": "ce35c070f345c91abe43d6bf29b0eccb8687e4026fadc0e0a70a73c9afb7bbb3",
+      "workflows": [
+        "bernini-r2v.json"
+      ]
+    },
+    {
+      "name": "wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors",
+      "file": "wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/Wan-AI/Wan2.2-I2V-A14B",
+      "bytes": 14294742832,
+      "sha256": "6122e79d55e0f235698d11d657f3b196c5273c830da00b2b013c5a048d5e6a42",
+      "workflows": [
+        "wan22a14b-i2v.json"
+      ]
+    },
+    {
+      "name": "wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors",
+      "file": "wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/Wan-AI/Wan2.2-I2V-A14B",
+      "bytes": 14294742832,
+      "sha256": "5471a457b6ac404202a5fbe6c11595a3d5641fc766b00f38763f72303fffc21e",
+      "workflows": [
+        "wan22a14b-i2v.json"
+      ]
+    },
+    {
+      "name": "wan2.2_s2v_14B_fp8_scaled.safetensors",
+      "file": "wan2.2_s2v_14B_fp8_scaled.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/Wan-AI/Wan2.2-S2V-14B",
+      "bytes": null,
+      "workflows": [
+        "lipsync-s2v.json"
+      ]
+    },
+    {
+      "name": "wan2.2_t2v_high_noise_14B_fp8_scaled.safetensors",
+      "file": "wan2.2_t2v_high_noise_14B_fp8_scaled.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/Wan-AI/Wan2.2-T2V-A14B",
+      "bytes": 14293923632,
+      "sha256": "cad711ae211c8b23455ec68cd6a190a33a3d874234a77eb57266d73f8f0e6c9f",
+      "workflows": [
+        "wan22a14b-t2v.json"
+      ]
+    },
+    {
+      "name": "wan2.2_t2v_low_noise_14B_fp8_scaled.safetensors",
+      "file": "wan2.2_t2v_low_noise_14B_fp8_scaled.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/Wan-AI/Wan2.2-T2V-A14B",
+      "bytes": 14293923632,
+      "sha256": "e71b96d7c82e638694c5e7fb98fac4bfb0e4ddc5fbbb4b1df40da8f0f1278a97",
+      "workflows": [
+        "wan22a14b-t2v.json"
+      ]
+    },
+    {
+      "name": "wan2.2_ti2v_5B_fp16.safetensors",
+      "file": "wan2.2_ti2v_5B_fp16.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/Wan-AI/Wan2.2-TI2V-5B",
+      "bytes": 9999658848,
+      "sha256": "456f901338bd9eadbded3828b819109a9b68e8a525ca5cf8d0049a69fcfeca1e",
+      "workflows": [
+        "wan22-ti2v-img2video.json"
+      ]
+    },
+    {
+      "name": "wan2.2_vae.safetensors",
+      "file": "wan2.2_vae.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+      "bytes": 1409400960,
+      "sha256": "e40321bd36b9709991dae2530eb4ac303dd168276980d3e9bc4b6e2b75fed156",
+      "workflows": [
+        "wan22-ti2v-img2video.json"
+      ]
+    },
+    {
+      "name": "wav2vec2_large_english_fp16.safetensors",
+      "file": "wav2vec2_large_english_fp16.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/facebook/wav2vec2-large-960h-lv60",
+      "bytes": null,
+      "workflows": [
+        "lipsync-s2v.json"
+      ]
+    },
+    {
+      "name": "whisper ggml-base.en",
+      "file": null,
+      "license": "MIT",
+      "class": "open",
+      "url": "https://huggingface.co/ggerganov/whisper.cpp",
+      "bytes": null,
+      "workflows": [
+        "recipe:dub"
+      ]
+    },
+    {
+      "name": "whisper tiny.pt",
+      "file": "tiny.pt",
+      "license": "MIT",
+      "class": "open",
+      "url": "https://github.com/openai/whisper",
+      "bytes": null,
+      "workflows": [
+        "lipsync-talk-ltx.json",
+        "lipsync-talk.json",
+        "lipsync-talking-portrait-ltx.json",
+        "lipsync-talking-portrait.json",
+        "lipsync-video.json",
+        "recipe:dub",
+        "recipe:person-swap"
+      ]
+    },
+    {
+      "name": "whisper.cpp (whisper-cli)",
+      "file": null,
+      "license": "MIT",
+      "class": "open",
+      "url": "https://github.com/ggml-org/whisper.cpp",
+      "bytes": null,
+      "workflows": [
+        "recipe:dub"
+      ]
+    },
+    {
+      "name": "yolox_l.onnx",
+      "file": "yolox_l.onnx",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/yzd-v/DWPose",
+      "bytes": 216746733,
+      "workflows": []
+    },
+    {
+      "name": "z_image_turbo_int8_convrot.safetensors",
+      "file": "z_image_turbo_int8_convrot.safetensors",
+      "license": "Apache-2.0",
+      "class": "open",
+      "url": "https://huggingface.co/Tongyi-MAI/Z-Image-Turbo",
+      "bytes": 6201001296,
+      "sha256": "be517ebd47c912a5626a588e1aeea43e6be4a43c0cdcd2b48a2a780d9f358635",
+      "workflows": [
+        "director-wan-fun-txt.json",
+        "director-wan-txt.json",
+        "ltx-lens-t2v.json",
+        "zimage-img2img.json",
+        "zimage-txt2img.json"
+      ]
+    }
+  ],
+  "recipes": [
+    {
+      "name": "audio-mix",
+      "class": "open"
+    },
+    {
+      "name": "beat-cut",
+      "class": "open"
+    },
+    {
+      "name": "dub",
+      "class": "open"
+    },
+    {
+      "name": "game-build",
+      "class": "restricted"
+    },
+    {
+      "name": "motion-render",
+      "class": "open"
+    },
+    {
+      "name": "person-swap",
+      "class": "open"
+    },
+    {
+      "name": "re-edit-assemble",
+      "class": "open"
+    },
+    {
+      "name": "stage-render",
+      "class": "open"
+    },
+    {
+      "name": "video-post",
+      "class": "open"
+    }
+  ]
+}

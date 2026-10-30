@@ -1,0 +1,193 @@
+{
+  "_meta": {
+    "name": "Wan VACE reframe / video outpainting",
+    "placeholders": {
+      "PROMPT": "scene description for generated pad regions",
+      "NEGATIVE": "negative prompt",
+      "WIDTH": "target width, multiple of 32",
+      "HEIGHT": "target height, multiple of 32",
+      "FRAMES": "8n+1",
+      "SEED": "noise seed",
+      "STEPS": "20-30",
+      "INPUT_VIDEO": "source video, comfy input/ filename",
+      "PAD_LEFT": "px to pad left",
+      "PAD_RIGHT": "px to pad right",
+      "PAD_TOP": "px to pad top",
+      "PAD_BOTTOM": "px to pad bottom",
+      "PREFIX": "output filename prefix"
+    },
+    "requires": [
+      "wan2.1_vace_1.3B_fp16.safetensors (upgrade: wan2.1_vace_14B_fp8scaled.safetensors on a GPU / Comfy Cloud)",
+      "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "wan_2.1_vae.safetensors",
+      "custom-nodes: VideoHelperSuite (VHS_LoadVideo, VHS_VideoCombine)"
+    ],
+    "nodes": "core + VHS",
+    "notes": "Host computes PAD_* from source vs target aspect (e.g. 9:16->16:9 pads left/right). Mask marks only the padded region, so the original frame content is preserved while VACE fills surroundings with temporal consistency. For narrowing (16:9->9:16) prefer SAM2 smart-crop instead of outpaint."
+  },
+  "1": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "wan2.1_vace_1.3B_fp16.safetensors",
+      "weight_dtype": "default"
+    }
+  },
+  "2": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "type": "wan"
+    }
+  },
+  "3": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "wan_2.1_vae.safetensors"
+    }
+  },
+  "4": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "2",
+        0
+      ],
+      "text": "{{PROMPT}}"
+    }
+  },
+  "5": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "2",
+        0
+      ],
+      "text": "{{NEGATIVE}}"
+    }
+  },
+  "6": {
+    "class_type": "VHS_LoadVideo",
+    "inputs": {
+      "video": "{{INPUT_VIDEO}}",
+      "force_rate": 16,
+      "custom_width": "{{WIDTH}}",
+      "custom_height": "{{HEIGHT}}",
+      "frame_load_cap": "{{FRAMES}}",
+      "skip_first_frames": 0,
+      "select_every_nth": 1
+    }
+  },
+  "7": {
+    "class_type": "ImagePadForOutpaint",
+    "inputs": {
+      "image": [
+        "6",
+        0
+      ],
+      "left": "{{PAD_LEFT}}",
+      "top": "{{PAD_TOP}}",
+      "right": "{{PAD_RIGHT}}",
+      "bottom": "{{PAD_BOTTOM}}",
+      "feathering": 40
+    }
+  },
+  "8": {
+    "class_type": "WanVaceToVideo",
+    "inputs": {
+      "positive": [
+        "4",
+        0
+      ],
+      "negative": [
+        "5",
+        0
+      ],
+      "vae": [
+        "3",
+        0
+      ],
+      "width": "{{WIDTH}}",
+      "height": "{{HEIGHT}}",
+      "length": "{{FRAMES}}",
+      "batch_size": 1,
+      "strength": 1.0,
+      "control_video": [
+        "7",
+        0
+      ],
+      "control_masks": [
+        "7",
+        1
+      ]
+    }
+  },
+  "9": {
+    "class_type": "KSampler",
+    "inputs": {
+      "model": [
+        "1",
+        0
+      ],
+      "positive": [
+        "8",
+        0
+      ],
+      "negative": [
+        "8",
+        1
+      ],
+      "latent_image": [
+        "8",
+        2
+      ],
+      "seed": "{{SEED}}",
+      "steps": "{{STEPS}}",
+      "cfg": 5.0,
+      "sampler_name": "uni_pc",
+      "scheduler": "simple",
+      "denoise": 1.0
+    }
+  },
+  "10": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "20",
+        0
+      ],
+      "vae": [
+        "3",
+        0
+      ]
+    }
+  },
+  "11": {
+    "class_type": "VHS_VideoCombine",
+    "inputs": {
+      "images": [
+        "10",
+        0
+      ],
+      "frame_rate": 16,
+      "loop_count": 0,
+      "filename_prefix": "{{PREFIX}}",
+      "format": "video/h264-mp4",
+      "pix_fmt": "yuv420p",
+      "save_output": true,
+      "pingpong": false
+    }
+  },
+  "20": {
+    "class_type": "TrimVideoLatent",
+    "inputs": {
+      "samples": [
+        "9",
+        0
+      ],
+      "trim_amount": [
+        "8",
+        3
+      ]
+    }
+  }
+}

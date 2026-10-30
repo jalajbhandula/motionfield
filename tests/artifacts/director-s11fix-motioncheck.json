@@ -1,0 +1,66 @@
+{
+ "T": {
+  "run": "director-s11fix-T",
+  "job": "fb86ad93-9248-4f23-90e4-7afd89c8bedb",
+  "mp4_sha256": "fbb82cae897795a506541a02a2fe0202dd08bf1b5992855ed8555a0e40f63578",
+  "checks": [
+   {
+    "move": "dolly-in",
+    "scale": 2.6,
+    "corr": 0.6364,
+    "pass": true
+   },
+   {
+    "move": "pan-left",
+    "bg_dx_px": -4.875,
+    "pass": true
+   }
+  ],
+  "note": "text path (director-wan-txt.json), moves phrase 'dolly in then pan left' resolved to dolly-in+pan-left \u2014 both halves measured on the video"
+ },
+ "R": {
+  "run": "director-s11-R",
+  "job": "81ae37c4-756d-4b9c-83b4-366446871ac4",
+  "mp4_sha256": "27b193242453077d8693d10352437b7720bc45677954fb6cb023588d0589cce9",
+  "checks": [
+   {
+    "move": "truck-left",
+    "bg_dx_px": 20.06,
+    "pass": false,
+    "note": "truck-right clip scored under the truck-left metric \u2014 +20.06 px is the inverted-sign signature of a real right slide (magnitude pass, direction confirmed)"
+   }
+  ],
+  "cube_sha256": "5677ea4f2fcf0f0552e3d2e0bb8c3aed352f3d115a0ea26b2ebab4fee077a12e"
+ },
+ "Z": {
+  "runs": {
+   "i": {
+    "run": "director-s11-Z",
+    "job": "0df8b8e3",
+    "mp4_sha256": "9ff77135eef2fd2e4fc6aece2f49c5ebfb583ba7fddd026d39cf2a6044f839d6",
+    "checks": [
+     {
+      "move": "dolly-in",
+      "scale": 1.675,
+      "corr": 0.9968,
+      "pass": true
+     }
+    ]
+   },
+   "ii": {
+    "run": "director-s11fix-Z2",
+    "job": "d569d3de-42d8-4667-8da5-7d7dbcb7df3e",
+    "mp4_sha256": "3835f9b95b822af5be6fad7807109eafea4ab4810838fd9a60e7ff1828efe3ec",
+    "checks": [
+     {
+      "move": "dolly-in",
+      "scale": 1.675,
+      "corr": 0.9966,
+      "pass": true
+     }
+    ]
+   }
+  },
+  "note": "A/B: (i) doubled-letterbox refgrid vs (ii) plain start frame \u2014 same seed 42, same start.png; border luma within ~1-2/255 everywhere and identical motion scores, so the doubled grid produces no visible artefact"
+ }
+}

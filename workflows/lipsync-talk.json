@@ -1,0 +1,302 @@
+{
+ "_meta": {
+  "name": "Portrait speaks text (image + line) \u2014 Kokoro TTS + Wan 2.1 VACE 1.3B (Apache-2.0) first-frame motion + MuseTalk lip-sync",
+  "placeholders": {
+   "INPUT_IMAGE": "uploaded portrait filename",
+   "PROMPT": "the line the portrait should speak",
+   "VOICE": "kokoro voice id",
+   "SPEED": "speech speed 0.5-2.0",
+   "MOTION_PROMPT": "how the clip should move (subtle motion keeps faces aligned)",
+   "NEGATIVE": "negative prompt",
+   "WIDTH": "multiple of 32",
+   "HEIGHT": "multiple of 32",
+   "FRAMES": "4n+1",
+   "FPS": "clip/output fps",
+   "SEED": "noise seed",
+   "STEPS": "sampler steps",
+   "BBOX_SHIFT": "mouth-open bias (-10..10, 0 default)",
+   "BATCH": "frames per inference batch",
+   "PREFIX": "filename prefix"
+  },
+  "requires": [
+   "ComfyUI-MuseTalk (chaojie, MIT) \u2014 MotionField patch (OF_MouthMask blend)",
+   "ComfyUI-VideoHelperSuite",
+   "comfyui-kokoro (stavsap)",
+   "wan2.1_vace_1.3B_fp16.safetensors (diffusion_models)",
+   "umt5_xxl_fp8_e4m3fn_scaled.safetensors (text_encoders)",
+   "wan_2.1_vae.safetensors (vae)",
+   "motionfield_nodes pack (OF_MouthMask, DWPose ONNX)"
+  ],
+  "nodes": "core + custom (Kokoro, MuseTalkRun, OF_MouthMask, VHS) \u2014 TTS -> Wan VACE first-frame i2v clip -> lip-sync pass",
+  "drop_outputs": [
+   "30"
+  ]
+ },
+ "12": {
+  "class_type": "LoadImage",
+  "inputs": {
+   "image": "{{INPUT_IMAGE}}"
+  }
+ },
+ "19": {
+  "class_type": "VHS_VideoCombine",
+  "inputs": {
+   "images": [
+    "32",
+    0
+   ],
+   "audio": [
+    "25",
+    0
+   ],
+   "frame_rate": "{{FPS}}",
+   "loop_count": 0,
+   "filename_prefix": "{{PREFIX}}",
+   "format": "video/h264-mp4",
+   "pingpong": false,
+   "save_output": true
+  }
+ },
+ "24": {
+  "class_type": "KokoroSpeaker",
+  "inputs": {
+   "speaker_name": "{{VOICE}}"
+  }
+ },
+ "25": {
+  "class_type": "KokoroGenerator",
+  "inputs": {
+   "text": "{{PROMPT}}",
+   "speaker": [
+    "24",
+    0
+   ],
+   "speed": "{{SPEED}}",
+   "lang": "English"
+  }
+ },
+ "30": {
+  "class_type": "VHS_VideoCombine",
+  "inputs": {
+   "images": [
+    "10",
+    0
+   ],
+   "frame_rate": "{{FPS}}",
+   "loop_count": 0,
+   "filename_prefix": "{{PREFIX}}",
+   "format": "video/h264-mp4",
+   "pingpong": false,
+   "save_output": false
+  }
+ },
+ "31": {
+  "class_type": "VHS_FILENAMES_STRING_MuseTalk",
+  "inputs": {
+   "filenames": [
+    "30",
+    0
+   ]
+  }
+ },
+ "32": {
+  "class_type": "MuseTalkRun",
+  "inputs": {
+   "mouth_masks": [
+    "34",
+    0
+   ],
+   "video_path": [
+    "31",
+    0
+   ],
+   "audio": [
+    "25",
+    0
+   ],
+   "bbox_shift": "{{BBOX_SHIFT}}",
+   "batch_size": "{{BATCH}}"
+  }
+ },
+ "1": {
+  "class_type": "UNETLoader",
+  "inputs": {
+   "unet_name": "wan2.1_vace_1.3B_fp16.safetensors",
+   "weight_dtype": "default"
+  }
+ },
+ "2": {
+  "class_type": "CLIPLoader",
+  "inputs": {
+   "clip_name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+   "type": "wan",
+   "device": "default"
+  }
+ },
+ "3": {
+  "class_type": "VAELoader",
+  "inputs": {
+   "vae_name": "wan_2.1_vae.safetensors"
+  }
+ },
+ "4": {
+  "class_type": "CLIPTextEncode",
+  "inputs": {
+   "clip": [
+    "2",
+    0
+   ],
+   "text": "{{MOTION_PROMPT}}"
+  }
+ },
+ "5": {
+  "class_type": "CLIPTextEncode",
+  "inputs": {
+   "clip": [
+    "2",
+    0
+   ],
+   "text": "{{NEGATIVE}}"
+  }
+ },
+ "13": {
+  "class_type": "EmptyImage",
+  "inputs": {
+   "width": "{{WIDTH}}",
+   "height": "{{HEIGHT}}",
+   "batch_size": 1,
+   "color": 0
+  }
+ },
+ "14": {
+  "class_type": "EmptyImage",
+  "inputs": {
+   "width": "{{WIDTH}}",
+   "height": "{{HEIGHT}}",
+   "batch_size": "{{FRAMES}}",
+   "color": 16777215
+  }
+ },
+ "15": {
+  "class_type": "BatchImagesNode",
+  "inputs": {
+   "images.image0": [
+    "13",
+    0
+   ],
+   "images.image1": [
+    "14",
+    0
+   ]
+  }
+ },
+ "16": {
+  "class_type": "ImageToMask",
+  "inputs": {
+   "image": [
+    "15",
+    0
+   ],
+   "channel": "red"
+  }
+ },
+ "17": {
+  "class_type": "WanVaceToVideo",
+  "inputs": {
+   "positive": [
+    "4",
+    0
+   ],
+   "negative": [
+    "5",
+    0
+   ],
+   "vae": [
+    "3",
+    0
+   ],
+   "width": "{{WIDTH}}",
+   "height": "{{HEIGHT}}",
+   "length": "{{FRAMES}}",
+   "batch_size": 1,
+   "strength": 1.0,
+   "control_video": [
+    "12",
+    0
+   ],
+   "control_masks": [
+    "16",
+    0
+   ],
+   "reference_image": [
+    "12",
+    0
+   ]
+  }
+ },
+ "18": {
+  "class_type": "KSampler",
+  "inputs": {
+   "model": [
+    "1",
+    0
+   ],
+   "positive": [
+    "17",
+    0
+   ],
+   "negative": [
+    "17",
+    1
+   ],
+   "latent_image": [
+    "17",
+    2
+   ],
+   "seed": "{{SEED}}",
+   "steps": "{{STEPS}}",
+   "cfg": 5.0,
+   "sampler_name": "uni_pc",
+   "scheduler": "simple",
+   "denoise": 1.0
+  }
+ },
+ "10": {
+  "class_type": "VAEDecode",
+  "inputs": {
+   "samples": [
+    "33",
+    0
+   ],
+   "vae": [
+    "3",
+    0
+   ]
+  }
+ },
+ "33": {
+  "class_type": "TrimVideoLatent",
+  "inputs": {
+   "samples": [
+    "18",
+    0
+   ],
+   "trim_amount": [
+    "17",
+    3
+   ]
+  }
+ },
+ "34": {
+  "class_type": "OF_MouthMask",
+  "inputs": {
+   "image": [
+    "10",
+    0
+   ],
+   "dilate": 6,
+   "feather": 9,
+   "resolution": 512
+  }
+ }
+}

@@ -1,0 +1,214 @@
+{
+  "_meta": {
+    "name": "Stage render (Wan VACE)",
+    "placeholders": {
+      "PROMPT": "composed scene prompt (user + frustum-visible objects)",
+      "NEGATIVE": "negative prompt",
+      "WIDTH": "multiple of 16",
+      "HEIGHT": "multiple of 16",
+      "FRAMES": "4n+1, ≤81",
+      "SEED": "noise seed",
+      "STEPS": "20-30",
+      "INPUT_VIDEO": "scene-derived control video (depth or pose pass), comfy input/ filename",
+      "MASK_VIDEO": "optional window-2 continuation mask — black = continue, white = keep first 8 frames",
+      "REF_IMAGE": "optional continuation anchor — last frame of window 1 (window 2) or first previz frame (window 1)",
+      "PREFIX": "output filename prefix"
+    },
+    "optional": [
+      "MASK_VIDEO"
+    ],
+    "requires": [
+      "wan2.1_vace_1.3B_fp16.safetensors (UNET; upgrade: wan2.1_vace_14B_fp8scaled.safetensors on a GPU / Comfy Cloud)",
+      "umt5_xxl_fp8_e4m3fn_scaled.safetensors (wan CLIP)",
+      "wan_2.1_vae.safetensors",
+      "custom-nodes: VideoHelperSuite (VHS_LoadVideo, VHS_VideoCombine)"
+    ],
+    "nodes": "core + VHS",
+    "notes": "The stage-render recipe renders the control pass itself from the scene document (headless three.js), so this graph feeds VHS_LoadVideo straight into control_video — no DWPose. MASK_VIDEO carries the 8-frame keep-tail mask on continuation windows; REF_IMAGE anchors identity (VACE prepends its latent, TrimVideoLatent strips it). The recipe submits this graph pre-substituted per window — MASK_VIDEO/REF_IMAGE loader nodes simply never exist on a single-window run."
+  },
+  "1": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "wan2.1_vace_1.3B_fp16.safetensors",
+      "weight_dtype": "default"
+    }
+  },
+  "2": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "type": "wan"
+    }
+  },
+  "3": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "wan_2.1_vae.safetensors"
+    }
+  },
+  "4": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "2",
+        0
+      ],
+      "text": "{{PROMPT}}"
+    }
+  },
+  "5": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "2",
+        0
+      ],
+      "text": "{{NEGATIVE}}"
+    }
+  },
+  "6": {
+    "class_type": "VHS_LoadVideo",
+    "inputs": {
+      "video": "{{INPUT_VIDEO}}",
+      "force_rate": 16,
+      "custom_width": "{{WIDTH}}",
+      "custom_height": "{{HEIGHT}}",
+      "frame_load_cap": "{{FRAMES}}",
+      "skip_first_frames": 0,
+      "select_every_nth": 1,
+      "format": "AnimateDiff"
+    }
+  },
+  "7": {
+    "class_type": "VHS_LoadVideo",
+    "inputs": {
+      "video": "{{MASK_VIDEO}}",
+      "force_rate": 16,
+      "custom_width": "{{WIDTH}}",
+      "custom_height": "{{HEIGHT}}",
+      "frame_load_cap": "{{FRAMES}}",
+      "skip_first_frames": 0,
+      "select_every_nth": 1,
+      "format": "AnimateDiff"
+    }
+  },
+  "7b": {
+    "class_type": "ImageToMask",
+    "inputs": {
+      "image": [
+        "7",
+        0
+      ],
+      "channel": "red"
+    }
+  },
+  "8": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "{{REF_IMAGE}}"
+    }
+  },
+  "9": {
+    "class_type": "WanVaceToVideo",
+    "inputs": {
+      "positive": [
+        "4",
+        0
+      ],
+      "negative": [
+        "5",
+        0
+      ],
+      "vae": [
+        "3",
+        0
+      ],
+      "width": "{{WIDTH}}",
+      "height": "{{HEIGHT}}",
+      "length": "{{FRAMES}}",
+      "batch_size": 1,
+      "strength": 1.0,
+      "control_video": [
+        "6",
+        0
+      ],
+      "control_masks": [
+        "7b",
+        0
+      ],
+      "reference_image": [
+        "8",
+        0
+      ]
+    }
+  },
+  "10": {
+    "class_type": "KSampler",
+    "inputs": {
+      "model": [
+        "1",
+        0
+      ],
+      "positive": [
+        "9",
+        0
+      ],
+      "negative": [
+        "9",
+        1
+      ],
+      "latent_image": [
+        "9",
+        2
+      ],
+      "seed": "{{SEED}}",
+      "steps": "{{STEPS}}",
+      "cfg": 5.0,
+      "sampler_name": "uni_pc",
+      "scheduler": "simple",
+      "denoise": 1.0
+    }
+  },
+  "11": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "13",
+        0
+      ],
+      "vae": [
+        "3",
+        0
+      ]
+    }
+  },
+  "12": {
+    "class_type": "VHS_VideoCombine",
+    "inputs": {
+      "images": [
+        "11",
+        0
+      ],
+      "frame_rate": 16,
+      "loop_count": 0,
+      "filename_prefix": "{{PREFIX}}",
+      "format": "video/h264-mp4",
+      "pix_fmt": "yuv420p",
+      "save_output": true,
+      "pingpong": false
+    }
+  },
+  "13": {
+    "class_type": "TrimVideoLatent",
+    "inputs": {
+      "samples": [
+        "10",
+        0
+      ],
+      "trim_amount": [
+        "9",
+        3
+      ]
+    }
+  }
+}

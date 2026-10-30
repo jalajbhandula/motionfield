@@ -1,0 +1,14 @@
+[project]
+name = "motionfield_nodes"
+description = "MotionField node pack — DA3 camera rig, trajectories, pose/mask helpers, and provenance nodes used by the MotionField example workflows."
+version = "0.1.0"
+license = { text = "MIT" }
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/jalajbhandula/motionfield"
+
+[tool.comfy]
+PublisherId = "motionfield"
+DisplayName = "MotionField"
+Icon = "https://raw.githubusercontent.com/jalajbhandula/motionfield/main/comfy-nodes/motionfield_nodes/icon.png"

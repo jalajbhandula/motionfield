@@ -1,0 +1,349 @@
+{
+ "_meta": {
+  "name": "MotionField Re-shoot (Mac) \u2014 clip re-shot along a new camera path (DA3 multiview + OF rig + Wan VACE)",
+  "placeholders": {
+   "INPUT_VIDEO": "owned source clip filename",
+   "MOVES": "'+'-joined trajectory stack (1-3 video-capable catalog ids)",
+   "PROMPT": "scene/style prompt (optional \u2014 default describes neutral motion)",
+   "NEGATIVE": "negative prompt",
+   "STRENGTH": "trajectory strength 0.25-2",
+   "DISTANCE": "subject distance, metres (rescales DA3 world units)",
+   "DURATION": "source clip length, seconds (= (FRAMES-1)/FPS)",
+   "WIDTH": "output width px (multiple of 16, source aspect)",
+   "HEIGHT": "output height px (multiple of 16, source aspect)",
+   "FRAMES": "source frame count \u2014 the video stream's packet probe (load cap)",
+   "PAD_FRAMES": "FRAMES rounded up to 4n+1 for the VACE latent",
+   "DA3_RES": "DA3 multiview processing resolution (multiple of 14)",
+   "FPS": "source fps \u2014 force_rate AND output frame_rate (frame-exact)",
+   "SEED": "noise seed",
+   "STEPS": "sampler steps",
+   "PREFIX": "filename prefix"
+  },
+  "requires": [
+   "wan2.1_vace_1.3B_fp16.safetensors (diffusion_models)",
+   "umt5_xxl_fp8_e4m3fn_scaled.safetensors (text_encoders)",
+   "wan_2.1_vae.safetensors (vae)",
+   "depth_anything_3_base.safetensors (geometry_estimation)",
+   "custom-nodes: VideoHelperSuite (VHS_LoadVideo, VHS_VideoCombine)",
+   "custom-nodes: motionfield_nodes (OF_DA3Poses, OF_Trajectory, OF_CameraRig)"
+  ],
+  "nodes": "VHS_LoadVideo caps the clip at FRAMES; DA3-Base multiview returns per-frame depth + the source camera's recovered poses; OF_DA3Poses converts them to the trajectory schema (metres, source frame-0 as anchor); OF_Trajectory composes the NEW path anchored on the source camera's first pose \u2014 the source's own move is replaced, not layered, and its exact pose count comes from OF_DA3Poses.frame_count (the decoded batch, not the container duration); OF_CameraRig re-projects each frame through its own source pose and splats along the new path (rgb + feathered hole mask + 0.5-grey control, padded to 4n+1); the BiRefNet matte re-places the moving subject as a billboard where the new camera puts it (implausible projections fall back to the hole mask); WanVaceToVideo generates on control_video=control, control_masks=holes, reference_image=source frame 0; the decode is trimmed to that same decoded count and muxed at the source fps WITH the source audio track."
+ },
+ "1": {
+  "class_type": "UNETLoader",
+  "inputs": {
+   "unet_name": "wan2.1_vace_1.3B_fp16.safetensors",
+   "weight_dtype": "default"
+  }
+ },
+ "2": {
+  "class_type": "CLIPLoader",
+  "inputs": {
+   "clip_name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+   "type": "wan",
+   "device": "default"
+  }
+ },
+ "3": {
+  "class_type": "VAELoader",
+  "inputs": {
+   "vae_name": "wan_2.1_vae.safetensors"
+  }
+ },
+ "4": {
+  "class_type": "CLIPTextEncode",
+  "inputs": {
+   "clip": [
+    "2",
+    0
+   ],
+   "text": "{{PROMPT}}"
+  }
+ },
+ "5": {
+  "class_type": "CLIPTextEncode",
+  "inputs": {
+   "clip": [
+    "2",
+    0
+   ],
+   "text": "{{NEGATIVE}}"
+  }
+ },
+ "6": {
+  "class_type": "VHS_LoadVideo",
+  "inputs": {
+   "video": "{{INPUT_VIDEO}}",
+   "force_rate": "{{FPS}}",
+   "custom_width": "{{WIDTH}}",
+   "custom_height": "{{HEIGHT}}",
+   "frame_load_cap": "{{FRAMES}}",
+   "skip_first_frames": 0,
+   "select_every_nth": 1
+  }
+ },
+ "7": {
+  "class_type": "LoadDA3Model",
+  "inputs": {
+   "model_name": "depth_anything_3_base.safetensors",
+   "weight_dtype": "default"
+  }
+ },
+ "8": {
+  "class_type": "OF_DA3Windowed",
+  "inputs": {
+   "da3_model": [
+    "7",
+    0
+   ],
+   "image": [
+    "6",
+    0
+   ],
+   "resolution": "{{DA3_RES}}",
+   "resize_method": "upper_bound_resize",
+   "ref_view_strategy": "saddle_balanced",
+   "pose_method": "cam_dec",
+   "window": 10,
+   "overlap": 4
+  }
+ },
+ "9": {
+  "class_type": "OF_DA3Poses",
+  "inputs": {
+   "da3_geometry": [
+    "8",
+    0
+   ],
+   "fps": "{{FPS}}",
+   "distance": "{{DISTANCE}}",
+   "process_res": "{{DA3_RES}}",
+   "resize_method": "upper_bound_resize",
+   "min_confidence": 0.0
+  }
+ },
+ "10": {
+  "class_type": "OF_Trajectory",
+  "inputs": {
+   "trajectory": "locked-off",
+   "moves": "{{MOVES}}",
+   "strength": "{{STRENGTH}}",
+   "duration": "{{DURATION}}",
+   "fps": "{{FPS}}",
+   "seed": "{{SEED}}",
+   "target": "auto",
+   "layer": "auto",
+   "post": "auto",
+   "subject_class": "person",
+   "distance": "{{DISTANCE}}",
+   "fov": 40,
+   "frames": [
+    "9",
+    2
+   ],
+   "anchor": [
+    "9",
+    0
+   ]
+  }
+ },
+ "11": {
+  "class_type": "OF_CameraRig",
+  "inputs": {
+   "source": [
+    "6",
+    0
+   ],
+   "depth": [
+    "9",
+    1
+   ],
+   "poses_json": [
+    "10",
+    0
+   ],
+   "src_poses_json": [
+    "9",
+    0
+   ],
+   "near": 0.05,
+   "hole_dilate": 6,
+   "subject_mode": "billboard",
+   "hole_feather": 2,
+   "distance": "{{DISTANCE}}",
+   "width": "{{WIDTH}}",
+   "height": "{{HEIGHT}}",
+   "depth_mode": "metres",
+   "pad_to": "{{PAD_FRAMES}}",
+   "subject_mask": [
+    "20",
+    0
+   ],
+   "hole_clamp": 0.6
+  }
+ },
+ "12": {
+  "class_type": "ImageFromBatch",
+  "inputs": {
+   "image": [
+    "6",
+    0
+   ],
+   "batch_index": 0,
+   "length": 1
+  }
+ },
+ "13": {
+  "class_type": "WanVaceToVideo",
+  "inputs": {
+   "positive": [
+    "4",
+    0
+   ],
+   "negative": [
+    "5",
+    0
+   ],
+   "vae": [
+    "3",
+    0
+   ],
+   "width": "{{WIDTH}}",
+   "height": "{{HEIGHT}}",
+   "length": "{{PAD_FRAMES}}",
+   "batch_size": 1,
+   "strength": 1.0,
+   "control_video": [
+    "11",
+    2
+   ],
+   "control_masks": [
+    "11",
+    1
+   ],
+   "reference_image": [
+    "12",
+    0
+   ]
+  }
+ },
+ "14": {
+  "class_type": "KSampler",
+  "inputs": {
+   "model": [
+    "1",
+    0
+   ],
+   "positive": [
+    "13",
+    0
+   ],
+   "negative": [
+    "13",
+    1
+   ],
+   "latent_image": [
+    "13",
+    2
+   ],
+   "seed": "{{SEED}}",
+   "steps": "{{STEPS}}",
+   "cfg": 5.0,
+   "sampler_name": "uni_pc",
+   "scheduler": "simple",
+   "denoise": 1.0
+  }
+ },
+ "15": {
+  "class_type": "TrimVideoLatent",
+  "inputs": {
+   "samples": [
+    "14",
+    0
+   ],
+   "trim_amount": [
+    "13",
+    3
+   ]
+  }
+ },
+ "16": {
+  "class_type": "VAEDecode",
+  "inputs": {
+   "samples": [
+    "15",
+    0
+   ],
+   "vae": [
+    "3",
+    0
+   ]
+  }
+ },
+ "17": {
+  "class_type": "ImageFromBatch",
+  "inputs": {
+   "image": [
+    "16",
+    0
+   ],
+   "batch_index": 0,
+   "length": [
+    "9",
+    2
+   ]
+  }
+ },
+ "18": {
+  "class_type": "VHS_VideoCombine",
+  "inputs": {
+   "images": [
+    "17",
+    0
+   ],
+   "audio": [
+    "21",
+    0
+   ],
+   "frame_rate": "{{FPS}}",
+   "loop_count": 0,
+   "filename_prefix": "{{PREFIX}}",
+   "format": "video/h264-mp4",
+   "save_output": true,
+   "pingpong": false
+  }
+ },
+ "19": {
+  "class_type": "LoadBackgroundRemovalModel",
+  "inputs": {
+   "bg_removal_name": "birefnet.safetensors"
+  },
+  "_meta": {
+   "title": "BiRefNet \u2014 moving-subject matte model"
+  }
+ },
+ "20": {
+  "class_type": "RemoveBackground",
+  "inputs": {
+   "bg_removal_model": [
+    "19",
+    0
+   ],
+   "image": [
+    "6",
+    0
+   ]
+  },
+  "_meta": {
+   "title": "Moving-subject matte \u2014 the rig copies these pixels through unsmashed"
+  }
+ },
+ "21": {
+  "class_type": "OF_PlateAudio",
+  "inputs": {
+   "video": "{{INPUT_VIDEO}}",
+   "start_time": 0,
+   "duration": 0
+  }
+ }
+}

@@ -1,0 +1,372 @@
+{
+ "_meta": {
+  "name": "Wan2.2-Animate character swap (cloud recommended)",
+  "placeholders": {
+   "PROMPT": "scene/character description",
+   "NEGATIVE": "negative prompt",
+   "WIDTH": "multiple of 32",
+   "HEIGHT": "multiple of 32",
+   "FRAMES": "4n+1",
+   "SEED": "noise seed",
+   "STEPS": "6-20",
+   "INPUT_VIDEO": "source video with the person to replace, comfy input/ filename",
+   "REF_IMAGE": "new character reference image, comfy input/ filename",
+   "MASK_IMAGE": "optional frame-0 pick mask (white = character region; a rough box is enough, it is clipped to the per-frame BiRefNet matte and tracked)",
+   "PREFIX": "output filename prefix"
+  },
+  "optional": [
+   "MASK_IMAGE"
+  ],
+  "requires": [
+   "wan2.2_animate_14B_bf16.safetensors (~34.5 GB bf16; Comfy-Org/Wan_2.2_ComfyUI_Repackaged \u2014 upstream Wan-AI/Wan2.2-Animate-14B, Apache-2.0). GPU only",
+   "wan2.2_animate_14B_relight_lora_bf16.safetensors (Comfy-Org/Wan-2.2 loras \u2014 Wan-AI relight LoRA from the official template, Apache-2.0)",
+   "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+   "wan_2.1_vae.safetensors",
+   "clip_vision_h.safetensors (CLIP-ViT-H/14 for the reference image)",
+   "DWPose ONNX weights (yolox_l.onnx + dw-ll_ucoco_384.onnx, Apache-2.0) under models/motionfield/dwpose or the MuseTalk dwpose dir",
+   "custom-nodes: VideoHelperSuite (VHS_LoadVideo, VHS_VideoCombine), motionfield_nodes (OF_DWPose, OF_PlateAudio, OF_MaskTrack)",
+   "birefnet.safetensors (models/birefnet, MIT) — per-frame person matte for the replace path",
+   "lightx2v_I2V_14B_480p_cfg_step_distill_rank64_bf16.safetensors (loras, 738 MB, Kijai/WanVideo_comfy \u2014 4-step distill, required for the cfg-1 6-step path per the official template)"
+  ],
+  "nodes": "core (WanAnimateToVideo) + VHS + motionfield_nodes",
+  "notes": "Matches the official ComfyUI video_wan2_2_14B_animate template: bf16 checkpoint + WanAnimate relight LoRA (strength 1) + ModelSamplingSD3 shift 8, umt5 encoder, wan_2.1 VAE, KSampler cfg 1.0 / euler / simple. pose_video gets the body+hands DWP render, face_video the face-only DWP render (as the template wires two DWPreprocessor branches). reference_image and CLIP vision both take REF_IMAGE. With MASK_IMAGE (replace mode) BiRefNet mattes every frame and OF_MaskTrack keeps only the part that follows the frame-0 pick, so character_mask is a per-frame video and the grey plate is painted only on that moving region. A still mask wired straight into WanAnimateToVideo paints a fixed grey plate. Without MASK_IMAGE the track node drops (pick_image holds the optional placeholder) and _meta.cascade_drop takes the grey plate (node 18) with it, so move mode disconnects both background_video and character_mask exactly as the stock template's Move mode does. TrimVideoLatent strips the prepended reference latent; source audio is muxed back via OF_PlateAudio (silent-safe).",
+  "cascade_drop": ["18"]
+ },
+ "1": {
+  "class_type": "UNETLoader",
+  "inputs": {
+   "unet_name": "wan2.2_animate_14B_bf16.safetensors",
+   "weight_dtype": "default"
+  }
+ },
+ "2": {
+  "class_type": "CLIPLoader",
+  "inputs": {
+   "clip_name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+   "type": "wan"
+  }
+ },
+ "3": {
+  "class_type": "VAELoader",
+  "inputs": {
+   "vae_name": "wan_2.1_vae.safetensors"
+  }
+ },
+ "4": {
+  "class_type": "CLIPTextEncode",
+  "inputs": {
+   "clip": [
+    "2",
+    0
+   ],
+   "text": "{{PROMPT}}"
+  }
+ },
+ "5": {
+  "class_type": "CLIPTextEncode",
+  "inputs": {
+   "clip": [
+    "2",
+    0
+   ],
+   "text": "{{NEGATIVE}}"
+  }
+ },
+ "6": {
+  "class_type": "VHS_LoadVideo",
+  "inputs": {
+   "video": "{{INPUT_VIDEO}}",
+   "force_rate": 16,
+   "custom_width": "{{WIDTH}}",
+   "custom_height": "{{HEIGHT}}",
+   "frame_load_cap": "{{FRAMES}}",
+   "skip_first_frames": 0,
+   "select_every_nth": 1
+  }
+ },
+ "7": {
+  "class_type": "OF_DWPose",
+  "inputs": {
+   "image": [
+    "6",
+    0
+   ],
+   "detect_body": true,
+   "detect_hands": true,
+   "detect_face": false,
+   "resolution": 512
+  }
+ },
+ "8": {
+  "class_type": "LoadImage",
+  "inputs": {
+   "image": "{{REF_IMAGE}}"
+  }
+ },
+ "9": {
+  "class_type": "CLIPVisionLoader",
+  "inputs": {
+   "clip_name": "clip_vision_h.safetensors"
+  }
+ },
+ "10": {
+  "class_type": "CLIPVisionEncode",
+  "inputs": {
+   "clip_vision": [
+    "9",
+    0
+   ],
+   "image": [
+    "8",
+    0
+   ],
+   "crop": "center"
+  }
+ },
+ "11": {
+  "class_type": "LoadImageMask",
+  "inputs": {
+   "image": "{{MASK_IMAGE}}",
+   "channel": "red"
+  }
+ },
+ "12": {
+  "class_type": "WanAnimateToVideo",
+  "inputs": {
+   "positive": [
+    "4",
+    0
+   ],
+   "negative": [
+    "5",
+    0
+   ],
+   "vae": [
+    "3",
+    0
+   ],
+   "width": "{{WIDTH}}",
+   "height": "{{HEIGHT}}",
+   "length": "{{FRAMES}}",
+   "batch_size": 1,
+   "clip_vision_output": [
+    "10",
+    0
+   ],
+   "reference_image": [
+    "8",
+    0
+   ],
+   "face_video": [
+    "19",
+    0
+   ],
+   "pose_video": [
+    "7",
+    0
+   ],
+   "background_video": [
+    "18",
+    0
+   ],
+   "character_mask": [
+    "26",
+    0
+   ],
+   "continue_motion_max_frames": 5,
+   "video_frame_offset": 0
+  }
+ },
+ "13": {
+  "class_type": "KSampler",
+  "inputs": {
+   "model": [
+    "17",
+    0
+   ],
+   "positive": [
+    "12",
+    0
+   ],
+   "negative": [
+    "12",
+    1
+   ],
+   "latent_image": [
+    "12",
+    2
+   ],
+   "seed": "{{SEED}}",
+   "steps": "{{STEPS}}",
+   "cfg": 1.0,
+   "sampler_name": "euler",
+   "scheduler": "simple",
+   "denoise": 1.0
+  }
+ },
+ "14": {
+  "class_type": "TrimVideoLatent",
+  "inputs": {
+   "samples": [
+    "13",
+    0
+   ],
+   "trim_amount": [
+    "12",
+    3
+   ]
+  }
+ },
+ "15": {
+  "class_type": "VAEDecode",
+  "inputs": {
+   "samples": [
+    "14",
+    0
+   ],
+   "vae": [
+    "3",
+    0
+   ]
+  }
+ },
+ "16": {
+  "class_type": "VHS_VideoCombine",
+  "inputs": {
+   "images": [
+    "15",
+    0
+   ],
+   "frame_rate": 16,
+   "loop_count": 0,
+   "filename_prefix": "{{PREFIX}}",
+   "format": "video/h264-mp4",
+   "pix_fmt": "yuv420p",
+   "save_output": true,
+   "pingpong": false,
+   "audio": [
+    "21",
+    0
+   ]
+  }
+ },
+ "17": {
+  "class_type": "ModelSamplingSD3",
+  "inputs": {
+   "model": [
+    "23",
+    0
+   ],
+   "shift": 8.0
+  },
+  "_meta": {
+   "title": "ModelSamplingSD3"
+  }
+ },
+ "18": {
+  "class_type": "ImageCompositeMasked",
+  "inputs": {
+   "destination": [
+    "6",
+    0
+   ],
+   "source": [
+    "20",
+    0
+   ],
+   "x": 0,
+   "y": 0,
+   "resize_source": true,
+   "mask": [
+    "26",
+    0
+   ]
+  }
+ },
+ "19": {
+  "class_type": "OF_DWPose",
+  "inputs": {
+   "image": [
+    "6",
+    0
+   ],
+   "detect_body": false,
+   "detect_hands": false,
+   "detect_face": true,
+   "resolution": 512
+  }
+ },
+ "20": {
+  "class_type": "EmptyImage",
+  "inputs": {
+   "width": "{{WIDTH}}",
+   "height": "{{HEIGHT}}",
+   "batch_size": 1,
+   "color": 8421504
+  }
+ },
+ "21": {
+  "class_type": "OF_PlateAudio",
+  "inputs": {
+   "video": "{{INPUT_VIDEO}}",
+   "start_time": 0,
+   "duration": 0
+  }
+ },
+ "22": {
+  "class_type": "LoraLoaderModelOnly",
+  "inputs": {
+   "model": [
+    "1",
+    0
+   ],
+   "lora_name": "wan2.2_animate_14B_relight_lora_bf16.safetensors",
+   "strength_model": 1.0
+  }
+ },
+ "23": {
+  "inputs": {
+   "model": [
+    "22",
+    0
+   ],
+   "lora_name": "lightx2v_I2V_14B_480p_cfg_step_distill_rank64_bf16.safetensors",
+   "strength_model": 1.0
+  },
+  "class_type": "LoraLoaderModelOnly",
+  "_meta": {
+   "title": "LightX2V 4-step distill"
+  }
+ },
+ "24": {
+  "class_type": "LoadBackgroundRemovalModel",
+  "inputs": {
+   "bg_removal_name": "birefnet.safetensors"
+  }
+ },
+ "25": {
+  "class_type": "RemoveBackground",
+  "inputs": {
+   "bg_removal_model": ["24", 0],
+   "image": ["6", 0]
+  }
+ },
+ "28": {
+  "class_type": "GrowMask",
+  "inputs": {
+   "mask": ["25", 0],
+   "expand": 8,
+   "tapered_corners": true
+  }
+ },
+ "26": {
+  "class_type": "OF_MaskTrack",
+  "inputs": {
+   "matte": ["28", 0],
+   "pick": ["11", 0],
+   "min_coverage": 0.01,
+   "overlap_px": 16,
+   "pick_image": "{{MASK_IMAGE}}"
+  }
+ }
+}

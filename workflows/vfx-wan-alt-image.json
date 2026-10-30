@@ -1,0 +1,324 @@
+{
+  "_meta": {
+    "name": "VFX Lab · Wan VACE alt — image keyframes",
+    "placeholders": {
+      "INPUT_IMAGE": "plate still, comfy input/ filename — the first keyframe",
+      "END_IMAGE": "last control keyframe — the plate itself when no target frame was made (its mask slot marks it reactive either way)",
+      "END_MASK": "last-frame mask value — 0 keeps the end keyframe's pixels, 16777215 lets it be generated",
+      "PROMPT": "effect prompt",
+      "NEGATIVE": "negative prompt",
+      "WIDTH": "multiple of 16",
+      "HEIGHT": "multiple of 16",
+      "FRAMES": "4n+1",
+      "FRAMES_M2": "FRAMES-2 (middle span)",
+      "FPS": "fps (16)",
+      "SEED": "noise seed",
+      "STEPS": "steps",
+      "PREFIX": "filename prefix"
+    },
+    "requires": [
+      "wan2.1_vace_1.3B_fp16.safetensors",
+      "wan_2.1_vae.safetensors",
+      "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "ComfyUI-VideoHelperSuite",
+      "batching nodes"
+    ],
+    "nodes": "core + VHS + batching",
+    "notes": "Still → clip on Wan VACE: control frames are [plate, mid greys…, end], masks are [0 kept, mid 1s reactive, last per END_MASK]. With no end keyframe the plate feeds both slots but the last mask marks it reactive — an end-to-end generation guided only by frame 0. Silent output."
+  },
+  "1": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "wan2.1_vace_1.3B_fp16.safetensors",
+      "weight_dtype": "default"
+    }
+  },
+  "2": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "type": "wan"
+    }
+  },
+  "3": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "wan_2.1_vae.safetensors"
+    }
+  },
+  "4": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "2",
+        0
+      ],
+      "text": "{{PROMPT}}"
+    }
+  },
+  "5": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "2",
+        0
+      ],
+      "text": "{{NEGATIVE}}"
+    }
+  },
+  "6": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "{{INPUT_IMAGE}}"
+    }
+  },
+  "7": {
+    "class_type": "ImageScale",
+    "inputs": {
+      "image": [
+        "6",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "width": "{{WIDTH}}",
+      "height": "{{HEIGHT}}",
+      "crop": "disabled"
+    }
+  },
+  "8": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "{{END_IMAGE}}"
+    }
+  },
+  "9": {
+    "class_type": "ImageScale",
+    "inputs": {
+      "image": [
+        "8",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "width": "{{WIDTH}}",
+      "height": "{{HEIGHT}}",
+      "crop": "disabled"
+    }
+  },
+  "10": {
+    "class_type": "EmptyImage",
+    "inputs": {
+      "width": "{{WIDTH}}",
+      "height": "{{HEIGHT}}",
+      "batch_size": "{{FRAMES_M2}}",
+      "color": 8421504
+    }
+  },
+  "11": {
+    "class_type": "VHS_MergeImages",
+    "inputs": {
+      "images_A": [
+        "7",
+        0
+      ],
+      "images_B": [
+        "10",
+        0
+      ],
+      "merge_strategy": "match larger",
+      "scale_method": "bislerp",
+      "crop": "disabled"
+    }
+  },
+  "12": {
+    "class_type": "VHS_MergeImages",
+    "inputs": {
+      "images_A": [
+        "11",
+        0
+      ],
+      "images_B": [
+        "9",
+        0
+      ],
+      "merge_strategy": "match larger",
+      "scale_method": "bislerp",
+      "crop": "disabled"
+    }
+  },
+  "13": {
+    "class_type": "EmptyImage",
+    "inputs": {
+      "width": "{{WIDTH}}",
+      "height": "{{HEIGHT}}",
+      "batch_size": 1,
+      "color": 0
+    }
+  },
+  "14": {
+    "class_type": "ImageToMask",
+    "inputs": {
+      "image": [
+        "13",
+        0
+      ],
+      "channel": "red"
+    }
+  },
+  "15": {
+    "class_type": "EmptyImage",
+    "inputs": {
+      "width": "{{WIDTH}}",
+      "height": "{{HEIGHT}}",
+      "batch_size": "{{FRAMES_M2}}",
+      "color": 16777215
+    }
+  },
+  "16": {
+    "class_type": "ImageToMask",
+    "inputs": {
+      "image": [
+        "15",
+        0
+      ],
+      "channel": "red"
+    }
+  },
+  "17": {
+    "class_type": "EmptyImage",
+    "inputs": {
+      "width": "{{WIDTH}}",
+      "height": "{{HEIGHT}}",
+      "batch_size": 1,
+      "color": "{{END_MASK}}"
+    }
+  },
+  "18": {
+    "class_type": "ImageToMask",
+    "inputs": {
+      "image": [
+        "17",
+        0
+      ],
+      "channel": "red"
+    }
+  },
+  "19": {
+    "class_type": "BatchMasksNode",
+    "inputs": {
+      "masks.mask0": [
+        "14",
+        0
+      ],
+      "masks.mask1": [
+        "16",
+        0
+      ],
+      "masks.mask2": [
+        "18",
+        0
+      ]
+    }
+  },
+  "20": {
+    "class_type": "WanVaceToVideo",
+    "inputs": {
+      "positive": [
+        "4",
+        0
+      ],
+      "negative": [
+        "5",
+        0
+      ],
+      "vae": [
+        "3",
+        0
+      ],
+      "width": "{{WIDTH}}",
+      "height": "{{HEIGHT}}",
+      "length": "{{FRAMES}}",
+      "batch_size": 1,
+      "strength": 1.0,
+      "control_video": [
+        "12",
+        0
+      ],
+      "control_masks": [
+        "19",
+        0
+      ],
+      "reference_image": [
+        "7",
+        0
+      ]
+    }
+  },
+  "21": {
+    "class_type": "KSampler",
+    "inputs": {
+      "model": [
+        "1",
+        0
+      ],
+      "seed": "{{SEED}}",
+      "steps": "{{STEPS}}",
+      "cfg": 5.0,
+      "sampler_name": "uni_pc",
+      "scheduler": "simple",
+      "positive": [
+        "20",
+        0
+      ],
+      "negative": [
+        "20",
+        1
+      ],
+      "latent_image": [
+        "20",
+        2
+      ],
+      "denoise": 1.0
+    }
+  },
+  "22": {
+    "class_type": "TrimVideoLatent",
+    "inputs": {
+      "samples": [
+        "21",
+        0
+      ],
+      "trim_amount": [
+        "20",
+        3
+      ]
+    }
+  },
+  "23": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "22",
+        0
+      ],
+      "vae": [
+        "3",
+        0
+      ]
+    }
+  },
+  "24": {
+    "class_type": "VHS_VideoCombine",
+    "inputs": {
+      "images": [
+        "23",
+        0
+      ],
+      "frame_rate": "{{FPS}}",
+      "loop_count": 0,
+      "filename_prefix": "{{PREFIX}}",
+      "format": "video/h264-mp4",
+      "pingpong": false,
+      "save_output": true
+    }
+  }
+}

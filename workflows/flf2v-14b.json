@@ -1,0 +1,152 @@
+{
+ "_meta": {
+  "name": "Wan 2.1 FLF2V 14B — first + last frame to video (cloud tier, Apache-2.0)",
+  "placeholders": {
+   "PROMPT": "motion/scene prompt",
+   "NEGATIVE": "negative prompt",
+   "WIDTH": "width px (multiple of 16 — 720p is 1280)",
+   "HEIGHT": "height px (multiple of 16 — 720p is 704)",
+   "FRAMES": "frame count 4n+1",
+   "INPUT_IMAGE": "first frame filename",
+   "END_IMAGE": "last frame filename",
+   "SEED": "noise seed",
+   "STEPS": "sampler steps",
+   "FPS": "output fps",
+   "PREFIX": "filename prefix"
+  },
+  "requires": [
+   "wan2.1_flf2v_720p_14B_fp8_e4m3fn.safetensors (diffusion_models — tier B manifest)",
+   "umt5_xxl_fp8_e4m3fn_scaled.safetensors (text_encoders)",
+   "wan_2.1_vae.safetensors (vae)",
+   "clip_vision_h.safetensors (clip_vision)",
+   "custom-nodes: VideoHelperSuite (VHS_VideoCombine)"
+  ],
+  "nodes": "Wan2.1 FLF2V-14B per the official card: WanFirstLastFrameToVideo carries the first+last frame conditioning (both get clip-vision encodes), ModelSamplingSD3 shift 8 like the other Wan2.1 graphs, single KSampler, 16 fps output. 16 GB fp8 DiT — pod tier."
+ },
+ "1": {
+  "class_type": "UNETLoader",
+  "inputs": {
+   "unet_name": "wan2.1_flf2v_720p_14B_fp8_e4m3fn.safetensors",
+   "weight_dtype": "default"
+  }
+ },
+ "2": {
+  "class_type": "CLIPLoader",
+  "inputs": {
+   "clip_name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+   "type": "wan",
+   "device": "default"
+  }
+ },
+ "3": {
+  "class_type": "VAELoader",
+  "inputs": {
+   "vae_name": "wan_2.1_vae.safetensors"
+  }
+ },
+ "4": {
+  "class_type": "CLIPTextEncode",
+  "inputs": {
+   "clip": ["2", 0],
+   "text": "{{PROMPT}}"
+  }
+ },
+ "5": {
+  "class_type": "CLIPTextEncode",
+  "inputs": {
+   "clip": ["2", 0],
+   "text": "{{NEGATIVE}}"
+  }
+ },
+ "6": {
+  "class_type": "LoadImage",
+  "inputs": {
+   "image": "{{INPUT_IMAGE}}"
+  }
+ },
+ "7": {
+  "class_type": "LoadImage",
+  "inputs": {
+   "image": "{{END_IMAGE}}"
+  }
+ },
+ "8": {
+  "class_type": "CLIPVisionLoader",
+  "inputs": {
+   "clip_name": "clip_vision_h.safetensors"
+  }
+ },
+ "9": {
+  "class_type": "CLIPVisionEncode",
+  "inputs": {
+   "clip_vision": ["8", 0],
+   "image": ["6", 0],
+   "crop": "none"
+  }
+ },
+ "10": {
+  "class_type": "CLIPVisionEncode",
+  "inputs": {
+   "clip_vision": ["8", 0],
+   "image": ["7", 0],
+   "crop": "none"
+  }
+ },
+ "11": {
+  "class_type": "WanFirstLastFrameToVideo",
+  "inputs": {
+   "positive": ["4", 0],
+   "negative": ["5", 0],
+   "vae": ["3", 0],
+   "width": "{{WIDTH}}",
+   "height": "{{HEIGHT}}",
+   "length": "{{FRAMES}}",
+   "batch_size": 1,
+   "clip_vision_start_image": ["9", 0],
+   "clip_vision_end_image": ["10", 0],
+   "start_image": ["6", 0],
+   "end_image": ["7", 0]
+  }
+ },
+ "12": {
+  "class_type": "ModelSamplingSD3",
+  "inputs": {
+   "model": ["1", 0],
+   "shift": 8.0
+  }
+ },
+ "13": {
+  "class_type": "KSampler",
+  "inputs": {
+   "model": ["12", 0],
+   "positive": ["11", 0],
+   "negative": ["11", 1],
+   "latent_image": ["11", 2],
+   "seed": "{{SEED}}",
+   "steps": "{{STEPS}}",
+   "cfg": 6.0,
+   "sampler_name": "uni_pc",
+   "scheduler": "simple",
+   "denoise": 1.0
+  }
+ },
+ "14": {
+  "class_type": "VAEDecode",
+  "inputs": {
+   "samples": ["13", 0],
+   "vae": ["3", 0]
+  }
+ },
+ "15": {
+  "class_type": "VHS_VideoCombine",
+  "inputs": {
+   "images": ["14", 0],
+   "frame_rate": "{{FPS}}",
+   "loop_count": 0,
+   "filename_prefix": "{{PREFIX}}",
+   "format": "video/h264-mp4",
+   "save_output": true,
+   "pingpong": false
+  }
+ }
+}

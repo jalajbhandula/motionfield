@@ -1,0 +1,211 @@
+{
+ "_meta": {
+  "name": "MotionField CameraRig — image to video (Uni3C + Wan 2.1 I2V 14B, cloud tier)",
+  "placeholders": {
+   "INPUT_IMAGE": "start frame filename",
+   "PROMPT": "scene/motion prompt",
+   "NEGATIVE": "negative prompt",
+   "MOVES": "'+'-joined trajectory ids (1-3) for OF_Trajectory",
+   "DURATION": "shot length, seconds",
+   "STRENGTH": "trajectory strength 0.25-2",
+   "DISTANCE": "subject distance, metres (depth scale)",
+   "FOV": "camera horizontal fov, degrees",
+   "CAM_W": "rig + model width (multiple of 16)",
+   "CAM_H": "rig + model height (multiple of 16)",
+   "CAM_FRAMES": "frame count = duration*16+1 (4n+1)",
+   "SEED": "noise seed",
+   "STEPS": "sampler steps",
+   "FPS": "output fps",
+   "PREFIX": "filename prefix"
+  },
+  "requires": [
+   "wan2.1_i2v_480p_14B_fp8_scaled.safetensors (diffusion_models — tier A manifest)",
+   "wan2.1_uni3c_controlnet.pth (model_patches — tier A manifest)",
+   "umt5_xxl_fp8_e4m3fn_scaled.safetensors (text_encoders)",
+   "wan_2.1_vae.safetensors (vae)",
+   "clip_vision_h.safetensors (clip_vision)",
+   "depth_anything_3_mono_large.safetensors (geometry_estimation)",
+   "custom-nodes: VideoHelperSuite (VHS_VideoCombine)",
+   "custom-nodes: motionfield_nodes (OF_Trajectory, OF_CameraRig)"
+  ],
+  "nodes": "cam-i2v's proven chain with Uni3C steering instead of VACE: OF_Trajectory emits the poses, DA3 mono depth + OF_CameraRig re-render the start frame along them, and the rig's rgb render is WanUni3CControlnetApply's render_video — Uni3C's documented guidance channel. The I2V-14B fp8 DiT generates; clip vision rides the start frame per the Wan2.1 card. 16 fps."
+ },
+ "1": {
+  "class_type": "UNETLoader",
+  "inputs": {
+   "unet_name": "wan2.1_i2v_480p_14B_fp8_scaled.safetensors",
+   "weight_dtype": "default"
+  }
+ },
+ "2": {
+  "class_type": "CLIPLoader",
+  "inputs": {
+   "clip_name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+   "type": "wan",
+   "device": "default"
+  }
+ },
+ "3": {
+  "class_type": "VAELoader",
+  "inputs": {
+   "vae_name": "wan_2.1_vae.safetensors"
+  }
+ },
+ "4": {
+  "class_type": "CLIPTextEncode",
+  "inputs": {
+   "clip": ["2", 0],
+   "text": "{{PROMPT}}"
+  }
+ },
+ "5": {
+  "class_type": "CLIPTextEncode",
+  "inputs": {
+   "clip": ["2", 0],
+   "text": "{{NEGATIVE}}"
+  }
+ },
+ "6": {
+  "class_type": "LoadImage",
+  "inputs": {
+   "image": "{{INPUT_IMAGE}}"
+  }
+ },
+ "7": {
+  "class_type": "OF_Trajectory",
+  "inputs": {
+   "trajectory": "locked-off",
+   "moves": "{{MOVES}}",
+   "strength": "{{STRENGTH}}",
+   "duration": "{{DURATION}}",
+   "fps": "{{FPS}}",
+   "seed": "{{SEED}}",
+   "target": "auto",
+   "layer": "auto",
+   "post": "auto",
+   "subject_class": "person",
+   "distance": "{{DISTANCE}}",
+   "fov": "{{FOV}}"
+  }
+ },
+ "8": {
+  "class_type": "LoadDA3Model",
+  "inputs": {
+   "model_name": "depth_anything_3_mono_large.safetensors",
+   "weight_dtype": "default"
+  }
+ },
+ "9": {
+  "class_type": "DA3Inference",
+  "inputs": {
+   "da3_model": ["8", 0],
+   "image": ["6", 0],
+   "resolution": 518,
+   "resize_method": "upper_bound_resize",
+   "mode": "mono"
+  }
+ },
+ "10": {
+  "class_type": "DA3Render",
+  "inputs": {
+   "da3_geometry": ["9", 0],
+   "output": "depth",
+   "output.normalization": "raw",
+   "output.apply_sky_clip": true
+  }
+ },
+ "11": {
+  "class_type": "OF_CameraRig",
+  "inputs": {
+   "source": ["6", 0],
+   "depth": ["10", 0],
+   "poses_json": ["7", 0],
+   "near": 0.05,
+   "hole_dilate": 3,
+   "distance": "{{DISTANCE}}",
+   "width": "{{CAM_W}}",
+   "height": "{{CAM_H}}",
+   "depth_mode": "auto"
+  }
+ },
+ "16": {
+  "class_type": "CLIPVisionLoader",
+  "inputs": {
+   "clip_name": "clip_vision_h.safetensors"
+  }
+ },
+ "17": {
+  "class_type": "CLIPVisionEncode",
+  "inputs": {
+   "clip_vision": ["16", 0],
+   "image": ["6", 0],
+   "crop": "none"
+  }
+ },
+ "18": {
+  "class_type": "ModelPatchLoader",
+  "inputs": {
+   "name": "wan2.1_uni3c_controlnet.pth"
+  }
+ },
+ "12": {
+  "class_type": "WanImageToVideo",
+  "inputs": {
+   "positive": ["4", 0],
+   "negative": ["5", 0],
+   "vae": ["3", 0],
+   "width": "{{CAM_W}}",
+   "height": "{{CAM_H}}",
+   "length": "{{CAM_FRAMES}}",
+   "batch_size": 1,
+   "clip_vision_output": ["17", 0],
+   "start_image": ["6", 0]
+  }
+ },
+ "19": {
+  "class_type": "WanUni3CControlnetApply",
+  "inputs": {
+   "model": ["1", 0],
+   "model_patch": ["18", 0],
+   "vae": ["3", 0],
+   "render_video": ["11", 0],
+   "strength": 1.0,
+   "start_percent": 0.0,
+   "end_percent": 1.0
+  }
+ },
+ "13": {
+  "class_type": "KSampler",
+  "inputs": {
+   "model": ["19", 0],
+   "positive": ["12", 0],
+   "negative": ["12", 1],
+   "latent_image": ["12", 2],
+   "seed": "{{SEED}}",
+   "steps": "{{STEPS}}",
+   "cfg": 6.0,
+   "sampler_name": "uni_pc",
+   "scheduler": "simple",
+   "denoise": 1.0
+  }
+ },
+ "14": {
+  "class_type": "VAEDecode",
+  "inputs": {
+   "samples": ["13", 0],
+   "vae": ["3", 0]
+  }
+ },
+ "15": {
+  "class_type": "VHS_VideoCombine",
+  "inputs": {
+   "images": ["14", 0],
+   "frame_rate": "{{FPS}}",
+   "loop_count": 0,
+   "filename_prefix": "{{PREFIX}}",
+   "format": "video/h264-mp4",
+   "save_output": true,
+   "pingpong": false
+  }
+ }
+}

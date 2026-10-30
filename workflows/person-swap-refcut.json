@@ -1,0 +1,24 @@
+{
+  "_meta": {
+    "name": "PersonSwap identity ref cut-out (white plate)",
+    "placeholders": {
+      "INPUT_IMAGE": "identity photo, comfy input/ filename",
+      "PREFIX": "output filename prefix"
+    },
+    "requires": [
+      "birefnet.safetensors (models/birefnet, MIT)",
+      "custom-nodes: motionfield_nodes (OF_MatteCoverage)"
+    ],
+    "nodes": "core + motionfield_nodes",
+    "notes": "One cheap pass per identity ref, run once per job before the VACE windows: BiRefNet RemoveBackground returns the subject MASK, the mask's inverse is rendered by MaskToImage as the WHITE destination plate, and ImageCompositeMasked pastes the subject onto it — a clean white-background cut-out. VACE's reference_image encoder keys identity much more reliably off a cut-out than off a busy scene photo. The recipe re-uploads the cut-out and feeds it as the person graph's REF_IMAGE(n). OF_MatteCoverage on the matte emits a 1x1 coverage strip so the recipe can rank refs — the best 3 by matte coverage drive the swap when more than 3 photos come in."
+  },
+  "1": { "class_type": "LoadBackgroundRemovalModel", "inputs": { "bg_removal_name": "birefnet.safetensors" } },
+  "2": { "class_type": "LoadImage", "inputs": { "image": "{{INPUT_IMAGE}}" } },
+  "3": { "class_type": "RemoveBackground", "inputs": { "bg_removal_model": ["1", 0], "image": ["2", 0] } },
+  "4": { "class_type": "InvertMask", "inputs": { "mask": ["3", 0] } },
+  "5": { "class_type": "MaskToImage", "inputs": { "mask": ["4", 0] } },
+  "6": { "class_type": "ImageCompositeMasked", "inputs": { "destination": ["5", 0], "source": ["2", 0], "x": 0, "y": 0, "resize_source": false, "mask": ["3", 0] } },
+  "7": { "class_type": "SaveImage", "inputs": { "images": ["6", 0], "filename_prefix": "{{PREFIX}}" } },
+  "8": { "class_type": "OF_MatteCoverage", "inputs": { "mask": ["3", 0] } },
+  "9": { "class_type": "SaveImage", "inputs": { "images": ["8", 1], "filename_prefix": "{{PREFIX}}" } }
+}

@@ -1,0 +1,89 @@
+{
+  "_meta": {
+    "name": "MotionField Relight — normal map (DA3 depth → OF_RelightNormals)",
+    "placeholders": {
+      "INPUT_IMAGE": "photo to relight, comfy input/ filename",
+      "PREFIX": "output filename prefix"
+    },
+    "requires": [
+      "depth_anything_3_mono_large.safetensors (geometry_estimation)",
+      "custom-nodes: motionfield_nodes (OF_RelightNormals)"
+    ],
+    "nodes": "LoadImage → ImageScaleToTotalPixels 1 MP → LoadDA3Model + DA3Inference + DA3Render (raw depth) → OF_RelightNormals → SaveImage. The app shades the photo live in the browser with this normal map."
+  },
+  "10": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "{{INPUT_IMAGE}}"
+    }
+  },
+  "11": {
+    "class_type": "ImageScaleToTotalPixels",
+    "inputs": {
+      "image": [
+        "10",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "megapixels": 1.0,
+      "resolution_steps": 16
+    }
+  },
+  "30": {
+    "class_type": "LoadDA3Model",
+    "inputs": {
+      "model_name": "depth_anything_3_mono_large.safetensors",
+      "weight_dtype": "default"
+    }
+  },
+  "31": {
+    "class_type": "DA3Inference",
+    "inputs": {
+      "da3_model": [
+        "30",
+        0
+      ],
+      "image": [
+        "11",
+        0
+      ],
+      "resolution": 518,
+      "resize_method": "upper_bound_resize",
+      "mode": "mono"
+    }
+  },
+  "32": {
+    "class_type": "DA3Render",
+    "inputs": {
+      "da3_geometry": [
+        "31",
+        0
+      ],
+      "output": "depth",
+      "output.normalization": "raw",
+      "output.apply_sky_clip": true
+    }
+  },
+  "33": {
+    "class_type": "OF_RelightNormals",
+    "inputs": {
+      "depth": [
+        "32",
+        0
+      ],
+      "fov": 50.0,
+      "smooth": 2.0,
+      "depth_mode": "auto"
+    }
+  },
+  "40": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "33",
+        0
+      ],
+      "filename_prefix": "{{PREFIX}}"
+    }
+  }
+}

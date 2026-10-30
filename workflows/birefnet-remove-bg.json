@@ -1,0 +1,15 @@
+{
+  "_meta": {
+    "name": "BiRefNet background removal",
+    "placeholders": { "INPUT_IMAGE": "uploaded source filename", "PREFIX": "filename prefix" },
+    "requires": ["birefnet.safetensors (background_removal)"],
+    "nodes": "core",
+    "notes": "Native ComfyUI 0.41 nodes only — mirrors the official utility_birefnet_remove_background template. RemoveBackground emits a foreground mask (1 = subject); JoinImageWithAlpha treats mask 1 as transparent, so the mask is inverted first. Output is a single RGBA cutout PNG (alpha channel doubles as the matte)."
+  },
+  "1": { "class_type": "LoadImage", "inputs": { "image": "{{INPUT_IMAGE}}" } },
+  "2": { "class_type": "LoadBackgroundRemovalModel", "inputs": { "bg_removal_name": "birefnet.safetensors" } },
+  "3": { "class_type": "RemoveBackground", "inputs": { "image": ["1", 0], "bg_removal_model": ["2", 0] } },
+  "4": { "class_type": "InvertMask", "inputs": { "mask": ["3", 0] } },
+  "5": { "class_type": "JoinImageWithAlpha", "inputs": { "image": ["1", 0], "alpha": ["4", 0] } },
+  "6": { "class_type": "SaveImage", "inputs": { "images": ["5", 0], "filename_prefix": "{{PREFIX}}" } }
+}

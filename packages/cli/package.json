@@ -1,0 +1,19 @@
+{
+  "name": "motionfield-cli",
+  "version": "0.1.0",
+  "description": "Command-line client for the MotionField v1 API",
+  "license": "MIT",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "motionfield": "bin/motionfield.mjs"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "files": [
+    "bin",
+    "src",
+    "LICENSE"
+  ]
+}

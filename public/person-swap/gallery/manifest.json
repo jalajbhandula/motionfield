@@ -1,0 +1,32 @@
+{
+  "clips": [
+    {
+      "id": "park-walk-916",
+      "file": "park-walk-916.mp4",
+      "seconds": 4.06,
+      "aspect": "9:16",
+      "provenance": {
+        "made_by": "MotionField pipeline — scripts/comfy-smoke.ts",
+        "model": "Wan 2.1 T2V 1.3B (wan2.1_t2v_1.3B_fp16)",
+        "license": "Apache-2.0",
+        "prompt": "REQUESTED — pending night batch at native 480×832, 25–30 steps downscaled to 256×480 ≤1.5 MB, full verify block (a young woman with short black hair and a red jacket walks toward the camera along a sunny park path, medium shot, steady framing, daylight)",
+        "synthetic": true
+      },
+      "verified": false
+    },
+    {
+      "id": "night-street-169",
+      "file": "night-street-169.mp4",
+      "seconds": 4.0,
+      "aspect": "16:9",
+      "provenance": {
+        "made_by": "MotionField pipeline — scripts/comfy-smoke.ts",
+        "model": "Wan 2.1 T2V 1.3B (wan2.1_t2v_1.3B_fp16)",
+        "license": "Apache-2.0",
+        "prompt": "REQUESTED — pending night batch; a young man in a grey hoodie crosses a neon-lit street, side tracking shot",
+        "synthetic": true
+      },
+      "verified": false
+    }
+  ]
+}

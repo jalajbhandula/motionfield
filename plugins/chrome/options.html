@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>MotionField - extension setup</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body { font: 14px/1.5 system-ui, sans-serif; max-width: 560px; margin: 40px auto; padding: 0 16px; }
+    h1 { font-size: 20px; }
+    label { display: block; margin: 14px 0 4px; font-weight: 600; }
+    input[type=text], input[type=password] { width: 100%; box-sizing: border-box; padding: 7px 9px; border: 1px solid #8884; border-radius: 6px; font: inherit; }
+    .row { display: flex; gap: 8px; align-items: center; margin-top: 12px; }
+    button { font: inherit; padding: 7px 14px; border-radius: 6px; border: 1px solid #8886; background: #8881; cursor: pointer; }
+    button#of-check { background: #1d4ed8; color: #fff; border-color: #1d4ed8; }
+    button[disabled] { opacity: .5; cursor: default; }
+    #of-status { margin-top: 14px; padding: 8px 10px; border-radius: 6px; background: #8881; min-height: 1.4em; }
+    #of-status.err { background: #d81d1d22; }
+    #of-status.ok { background: #1dd85e22; }
+    .check { display: flex; gap: 8px; align-items: center; margin-top: 10px; font-weight: 400; }
+    .muted { color: #888; font-size: 13px; }
+    section { margin-top: 32px; padding-top: 16px; border-top: 1px solid #8884; }
+  </style>
+</head>
+<body>
+  <h1>MotionField</h1>
+  <p class="muted">Send web media to your local MotionField studio. The key lives in this browser's
+    <code>chrome.storage.local</code> only - it never syncs, and it is attached to requests only
+    when they go to the URL below.</p>
+
+  <label for="of-url">MotionField URL</label>
+  <input id="of-url" type="text" placeholder="http://localhost:3000" spellcheck="false">
+
+  <label for="of-key">API key</label>
+  <input id="of-key" type="password" placeholder="of_live_…" spellcheck="false" autocomplete="off">
+  <p class="muted">Create a key in the app under Settings → API keys. It's shown once; paste it here.
+    The key is saved only after the Check below succeeds against it.</p>
+
+  <label class="check"><input id="of-insecure" type="checkbox"> Allow insecure http:// to a non-local host</label>
+  <p class="muted">http:// sends the key in the clear. Loopback (localhost / 127.x / ::1) is always allowed;
+    anything else needs this tick.</p>
+
+  <div class="row">
+    <button id="of-check">Check</button>
+    <button id="of-forget">Forget key</button>
+  </div>
+  <div id="of-status" role="status">not configured</div>
+
+  <section>
+    <label>Site access (optional)</label>
+    <p class="muted">By default the extension can only reach MotionField on localhost. Granting
+      <strong>http(s)://*/*</strong> is needed for two things:</p>
+    <ul class="muted">
+      <li>connecting to an MotionField server that <em>isn't</em> on this machine (a LAN or hosted URL);</li>
+      <li>reading media straight off websites - without it, right-clicked images/videos on other
+        origins can't be fetched and Send to MotionField will report "can't read that media".</li>
+    </ul>
+    <button id="of-grant">Grant site access</button>
+    <span id="of-grant-status" class="muted"></span>
+  </section>
+
+  <script type="module" src="options.js"></script>
+</body>
+</html>

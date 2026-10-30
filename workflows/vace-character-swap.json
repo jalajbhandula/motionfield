@@ -1,0 +1,247 @@
+{
+  "_meta": {
+    "name": "Wan VACE character-swap (pose-driven)",
+    "placeholders": {
+      "PROMPT": "scene/character description",
+      "NEGATIVE": "negative prompt",
+      "WIDTH": "multiple of 32",
+      "HEIGHT": "multiple of 32",
+      "FRAMES": "8n+1",
+      "SEED": "noise seed",
+      "STEPS": "20-30",
+      "INPUT_VIDEO": "source video with the person to replace, comfy input/ filename",
+      "REF_IMAGE": "new character reference image, comfy input/ filename",
+      "REF_IMAGE_2": "optional second character ref (stitched onto REF_IMAGE)",
+      "REF_IMAGE_3": "optional third character ref",
+      "PREFIX": "output filename prefix"
+    },
+    "optional": [
+      "REF_IMAGE_2",
+      "REF_IMAGE_3"
+    ],
+    "requires": [
+      "wan2.1_vace_1.3B_fp16.safetensors (upgrade: wan2.1_vace_14B_fp8scaled.safetensors on a GPU / Comfy Cloud)",
+      "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "wan_2.1_vae.safetensors",
+      "custom-nodes: VideoHelperSuite (VHS_LoadVideo, VHS_VideoCombine)"
+    ],
+    "nodes": "core + VHS + motionfield_nodes",
+    "notes": "Source video -> OF_DWPose render -> VACE control_video; the reference image supplies the replacement identity and the whole frame re-renders around the pose (Animate-style 'move' mode). Multiple refs are stitched into one composite ref — WanVaceToVideo consumes reference_image[:1]. TrimVideoLatent strips the prepended reference latent so it never reaches the output. For background-preserving swaps feed a tracked person mask through the object-swap endpoint instead; for production-grade replacement use Wan2.2-Animate (wan-animate-character-swap.json, cloud)."
+  },
+  "1": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "wan2.1_vace_1.3B_fp16.safetensors",
+      "weight_dtype": "default"
+    }
+  },
+  "2": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "type": "wan"
+    }
+  },
+  "3": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "wan_2.1_vae.safetensors"
+    }
+  },
+  "4": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "2",
+        0
+      ],
+      "text": "{{PROMPT}}"
+    }
+  },
+  "5": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "2",
+        0
+      ],
+      "text": "{{NEGATIVE}}"
+    }
+  },
+  "6": {
+    "class_type": "VHS_LoadVideo",
+    "inputs": {
+      "video": "{{INPUT_VIDEO}}",
+      "force_rate": 16,
+      "custom_width": "{{WIDTH}}",
+      "custom_height": "{{HEIGHT}}",
+      "frame_load_cap": "{{FRAMES}}",
+      "skip_first_frames": 0,
+      "select_every_nth": 1
+    }
+  },
+  "7": {
+    "class_type": "OF_DWPose",
+    "inputs": {
+      "image": [
+        "6",
+        0
+      ],
+      "detect_body": true,
+      "detect_hands": true,
+      "detect_face": true,
+      "resolution": 512
+    }
+  },
+  "8": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "{{REF_IMAGE}}"
+    }
+  },
+  "9": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "{{REF_IMAGE_2}}"
+    }
+  },
+  "10": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "{{REF_IMAGE_3}}"
+    }
+  },
+  "11": {
+    "class_type": "ImageStitch",
+    "inputs": {
+      "image1": [
+        "8",
+        0
+      ],
+      "image2": [
+        "9",
+        0
+      ],
+      "direction": "right",
+      "match_image_size": true,
+      "spacing_width": 0,
+      "spacing_color": "black"
+    }
+  },
+  "12": {
+    "class_type": "ImageStitch",
+    "inputs": {
+      "image1": [
+        "11",
+        0
+      ],
+      "image2": [
+        "10",
+        0
+      ],
+      "direction": "right",
+      "match_image_size": true,
+      "spacing_width": 0,
+      "spacing_color": "black"
+    }
+  },
+  "13": {
+    "class_type": "WanVaceToVideo",
+    "inputs": {
+      "positive": [
+        "4",
+        0
+      ],
+      "negative": [
+        "5",
+        0
+      ],
+      "vae": [
+        "3",
+        0
+      ],
+      "width": "{{WIDTH}}",
+      "height": "{{HEIGHT}}",
+      "length": "{{FRAMES}}",
+      "batch_size": 1,
+      "strength": 1.0,
+      "control_video": [
+        "7",
+        0
+      ],
+      "reference_image": [
+        "12",
+        0
+      ]
+    }
+  },
+  "14": {
+    "class_type": "KSampler",
+    "inputs": {
+      "model": [
+        "1",
+        0
+      ],
+      "positive": [
+        "13",
+        0
+      ],
+      "negative": [
+        "13",
+        1
+      ],
+      "latent_image": [
+        "13",
+        2
+      ],
+      "seed": "{{SEED}}",
+      "steps": "{{STEPS}}",
+      "cfg": 5.0,
+      "sampler_name": "uni_pc",
+      "scheduler": "simple",
+      "denoise": 1.0
+    }
+  },
+  "15": {
+    "class_type": "TrimVideoLatent",
+    "inputs": {
+      "samples": [
+        "14",
+        0
+      ],
+      "trim_amount": [
+        "13",
+        3
+      ]
+    }
+  },
+  "16": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "15",
+        0
+      ],
+      "vae": [
+        "3",
+        0
+      ]
+    }
+  },
+  "17": {
+    "class_type": "VHS_VideoCombine",
+    "inputs": {
+      "images": [
+        "16",
+        0
+      ],
+      "frame_rate": 16,
+      "loop_count": 0,
+      "filename_prefix": "{{PREFIX}}",
+      "format": "video/h264-mp4",
+      "pix_fmt": "yuv420p",
+      "save_output": true,
+      "pingpong": false
+    }
+  }
+}

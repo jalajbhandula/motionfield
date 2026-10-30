@@ -1,0 +1,2161 @@
+{
+ "version": 1,
+ "note": "RunPod weight manifest — one entry per file. sha256 = HF LFS oid (or a locally computed sha256 for tiny non-LFS config files). licence ids follow licenseClassForSpdx; class must equal it, or be stricter only when 'pack' justifies it (trellis2 runs restricted beside its bundled DINOv3 clip — ws3-cloud.test.ts + the setup.sh gate enforce). Official repos or Comfy-Org repacks only. LTX-2.5 pack is gated on HF — run scripts/runpod/fill-hashes.py with HF_TOKEN once to resolve sha256, and pass --with-restricted (ltx community licence) to setup.sh.",
+ "base_url": "https://huggingface.co/{repo}/resolve/main/{path}",
+ "models": [
+  {
+   "name": "wan2.2_animate_14B_bf16.safetensors",
+   "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+   "path": "split_files/diffusion_models/wan2.2_animate_14B_bf16.safetensors",
+   "target": "diffusion_models",
+   "bytes": 34549787368,
+   "sha256": "7d37cb0120488dec2a061135aa3018426925318a60838c3de935c829abc88667",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/Wan-AI/Wan2.2-Animate",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "wan-animate"
+   ]
+  },
+  {
+   "name": "wan2.2_animate_14B_relight_lora_bf16.safetensors",
+   "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+   "path": "split_files/loras/wan2.2_animate_14B_relight_lora_bf16.safetensors",
+   "target": "loras",
+   "bytes": 1436673432,
+   "sha256": "5f4b6b9d3bc745a86e7bfd511f3880d90cf59c3bded9584d92c028f583fa74a3",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/Wan-AI/Wan2.2-Animate",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "wan-animate"
+   ]
+  },
+  {
+   "name": "qwen_image_edit_2511_fp8mixed.safetensors",
+   "repo": "Comfy-Org/Qwen-Image-Edit_ComfyUI",
+   "path": "split_files/diffusion_models/qwen_image_edit_2511_fp8mixed.safetensors",
+   "target": "diffusion_models",
+   "bytes": 20533762817,
+   "sha256": "c9fdc158e46d3b61ef75f21ae866ca2fe808bf4a53643120d1c1e87c19280a4e",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/Qwen/Qwen-Image-Edit-2511",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "qwen-edit"
+   ]
+  },
+  {
+   "name": "qwen_2.5_vl_7b_fp8_scaled.safetensors",
+   "repo": "Comfy-Org/Qwen-Image_ComfyUI",
+   "path": "split_files/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors",
+   "target": "text_encoders",
+   "bytes": 9384670680,
+   "sha256": "cb5636d852a0ea6a9075ab1bef496c0db7aef13c02350571e388aea959c5c0b4",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/Qwen/Qwen2.5-VL-7B-Instruct",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "qwen-edit",
+    "qwen-image"
+   ]
+  },
+  {
+   "name": "qwen_image_vae.safetensors",
+   "repo": "Comfy-Org/Qwen-Image_ComfyUI",
+   "path": "split_files/vae/qwen_image_vae.safetensors",
+   "target": "vae",
+   "bytes": 253806246,
+   "sha256": "a70580f0213e67967ee9c95f05bb400e8fb08307e017a924bf3441223e023d1f",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/Qwen/Qwen-Image",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "qwen-edit",
+    "qwen-image",
+    "marigold-v2"
+   ]
+  },
+  {
+   "name": "Qwen-Edit-2509-Multiple-angles.safetensors",
+   "repo": "Comfy-Org/Qwen-Image-Edit_ComfyUI",
+   "path": "split_files/loras/Qwen-Edit-2509-Multiple-angles.safetensors",
+   "target": "loras",
+   "bytes": 236117032,
+   "sha256": "e0cea9508025a39e41f50da0e7d10fbd9db182d057c745136a42ef8829914c8f",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/dx8152/Qwen-Edit-2509-Multiple-angles",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "qwen-edit-angles"
+   ]
+  },
+  {
+   "name": "flashvsr_streaming_dmd.safetensors",
+   "repo": "JunhaoZhuang/FlashVSR-v1.1",
+   "path": "diffusion_pytorch_model_streaming_dmd.safetensors",
+   "target": "diffusion_models",
+   "bytes": 5676070392,
+   "sha256": "bd28180edcf3446c028e32fc6b731a80bf7e4da2ab4caac3186b9499964d37be",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/JunhaoZhuang/FlashVSR-v1.1",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "flashvsr"
+   ]
+  },
+  {
+   "name": "flashvsr_LQ_proj_in.ckpt",
+   "repo": "JunhaoZhuang/FlashVSR-v1.1",
+   "path": "LQ_proj_in.ckpt",
+   "target": "flashvsr",
+   "bytes": 575694948,
+   "sha256": "d6d011cdaaba6a52645086caa08fa04124e746f6ca568140a24007591142bfd2",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/JunhaoZhuang/FlashVSR-v1.1",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "flashvsr"
+   ]
+  },
+  {
+   "name": "flashvsr_TCDecoder.ckpt",
+   "repo": "JunhaoZhuang/FlashVSR-v1.1",
+   "path": "TCDecoder.ckpt",
+   "target": "flashvsr",
+   "bytes": 189018333,
+   "sha256": "e224bdcf2f52745cbf4d393ff5374c2ba09e90285d5d19062d2bf63b915b6161",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/JunhaoZhuang/FlashVSR-v1.1",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "flashvsr"
+   ]
+  },
+  {
+   "name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+   "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+   "path": "split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+   "target": "text_encoders",
+   "bytes": 6735906897,
+   "sha256": "c3355d30191f1f066b26d93fba017ae9809dce6c627dda5f6a66eaa651204f68",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/google/umt5-xxl",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "wan2.1",
+    "wan2.2",
+    "wan-animate",
+    "uni3c-camera",
+    "camera-fun"
+   ]
+  },
+  {
+   "name": "wan_2.1_vae.safetensors",
+   "repo": "Comfy-Org/Wan-2.1",
+   "path": "split_files/vae/wan_2.1_vae.safetensors",
+   "target": "vae",
+   "bytes": 253815318,
+   "sha256": "2fc39d31359a4b0a64f55876d8ff7fa8d780956ae2cb13463b0223e15148976b",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/Wan-AI/Wan2.1-T2V-1.3B",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "director",
+    "reshoot",
+    "wan2.1",
+    "wan-animate"
+   ]
+  },
+  {
+   "name": "wan2.2_vae.safetensors",
+   "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+   "path": "split_files/vae/wan2.2_vae.safetensors",
+   "target": "vae",
+   "bytes": 1409400960,
+   "sha256": "e40321bd36b9709991dae2530eb4ac303dd168276980d3e9bc4b6e2b75fed156",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/Wan-AI/Wan2.2-T2V-A14B",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "wan2.2-i2v",
+    "wan2.2-t2v",
+    "wan-animate",
+    "ti2v-5b"
+   ]
+  },
+  {
+   "name": "clip_vision_h.safetensors",
+   "repo": "Comfy-Org/Wan_2.1_ComfyUI_repackaged",
+   "path": "split_files/clip_vision/clip_vision_h.safetensors",
+   "target": "clip_vision",
+   "bytes": 1264219396,
+   "sha256": "64a7ef761bfccbadbaa3da77366aac4185a6c58fa5de5f589b42a65bcc21f161",
+   "license": "mit",
+   "license_url": "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "wan-animate",
+    "camera-fun",
+    "uni3c-camera"
+   ]
+  },
+  {
+   "name": "depth_anything_3_mono_large.safetensors",
+   "repo": "Comfy-Org/Depth-Anything-3",
+   "path": "geometry_estimation/depth_anything_3_mono_large.safetensors",
+   "target": "geometry_estimation",
+   "bytes": 1336748056,
+   "sha256": "9b44eda5bedba5b4e125686fdb79d1db309c1b9785277576eb930f885b008f96",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/depth-anything/DA3MONO-LARGE",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "director",
+    "cam-i2v-uni3c"
+   ]
+  },
+  {
+   "name": "birefnet.safetensors",
+   "repo": "Comfy-Org/BiRefNet",
+   "path": "background_removal/birefnet.safetensors",
+   "target": "background_removal",
+   "bytes": 444473596,
+   "sha256": "9ab37426bf4de0567af6b5d21b16151357149139362e6e8992021b8ce356a154",
+   "license": "mit",
+   "license_url": "https://huggingface.co/ZhengPeng7/BiRefNet",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "birefnet-remove-bg",
+    "person-swap",
+    "reshoot-video",
+    "reshoot-uni3c",
+    "vace-object-swap",
+    "klein-faceswap",
+    "klein-product-compose"
+   ]
+  },
+  {
+   "name": "depth_anything_3_base.safetensors",
+   "repo": "Comfy-Org/Depth-Anything-3",
+   "path": "geometry_estimation/depth_anything_3_base.safetensors",
+   "target": "geometry_estimation",
+   "bytes": 541524124,
+   "sha256": "418c0d2ea857e2d1215fa51baa46833f499a62eb2400ec63d337aa20d326414f",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/depth-anything/DA3-BASE",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "reshoot-video",
+    "reshoot-uni3c"
+   ]
+  },
+  {
+   "name": "rife_v4.26.safetensors",
+   "repo": "Comfy-Org/Frame-Interpolation",
+   "path": "frame_interpolation/rife_v4.26.safetensors",
+   "target": "frame_interpolation",
+   "bytes": 22674688,
+   "sha256": "151874592c877740e5db11522f4514df569eeafb0a0fcb2696f16e9e8d317c94",
+   "license": "mit",
+   "license_url": "https://github.com/hzwer/Practical-RIFE",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "video-finish"
+   ]
+  },
+  {
+   "name": "z_image_turbo_int8_convrot.safetensors",
+   "repo": "Comfy-Org/z_image_turbo",
+   "path": "split_files/diffusion_models/z_image_turbo_int8_convrot.safetensors",
+   "target": "diffusion_models",
+   "bytes": 6201001296,
+   "sha256": "be517ebd47c912a5626a588e1aeea43e6be4a43c0cdcd2b48a2a780d9f358635",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/Tongyi-MAI/Z-Image-Turbo",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "director"
+   ]
+  },
+  {
+   "name": "qwen_3_4b_fp8_mixed.safetensors",
+   "repo": "Comfy-Org/z_image_turbo",
+   "path": "split_files/text_encoders/qwen_3_4b_fp8_mixed.safetensors",
+   "target": "text_encoders",
+   "bytes": 5631994051,
+   "sha256": "72450b19758172c5a7273cf7de729d1c17e7f434a104a00167624cba94f68f15",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/Qwen/Qwen3-4B",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "director"
+   ]
+  },
+  {
+   "name": "wan2.1_14B_SCAIL_2_int8_convrot.safetensors",
+   "repo": "Comfy-Org/SCAIL-2",
+   "path": "diffusion_models/wan2.1_14B_SCAIL_2_int8_convrot.safetensors",
+   "target": "diffusion_models",
+   "bytes": 16654506256,
+   "sha256": "a2114c18a811243185f103765cd5004b61652141aa55a9016d3bdceebceb5ac0",
+   "license": "mit",
+   "license_url": "https://huggingface.co/zai-org/SCAIL-2",
+   "class": "open",
+   "tier": "B",
+   "optional": false,
+   "used_by": [
+    "scail2"
+   ]
+  },
+  {
+   "name": "wan2.1_flf2v_720p_14B_fp8_e4m3fn.safetensors",
+   "repo": "Comfy-Org/Wan_2.1_ComfyUI_repackaged",
+   "path": "split_files/diffusion_models/wan2.1_flf2v_720p_14B_fp8_e4m3fn.safetensors",
+   "target": "diffusion_models",
+   "bytes": 16397952536,
+   "sha256": "d68ca694a695274e48e00974128337e06e497d95a1dc09e86fd2a01a405f455f",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/Wan-AI/Wan2.1-FLF2V-14B-720P",
+   "class": "open",
+   "tier": "B",
+   "optional": false,
+   "used_by": [
+    "flf2v"
+   ]
+  },
+  {
+   "name": "wan2.2_ti2v_5B_fp16.safetensors",
+   "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+   "path": "split_files/diffusion_models/wan2.2_ti2v_5B_fp16.safetensors",
+   "target": "diffusion_models",
+   "bytes": 9999658848,
+   "sha256": "456f901338bd9eadbded3828b819109a9b68e8a525ca5cf8d0049a69fcfeca1e",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/Wan-AI/Wan2.2-TI2V-5B",
+   "class": "open",
+   "tier": "B",
+   "optional": false,
+   "used_by": [
+    "ti2v-5b"
+   ]
+  },
+  {
+   "name": "qwen_image_2512_fp8_e4m3fn.safetensors",
+   "repo": "Comfy-Org/Qwen-Image_ComfyUI",
+   "path": "split_files/diffusion_models/qwen_image_2512_fp8_e4m3fn.safetensors",
+   "target": "diffusion_models",
+   "bytes": 20430679144,
+   "sha256": "5dc80554d5d83390046a2f4a94ece06afb7700bf7b0aaf8bde9769793875876b",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/Qwen/Qwen-Image-2512",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "qwen-image"
+   ]
+  },
+  {
+   "name": "longcat_avatar_15_int8_00001.safetensors",
+   "repo": "meituan-longcat/LongCat-Video-Avatar-1.5",
+   "path": "base_model_int8/quantized_model-00001-of-00004.safetensors",
+   "target": "longcat",
+   "bytes": 4264635792,
+   "sha256": "ccf575d8cdf8e762272e2d4e52ae1a7c0b5d1fa81e26dfa4592867de4dd9a4fd",
+   "license": "mit",
+   "license_url": "https://huggingface.co/meituan-longcat/LongCat-Video-Avatar-1.5",
+   "class": "open",
+   "tier": "B",
+   "optional": false,
+   "used_by": [
+    "longcat-avatar"
+   ]
+  },
+  {
+   "name": "longcat_avatar_15_int8_00002.safetensors",
+   "repo": "meituan-longcat/LongCat-Video-Avatar-1.5",
+   "path": "base_model_int8/quantized_model-00002-of-00004.safetensors",
+   "target": "longcat",
+   "bytes": 4275232472,
+   "sha256": "af6ddb737ad66d12fd5892adee568c14314143ebd4388d3ab9cc6065754b3688",
+   "license": "mit",
+   "license_url": "https://huggingface.co/meituan-longcat/LongCat-Video-Avatar-1.5",
+   "class": "open",
+   "tier": "B",
+   "optional": false,
+   "used_by": [
+    "longcat-avatar"
+   ]
+  },
+  {
+   "name": "longcat_avatar_15_int8_00003.safetensors",
+   "repo": "meituan-longcat/LongCat-Video-Avatar-1.5",
+   "path": "base_model_int8/quantized_model-00003-of-00004.safetensors",
+   "target": "longcat",
+   "bytes": 4275232472,
+   "sha256": "6a349b76592b4752c2967235af457824d8938e3514bad8e78cfa86009e8a9bf5",
+   "license": "mit",
+   "license_url": "https://huggingface.co/meituan-longcat/LongCat-Video-Avatar-1.5",
+   "class": "open",
+   "tier": "B",
+   "optional": false,
+   "used_by": [
+    "longcat-avatar"
+   ]
+  },
+  {
+   "name": "longcat_avatar_15_int8_00004.safetensors",
+   "repo": "meituan-longcat/LongCat-Video-Avatar-1.5",
+   "path": "base_model_int8/quantized_model-00004-of-00004.safetensors",
+   "target": "longcat",
+   "bytes": 3065282200,
+   "sha256": "ab54b648a3f6a53946f07dd0a21441e2a8cb1aa8da17996b5f3f7f2e1370705b",
+   "license": "mit",
+   "license_url": "https://huggingface.co/meituan-longcat/LongCat-Video-Avatar-1.5",
+   "class": "open",
+   "tier": "B",
+   "optional": false,
+   "used_by": [
+    "longcat-avatar"
+   ]
+  },
+  {
+   "name": "longcat_avatar_15_int8.index.json",
+   "repo": "meituan-longcat/LongCat-Video-Avatar-1.5",
+   "path": "base_model_int8/quantized_model.safetensors.index.json",
+   "target": "longcat",
+   "bytes": 201884,
+   "sha256": "480ca179ba2d53fa1c28b7c403ce4ba1f159bb708a584499d6645024bf12acff",
+   "license": "mit",
+   "license_url": "https://huggingface.co/meituan-longcat/LongCat-Video-Avatar-1.5",
+   "class": "open",
+   "tier": "B",
+   "optional": false,
+   "used_by": [
+    "longcat-avatar"
+   ]
+  },
+  {
+   "name": "whisper-large-v3.safetensors",
+   "repo": "openai/whisper-large-v3",
+   "path": "model.safetensors",
+   "target": "audio_encoders",
+   "bytes": 3087130976,
+   "sha256": "a8e94b85976e5864ba3e9525c7e6c83b2a1eca42d4b797a0c7c24d778e40fd95",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/openai/whisper-large-v3",
+   "class": "open",
+   "tier": "B",
+   "optional": false,
+   "used_by": [
+    "longcat-avatar"
+   ]
+  },
+  {
+   "name": "seedvr2_3b_fp8_e4m3fn.safetensors",
+   "repo": "Comfy-Org/SeedVR2",
+   "path": "diffusion_models/seedvr2_3b_fp8_e4m3fn.safetensors",
+   "target": "diffusion_models",
+   "bytes": 3392794232,
+   "sha256": "a0226eaa2c3e6f47ae5ce83225120f16479da890ced1a3bc32b1a14619787914",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/ByteDance-Seed/SeedVR2-3B",
+   "class": "open",
+   "tier": "B",
+   "optional": false,
+   "used_by": [
+    "seedvr2"
+   ]
+  },
+  {
+   "name": "seedvr2_ema_vae_fp16.safetensors",
+   "repo": "Comfy-Org/SeedVR2",
+   "path": "vae/ema_vae_fp16.safetensors",
+   "target": "vae",
+   "bytes": 501324814,
+   "sha256": "20678548f420d98d26f11442d3528f8b8c94e57ee046ef93dbb7633da8612ca1",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/ByteDance-Seed/SeedVR2-3B",
+   "class": "open",
+   "tier": "B",
+   "optional": false,
+   "used_by": [
+    "seedvr2"
+   ]
+  },
+  {
+   "name": "hidream_o1_image_fp8_scaled.safetensors",
+   "repo": "Comfy-Org/HiDream-O1-Image",
+   "path": "checkpoints/hidream_o1_image_fp8_scaled.safetensors",
+   "target": "checkpoints",
+   "bytes": 8067535296,
+   "sha256": "05ad98bc4a94557697f31b839f6dbf6dba293a353d9e3c52eef7818b5802d206",
+   "license": "mit",
+   "license_url": "https://huggingface.co/HiDream-ai/HiDream-O1-Image",
+   "class": "open",
+   "tier": "C",
+   "optional": true,
+   "used_by": [
+    "hidream-o1"
+   ]
+  },
+  {
+   "name": "wan2.2_bernini_r_high_noise_fp8_scaled.safetensors",
+   "repo": "Comfy-Org/Bernini-R",
+   "path": "diffusion_models/wan2.2_bernini_r_high_noise_fp8_scaled.safetensors",
+   "target": "diffusion_models",
+   "bytes": 15574833216,
+   "sha256": "9ff3d7369da98f8eaf71045f7d0e99d5e344eea5e7dc934a930608786fe73f52",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/ByteDance/Bernini-R",
+   "class": "open",
+   "tier": "C",
+   "optional": true,
+   "used_by": [
+    "bernini-r"
+   ]
+  },
+  {
+   "name": "wan2.2_bernini_r_low_noise_fp8_scaled.safetensors",
+   "repo": "Comfy-Org/Bernini-R",
+   "path": "diffusion_models/wan2.2_bernini_r_low_noise_fp8_scaled.safetensors",
+   "target": "diffusion_models",
+   "bytes": 15574833216,
+   "sha256": "ce35c070f345c91abe43d6bf29b0eccb8687e4026fadc0e0a70a73c9afb7bbb3",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/ByteDance/Bernini-R",
+   "class": "open",
+   "tier": "C",
+   "optional": true,
+   "used_by": [
+    "bernini-r"
+   ]
+  },
+  {
+   "name": "triposg_transformer.safetensors",
+   "repo": "VAST-AI/TripoSG",
+   "path": "transformer/diffusion_pytorch_model.safetensors",
+   "target": "triposg",
+   "bytes": 5758280104,
+   "sha256": "9192b5923f7b605b394192809aa2ceb73bf0f4009674d8e3b999b45bb97d4bf2",
+   "license": "mit",
+   "license_url": "https://huggingface.co/VAST-AI/TripoSG",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "triposg"
+   ]
+  },
+  {
+   "name": "triposg_vae.safetensors",
+   "repo": "VAST-AI/TripoSG",
+   "path": "vae/diffusion_pytorch_model.safetensors",
+   "target": "triposg",
+   "bytes": 970685468,
+   "sha256": "a2e667c24927a5a35e5f19fcb4c75890e9399aa966b6db8131d7df733a750c8b",
+   "license": "mit",
+   "license_url": "https://huggingface.co/VAST-AI/TripoSG",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "triposg"
+   ]
+  },
+  {
+   "name": "triposg_dinov2.safetensors",
+   "repo": "VAST-AI/TripoSG",
+   "path": "image_encoder_dinov2/model.safetensors",
+   "target": "triposg",
+   "bytes": 1217522888,
+   "sha256": "399fba97a95f22c36834418bc69373364a99af3a1153da1c0fb31db567c92e23",
+   "license": "apache-2.0",
+   "license_url": "https://github.com/facebookresearch/dinov2/blob/main/LICENSE",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "triposg"
+   ]
+  },
+  {
+   "name": "triposg_model_index.json",
+   "repo": "VAST-AI/TripoSG",
+   "path": "model_index.json",
+   "target": "triposg",
+   "bytes": 525,
+   "sha256": "750af638d10fc67a5f43d19ef0a0d1d3d446174e24b73bddd0a49226016c80c2",
+   "license": "mit",
+   "license_url": "https://huggingface.co/VAST-AI/TripoSG",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "triposg"
+   ]
+  },
+  {
+   "name": "triposg_scheduler_config.json",
+   "repo": "VAST-AI/TripoSG",
+   "path": "scheduler/scheduler_config.json",
+   "target": "triposg",
+   "bytes": 158,
+   "sha256": "ea7c9b4d502dcaba97cd85291cfd7dbd3c6c82cbc4c775af5c6d9224864279c9",
+   "license": "mit",
+   "license_url": "https://huggingface.co/VAST-AI/TripoSG",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "triposg"
+   ]
+  },
+  {
+   "name": "triposg_transformer_config.json",
+   "repo": "VAST-AI/TripoSG",
+   "path": "transformer/config.json",
+   "target": "triposg",
+   "bytes": 191,
+   "sha256": "54ad779e68f9bc7303122cdf291f6db48dec7c67e41d28c05ac359daf914128a",
+   "license": "mit",
+   "license_url": "https://huggingface.co/VAST-AI/TripoSG",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "triposg"
+   ]
+  },
+  {
+   "name": "triposg_vae_config.json",
+   "repo": "VAST-AI/TripoSG",
+   "path": "vae/config.json",
+   "target": "triposg",
+   "bytes": 335,
+   "sha256": "2fb6ba9b364d42c9681879dca0f7edcb978f2db974a1ca4b15d28f9b15a5baed",
+   "license": "mit",
+   "license_url": "https://huggingface.co/VAST-AI/TripoSG",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "triposg"
+   ]
+  },
+  {
+   "name": "triposg_dinov2_config.json",
+   "repo": "VAST-AI/TripoSG",
+   "path": "image_encoder_dinov2/config.json",
+   "target": "triposg",
+   "bytes": 1104,
+   "sha256": "8ed81b0d5ffd2c8b2cecd7dc1326d3eefa409bc9d525537b6b2a3c70a992fd02",
+   "license": "apache-2.0",
+   "license_url": "https://github.com/facebookresearch/dinov2/blob/main/LICENSE",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "triposg"
+   ]
+  },
+  {
+   "name": "triposg_dinov2_preprocessor.json",
+   "repo": "VAST-AI/TripoSG",
+   "path": "feature_extractor_dinov2/preprocessor_config.json",
+   "target": "triposg",
+   "bytes": 436,
+   "sha256": "14e780d86fa1861f8751f868d7f45425b5feb55c38ca26f152ca5097ab30f828",
+   "license": "apache-2.0",
+   "license_url": "https://github.com/facebookresearch/dinov2/blob/main/LICENSE",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "triposg"
+   ]
+  },
+  {
+   "name": "trellis1_slat_flow_img_dit_L.safetensors",
+   "repo": "microsoft/TRELLIS-image-large",
+   "path": "ckpts/slat_flow_img_dit_L_64l8p2_fp16.safetensors",
+   "target": "trellis-image-large/ckpts",
+   "bytes": 1203755136,
+   "sha256": "693fb2a58ad497bd222007301eeec49d14d60f8c12d2f2f00c221fa747b4c66c",
+   "license": "mit",
+   "license_url": "https://huggingface.co/microsoft/TRELLIS-image-large",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "trellis1-image"
+   ]
+  },
+  {
+   "name": "trellis1_ss_flow_img_dit_L.safetensors",
+   "repo": "microsoft/TRELLIS-image-large",
+   "path": "ckpts/ss_flow_img_dit_L_16l8_fp16.safetensors",
+   "target": "trellis-image-large/ckpts",
+   "bytes": 1130770840,
+   "sha256": "96dc6bfd4136fd950af564dd16b4ae533c9ba6af8f26c670646b2a9f2789b1db",
+   "license": "mit",
+   "license_url": "https://huggingface.co/microsoft/TRELLIS-image-large",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "trellis1-image"
+   ]
+  },
+  {
+   "name": "trellis1_slat_enc.safetensors",
+   "repo": "microsoft/TRELLIS-image-large",
+   "path": "ckpts/slat_enc_swin8_B_64l8_fp16.safetensors",
+   "target": "trellis-image-large/ckpts",
+   "bytes": 173242816,
+   "sha256": "21dceac6bee917ab6458ff52c9757ba89a779d03031c7bd17f9e7f0103bfd436",
+   "license": "mit",
+   "license_url": "https://huggingface.co/microsoft/TRELLIS-image-large",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "trellis1-image"
+   ]
+  },
+  {
+   "name": "trellis1_slat_dec_gs.safetensors",
+   "repo": "microsoft/TRELLIS-image-large",
+   "path": "ckpts/slat_dec_gs_swin8_B_64l8gs32_fp16.safetensors",
+   "target": "trellis-image-large/ckpts",
+   "bytes": 171450952,
+   "sha256": "38c84bcef5ce0af1f48b1b5558dabc7575a13346043c41a7e0610f1fa619a161",
+   "license": "mit",
+   "license_url": "https://huggingface.co/microsoft/TRELLIS-image-large",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "trellis1-image"
+   ]
+  },
+  {
+   "name": "trellis1_slat_dec_mesh.safetensors",
+   "repo": "microsoft/TRELLIS-image-large",
+   "path": "ckpts/slat_dec_mesh_swin8_B_64l8m256c_fp16.safetensors",
+   "target": "trellis-image-large/ckpts",
+   "bytes": 181903412,
+   "sha256": "3e87aba94b5786407eb06d0502c1ed0885a0027a3f2b8537bfe15b0a92c01859",
+   "license": "mit",
+   "license_url": "https://huggingface.co/microsoft/TRELLIS-image-large",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "trellis1-image"
+   ]
+  },
+  {
+   "name": "trellis1_slat_dec_rf.safetensors",
+   "repo": "microsoft/TRELLIS-image-large",
+   "path": "ckpts/slat_dec_rf_swin8_B_64l8r16_fp16.safetensors",
+   "target": "trellis-image-large/ckpts",
+   "bytes": 171450488,
+   "sha256": "737da6578d01948016b7c39786113af0d64a46f7922f6b8b5e698b84643be514",
+   "license": "mit",
+   "license_url": "https://huggingface.co/microsoft/TRELLIS-image-large",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "trellis1-image"
+   ]
+  },
+  {
+   "name": "trellis1_ss_enc.safetensors",
+   "repo": "microsoft/TRELLIS-image-large",
+   "path": "ckpts/ss_enc_conv3d_16l8_fp16.safetensors",
+   "target": "trellis-image-large/ckpts",
+   "bytes": 119068016,
+   "sha256": "107874eeaa0feb82f51b19db5da7db534fb7e7f19e5a122b9ff1bc2e258bfc6d",
+   "license": "mit",
+   "license_url": "https://huggingface.co/microsoft/TRELLIS-image-large",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "trellis1-image"
+   ]
+  },
+  {
+   "name": "trellis1_ss_dec.safetensors",
+   "repo": "microsoft/TRELLIS-image-large",
+   "path": "ckpts/ss_dec_conv3d_16l8_fp16.safetensors",
+   "target": "trellis-image-large/ckpts",
+   "bytes": 147591972,
+   "sha256": "1c76d4a40519aa2d711cc263a8404105231ac26db31d946bed48b84fee79009a",
+   "license": "mit",
+   "license_url": "https://huggingface.co/microsoft/TRELLIS-image-large",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "trellis1-image"
+   ]
+  },
+  {
+   "name": "trellis1_pipeline.json",
+   "repo": "microsoft/TRELLIS-image-large",
+   "path": "pipeline.json",
+   "target": "trellis-image-large",
+   "bytes": 1987,
+   "sha256": "2686b6c9b3b0a100b544d5f9dc7b3ecb15c9d98be9852d68e8731bd8dbe52a42",
+   "license": "mit",
+   "license_url": "https://huggingface.co/microsoft/TRELLIS-image-large",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "trellis1-image"
+   ]
+  },
+  {
+   "name": "trellis1_slat_dec_gs.json",
+   "repo": "microsoft/TRELLIS-image-large",
+   "path": "ckpts/slat_dec_gs_swin8_B_64l8gs32_fp16.json",
+   "target": "trellis-image-large/ckpts",
+   "bytes": 843,
+   "sha256": "ebe9d3eade6d9cb7662efae109197e97d7ab58aebd5e8ede0c8991dfce88a06a",
+   "license": "mit",
+   "license_url": "https://huggingface.co/microsoft/TRELLIS-image-large",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "trellis1-image"
+   ]
+  },
+  {
+   "name": "trellis1_slat_dec_mesh.json",
+   "repo": "microsoft/TRELLIS-image-large",
+   "path": "ckpts/slat_dec_mesh_swin8_B_64l8m256c_fp16.json",
+   "target": "trellis-image-large/ckpts",
+   "bytes": 372,
+   "sha256": "293900795cb69cc972d1a20a4940ee12f7e007952c2ae92d128dda91b96ac317",
+   "license": "mit",
+   "license_url": "https://huggingface.co/microsoft/TRELLIS-image-large",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "trellis1-image"
+   ]
+  },
+  {
+   "name": "trellis1_slat_dec_rf.json",
+   "repo": "microsoft/TRELLIS-image-large",
+   "path": "ckpts/slat_dec_rf_swin8_B_64l8r16_fp16.json",
+   "target": "trellis-image-large/ckpts",
+   "bytes": 396,
+   "sha256": "9b46a04602988b9cd83f1d0537de1cb93c4c1b6d35a0bbbcb07bb37bac66b766",
+   "license": "mit",
+   "license_url": "https://huggingface.co/microsoft/TRELLIS-image-large",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "trellis1-image"
+   ]
+  },
+  {
+   "name": "trellis1_slat_enc.json",
+   "repo": "microsoft/TRELLIS-image-large",
+   "path": "ckpts/slat_enc_swin8_B_64l8_fp16.json",
+   "target": "trellis-image-large/ckpts",
+   "bytes": 321,
+   "sha256": "7b7e2bd3e831bdd5a6129cea36424a47ad73c1b9ad109d1de54e0f14af4d28a2",
+   "license": "mit",
+   "license_url": "https://huggingface.co/microsoft/TRELLIS-image-large",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "trellis1-image"
+   ]
+  },
+  {
+   "name": "trellis1_slat_flow.json",
+   "repo": "microsoft/TRELLIS-image-large",
+   "path": "ckpts/slat_flow_img_dit_L_64l8p2_fp16.json",
+   "target": "trellis-image-large/ckpts",
+   "bytes": 442,
+   "sha256": "c0a9bd57227f55cf75ff02562c27bb05c50174f06955f56a79dea2982fd7a8f9",
+   "license": "mit",
+   "license_url": "https://huggingface.co/microsoft/TRELLIS-image-large",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "trellis1-image"
+   ]
+  },
+  {
+   "name": "trellis1_ss_dec.json",
+   "repo": "microsoft/TRELLIS-image-large",
+   "path": "ckpts/ss_dec_conv3d_16l8_fp16.json",
+   "target": "trellis-image-large/ckpts",
+   "bytes": 245,
+   "sha256": "646781293f1cda74720de85d1cef50a957fb4aebd9a4bd014e454e32f2330ac5",
+   "license": "mit",
+   "license_url": "https://huggingface.co/microsoft/TRELLIS-image-large",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "trellis1-image"
+   ]
+  },
+  {
+   "name": "trellis1_ss_enc.json",
+   "repo": "microsoft/TRELLIS-image-large",
+   "path": "ckpts/ss_enc_conv3d_16l8_fp16.json",
+   "target": "trellis-image-large/ckpts",
+   "bytes": 244,
+   "sha256": "12efe92a0d7dcd790f251acb94a6950957ea4398268e2838ef7319c3f20b071e",
+   "license": "mit",
+   "license_url": "https://huggingface.co/microsoft/TRELLIS-image-large",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "trellis1-image"
+   ]
+  },
+  {
+   "name": "trellis1_ss_flow.json",
+   "repo": "microsoft/TRELLIS-image-large",
+   "path": "ckpts/ss_flow_img_dit_L_16l8_fp16.json",
+   "target": "trellis-image-large/ckpts",
+   "bytes": 385,
+   "sha256": "bf69161da7ece9a87394dd4441f0cfa6d4261696a214a8f68388c81fa9a6b5b7",
+   "license": "mit",
+   "license_url": "https://huggingface.co/microsoft/TRELLIS-image-large",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "trellis1-image"
+   ]
+  },
+  {
+   "name": "unirig_skeleton_rignet.ckpt",
+   "repo": "VAST-AI/UniRig",
+   "path": "skeleton/rignet/model.ckpt",
+   "target": "unirig",
+   "bytes": 621660032,
+   "sha256": "e68121ed9ef1ad8bd396c51e8c5e985048e45951d7e4be740b44723653659c45",
+   "license": "mit",
+   "license_url": "https://huggingface.co/VAST-AI/UniRig",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "unirig"
+   ]
+  },
+  {
+   "name": "unirig_skin_articulation_xl.ckpt",
+   "repo": "VAST-AI/UniRig",
+   "path": "skin/articulation-xl/model.ckpt",
+   "target": "unirig",
+   "bytes": 4375464854,
+   "sha256": "9d40cf42fb9d4c10d8b373d9f4f557c6fbbc5ebacae7ae6b3dce5a0d8a18bc33",
+   "license": "mit",
+   "license_url": "https://huggingface.co/VAST-AI/UniRig",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "unirig"
+   ]
+  },
+  {
+   "name": "marigold_v2_depth_log_stage2.safetensors",
+   "repo": "Comfy-Org/marigold-v2-0",
+   "path": "loras/marigold_v2_depth_log_stage2.safetensors",
+   "target": "loras",
+   "bytes": 1703764632,
+   "sha256": "ec1f5649eef5ddb487b4de2222f6b62837f094c02d652843bd4fceb481037ca0",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/huawei-bayerlab/marigold-v2-0",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "marigold-v2-depth"
+   ]
+  },
+  {
+   "name": "marigold_v2_normals.safetensors",
+   "repo": "Comfy-Org/marigold-v2-0",
+   "path": "loras/marigold_v2_normals.safetensors",
+   "target": "loras",
+   "bytes": 1703764632,
+   "sha256": "94a96e203f47797b23a21c6fe0bf169db178342698871f6a95d944537a680135",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/huawei-bayerlab/marigold-v2-0",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "marigold-v2-normals"
+   ]
+  },
+  {
+   "name": "marigold_v2_albedo.safetensors",
+   "repo": "Comfy-Org/marigold-v2-0",
+   "path": "loras/marigold_v2_albedo.safetensors",
+   "target": "loras",
+   "bytes": 1703764632,
+   "sha256": "263ec11bb29625c5ec7b145ea2fbc9e8e7854ad4a229031e020e55d614e8e919",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/huawei-bayerlab/marigold-v2-0",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "marigold-v2-albedo"
+   ]
+  },
+  {
+   "name": "marigold_v2_depth_conditioning.safetensors",
+   "repo": "Comfy-Org/marigold-v2-0",
+   "path": "embeddings/marigold_v2_depth_conditioning.safetensors",
+   "target": "embeddings",
+   "bytes": 2422904,
+   "sha256": "9f5c00a2df993136c541cdbc37bcfb81ab1ba81adaec25bfb9cbfff81edd7c9c",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/huawei-bayerlab/marigold-v2-0",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "marigold-v2-depth"
+   ]
+  },
+  {
+   "name": "marigold_v2_normals_conditioning.safetensors",
+   "repo": "Comfy-Org/marigold-v2-0",
+   "path": "embeddings/marigold_v2_normals_conditioning.safetensors",
+   "target": "embeddings",
+   "bytes": 2537592,
+   "sha256": "a0f82526b471482dfb2c2403aa63582f7732241d706f1f5b0daeda88762eeb5f",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/huawei-bayerlab/marigold-v2-0",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "marigold-v2-normals"
+   ]
+  },
+  {
+   "name": "marigold_v2_albedo_conditioning.safetensors",
+   "repo": "Comfy-Org/marigold-v2-0",
+   "path": "embeddings/marigold_v2_albedo_conditioning.safetensors",
+   "target": "embeddings",
+   "bytes": 2573432,
+   "sha256": "f3d70cc7d4d37743e3f4da197b97a2d2847a8a172a50f86112642ecfa99834fd",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/huawei-bayerlab/marigold-v2-0",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "marigold-v2-albedo"
+   ]
+  },
+  {
+   "name": "marigold_v2_depth_vae.safetensors",
+   "repo": "Comfy-Org/marigold-v2-0",
+   "path": "vae/marigold_v2_depth_log_stage2_vae.safetensors",
+   "target": "vae",
+   "bytes": 253806278,
+   "sha256": "0c1a95f7410678a93b59ba42b3a069f50b54ff9f6e35525699eb8fcd63ce332c",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/huawei-bayerlab/marigold-v2-0",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "marigold-v2-depth"
+   ]
+  },
+  {
+   "name": "marigold_v2_normals_vae.safetensors",
+   "repo": "Comfy-Org/marigold-v2-0",
+   "path": "vae/marigold_v2_normals_vae.safetensors",
+   "target": "vae",
+   "bytes": 253806278,
+   "sha256": "66db6213a47b53e8835df48c9977f06cd74c9a973c6f0ac4d65a725de03add71",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/huawei-bayerlab/marigold-v2-0",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "marigold-v2-normals"
+   ]
+  },
+  {
+   "name": "marigold_v2_albedo_vae.safetensors",
+   "repo": "Comfy-Org/marigold-v2-0",
+   "path": "vae/marigold_v2_albedo_vae.safetensors",
+   "target": "vae",
+   "bytes": 253806278,
+   "sha256": "91524d3ecafcbb25ceea3d7a76b09581eb27664fb1ba09996db3da2b1f91563f",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/huawei-bayerlab/marigold-v2-0",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "marigold-v2-albedo"
+   ]
+  },
+  {
+   "name": "trellis_2_int8_convrot.safetensors",
+   "repo": "Comfy-Org/TRELLIS.2",
+   "path": "diffusion_models/trellis_2_int8_convrot.safetensors",
+   "target": "diffusion_models",
+   "bytes": 5253048192,
+   "sha256": "d01952ad137213f6a868f86b6b877026276f84af5eec23069217475a0bad3a31",
+   "license": "mit",
+   "license_url": "https://huggingface.co/microsoft/TRELLIS.2-4B",
+   "class": "restricted",
+   "tier": "3d",
+   "pack": "trellis2",
+   "optional": false,
+   "used_by": [
+    "trellis2"
+   ]
+  },
+  {
+   "name": "trellis_2_shape_vae_bf16.safetensors",
+   "repo": "Comfy-Org/TRELLIS.2",
+   "path": "vae/trellis_2_shape_vae_bf16.safetensors",
+   "target": "vae",
+   "bytes": 1095844024,
+   "sha256": "de0cb4949a76c59ee5c091a995a69bcc8c51d5aeda939f0c641a50d2a72341f4",
+   "license": "mit",
+   "license_url": "https://huggingface.co/microsoft/TRELLIS.2-4B",
+   "class": "restricted",
+   "tier": "3d",
+   "pack": "trellis2",
+   "optional": false,
+   "used_by": [
+    "trellis2"
+   ]
+  },
+  {
+   "name": "trellis_2_texture_vae_bf16.safetensors",
+   "repo": "Comfy-Org/TRELLIS.2",
+   "path": "vae/trellis_2_texture_vae_bf16.safetensors",
+   "target": "vae",
+   "bytes": 948461364,
+   "sha256": "714e5ebf094a610e12a8e3b5175c18a62f37f6ea4218acb6073644456b73ab0e",
+   "license": "mit",
+   "license_url": "https://huggingface.co/microsoft/TRELLIS.2-4B",
+   "class": "restricted",
+   "tier": "3d",
+   "pack": "trellis2",
+   "optional": false,
+   "used_by": [
+    "trellis2"
+   ]
+  },
+  {
+   "name": "dino_v3_L_naf_fp32.safetensors",
+   "repo": "Comfy-Org/Pixal3D",
+   "path": "clip_vision/dino_v3_L_naf_fp32.safetensors",
+   "target": "clip_vision",
+   "bytes": 1215214176,
+   "sha256": "4ad2ec4e0879a5b5b04cd97325cc37da954a7b6edca5170b86510f17f2b2290f",
+   "license": "dinov3",
+   "license_url": "https://github.com/facebookresearch/dinov3/blob/main/LICENSE.md",
+   "class": "restricted",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "trellis2"
+   ]
+  },
+  {
+   "name": "ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors",
+   "repo": "Lightricks/LTX-2.5",
+   "path": "diffusion_models/ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors",
+   "target": "diffusion_models",
+   "bytes": 21504034224,
+   "sha256": "pending",
+   "license": "ltx-2.x-community-license-agreement",
+   "license_url": "https://huggingface.co/Lightricks/LTX-2.5/blob/main/LICENSE",
+   "class": "restricted",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "ltx25-t2v",
+    "ltx25-i2v",
+    "ltx25-flf2v",
+    "ltx25-dfr",
+    "ltx25-multishot"
+   ]
+  },
+  {
+   "name": "gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors",
+   "repo": "Lightricks/LTX-2.5",
+   "path": "text_encoders/gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors",
+   "target": "text_encoders",
+   "bytes": 15372969374,
+   "sha256": "pending",
+   "license": "ltx-2.x-community-license-agreement",
+   "license_url": "https://huggingface.co/Lightricks/LTX-2.5/blob/main/LICENSE",
+   "class": "restricted",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "ltx25-t2v",
+    "ltx25-i2v",
+    "ltx25-flf2v",
+    "ltx25-dfr"
+   ]
+  },
+  {
+   "name": "ltx-2.5-video-vae-bf16.safetensors",
+   "repo": "Lightricks/LTX-2.5",
+   "path": "vae/ltx-2.5-video-vae-bf16.safetensors",
+   "target": "vae",
+   "bytes": 1472223346,
+   "sha256": "pending",
+   "license": "ltx-2.x-community-license-agreement",
+   "license_url": "https://huggingface.co/Lightricks/LTX-2.5/blob/main/LICENSE",
+   "class": "restricted",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "ltx25-t2v",
+    "ltx25-i2v",
+    "ltx25-flf2v",
+    "ltx25-dfr"
+   ]
+  },
+  {
+   "name": "ltx-2.5-audio-vae-bf16.safetensors",
+   "repo": "Lightricks/LTX-2.5",
+   "path": "vae/ltx-2.5-audio-vae-bf16.safetensors",
+   "target": "vae",
+   "bytes": 364866540,
+   "sha256": "pending",
+   "license": "ltx-2.x-community-license-agreement",
+   "license_url": "https://huggingface.co/Lightricks/LTX-2.5/blob/main/LICENSE",
+   "class": "restricted",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "ltx25-dfr",
+    "ltx25-audio"
+   ]
+  },
+  {
+   "name": "ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors",
+   "repo": "Lightricks/LTX-2.5",
+   "path": "latent_upscale_models/ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors",
+   "target": "latent_upscale_models",
+   "bytes": 995778752,
+   "sha256": "pending",
+   "license": "ltx-2.x-community-license-agreement",
+   "license_url": "https://huggingface.co/Lightricks/LTX-2.5/blob/main/LICENSE",
+   "class": "restricted",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "ltx25-upscale"
+   ]
+  },
+  {
+   "name": "ltx-2.5-latent-temporal-upscaler-x2-bf16-1.0.safetensors",
+   "repo": "Lightricks/LTX-2.5",
+   "path": "latent_upscale_models/ltx-2.5-latent-temporal-upscaler-x2-bf16-1.0.safetensors",
+   "target": "latent_upscale_models",
+   "bytes": 261944000,
+   "sha256": "pending",
+   "license": "ltx-2.x-community-license-agreement",
+   "license_url": "https://huggingface.co/Lightricks/LTX-2.5/blob/main/LICENSE",
+   "class": "restricted",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "ltx25-upscale"
+   ]
+  },
+  {
+   "name": "ltx-2.5-duration-head-bf16.safetensors",
+   "repo": "Lightricks/LTX-2.5",
+   "path": "model_patches/ltx-2.5-duration-head-bf16.safetensors",
+   "target": "model_patches",
+   "bytes": 3843690,
+   "sha256": "pending",
+   "license": "ltx-2.x-community-license-agreement",
+   "license_url": "https://huggingface.co/Lightricks/LTX-2.5/blob/main/LICENSE",
+   "class": "restricted",
+   "tier": "A",
+   "optional": true,
+   "used_by": [
+    "ltx25-autoduration"
+   ]
+  },
+  {
+   "name": "ltx-2.3-22b-ic-lora-motion-track-control-ref0.5.safetensors",
+   "repo": "Lightricks/LTX-2.3-22b-IC-LoRA-Motion-Track-Control",
+   "path": "ltx-2.3-22b-ic-lora-motion-track-control-ref0.5.safetensors",
+   "target": "loras",
+   "bytes": 327309314,
+   "sha256": "e279807ee3aa3db1ce60188d665ff83342860367dcd6bac19f8bd5a99a9e1dca",
+   "license": "ltx-2.x-community-license-agreement",
+   "license_url": "https://huggingface.co/Lightricks/LTX-2.3-22b-IC-LoRA-Motion-Track-Control",
+   "class": "restricted",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "reshoot",
+    "ltx25-motion-track"
+   ]
+  },
+  {
+   "name": "ltx-2.3-22b-ic-lora-union-control-ref0.5.safetensors",
+   "repo": "Lightricks/LTX-2.3-22b-IC-LoRA-Union-Control",
+   "path": "ltx-2.3-22b-ic-lora-union-control-ref0.5.safetensors",
+   "target": "loras",
+   "bytes": 654465352,
+   "sha256": "a1b888a87f661d27f08b394ae559e8e1050be33900bcc36a5cdf659e48f88d18",
+   "license": "ltx-2.x-community-license-agreement",
+   "license_url": "https://huggingface.co/Lightricks/LTX-2.3-22b-IC-LoRA-Union-Control",
+   "class": "restricted",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "restyle",
+    "ltx25-union-control"
+   ]
+  },
+  {
+   "name": "ltx-2.5-22b-ic-lora-ingredients-0.9.safetensors",
+   "repo": "Lightricks/LTX-2.5-22b-IC-LoRA-Ingredients",
+   "path": "ltx-2.5-22b-ic-lora-ingredients-0.9.safetensors",
+   "target": "loras",
+   "bytes": 1308787472,
+   "sha256": "pending",
+   "license": "ltx-2.x-community-license-agreement",
+   "license_url": "https://huggingface.co/Lightricks/LTX-2.5-22b-IC-LoRA-Ingredients",
+   "class": "restricted",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "characters",
+    "ltx25-ingredients"
+   ]
+  },
+  {
+   "name": "ltx-2.5-22b-ic-lora-layout-to-render-1.0.safetensors",
+   "repo": "Lightricks/LTX-2.5-22b-IC-LoRA-Layout-To-Render",
+   "path": "ltx-2.5-22b-ic-lora-layout-to-render-1.0.safetensors",
+   "target": "loras",
+   "bytes": 1308787439,
+   "sha256": "pending",
+   "license": "ltx-2.x-community-license-agreement",
+   "license_url": "https://huggingface.co/Lightricks/LTX-2.5-22b-IC-LoRA-Layout-To-Render",
+   "class": "restricted",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "scene-3d",
+    "ltx25-layout-to-render"
+   ]
+  },
+  {
+   "name": "ltx-2.5-22b-ic-lora-alpha-gen-0.9.safetensors",
+   "repo": "Lightricks/LTX-2.5-22b-IC-LoRA-Alpha-Gen",
+   "path": "ltx-2.5-22b-ic-lora-alpha-gen-0.9.safetensors",
+   "target": "loras",
+   "bytes": 1308787472,
+   "sha256": "pending",
+   "license": "ltx-2.x-community-license-agreement",
+   "license_url": "https://huggingface.co/Lightricks/LTX-2.5-22b-IC-LoRA-Alpha-Gen",
+   "class": "restricted",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "visual-effects",
+    "ltx25-alpha-gen"
+   ]
+  },
+  {
+   "name": "ltx-2.5-22b-ic-lora-sdr-to-hdr-1.0.safetensors",
+   "repo": "Lightricks/LTX-2.5-22b-IC-LoRA-SDR-To-HDR",
+   "path": "ltx-2.5-22b-ic-lora-sdr-to-hdr-1.0.safetensors",
+   "target": "loras",
+   "bytes": 1308787472,
+   "sha256": "pending",
+   "license": "ltx-2.x-community-license-agreement",
+   "license_url": "https://huggingface.co/Lightricks/LTX-2.5-22b-IC-LoRA-SDR-To-HDR",
+   "class": "restricted",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "color-grade",
+    "ltx25-sdr-to-hdr"
+   ]
+  },
+  {
+   "name": "ltx-2.5-22b-ic-lora-sdr-to-hdr-scene-emb.safetensors",
+   "repo": "Lightricks/LTX-2.5-22b-IC-LoRA-SDR-To-HDR",
+   "path": "ltx-2.5-22b-ic-lora-sdr-to-hdr-scene-emb.safetensors",
+   "target": "loras",
+   "bytes": 12614165,
+   "sha256": "pending",
+   "license": "ltx-2.x-community-license-agreement",
+   "license_url": "https://huggingface.co/Lightricks/LTX-2.5-22b-IC-LoRA-SDR-To-HDR",
+   "class": "restricted",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "color-grade",
+    "ltx25-sdr-to-hdr"
+   ]
+  },
+  {
+   "name": "ltx-2.5-22b-ic-lora-pixel-spatial-upscaler-x2-1.0.safetensors",
+   "repo": "Lightricks/LTX-2.5-22b-IC-LoRA-Pixel-Spatial-Upscaler",
+   "path": "ltx-2.5-22b-ic-lora-pixel-spatial-upscaler-x2-1.0.safetensors",
+   "target": "loras",
+   "bytes": 327322640,
+   "sha256": "pending",
+   "license": "ltx-2.x-community-license-agreement",
+   "license_url": "https://huggingface.co/Lightricks/LTX-2.5-22b-IC-LoRA-Pixel-Spatial-Upscaler",
+   "class": "restricted",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "ltx25-dfr-upscale",
+    "visual-effects"
+   ]
+  },
+  {
+   "name": "ltx-2.3-22b-ic-lora-in-outpainting-0.9.safetensors",
+   "repo": "Lightricks/LTX-2.3-22b-IC-LoRA-In-Outpainting",
+   "path": "ltx-2.3-22b-ic-lora-in-outpainting-0.9.safetensors",
+   "target": "loras",
+   "bytes": 1308778338,
+   "sha256": "pending",
+   "license": "ltx-2.x-community-license-agreement",
+   "license_url": "https://huggingface.co/Lightricks/LTX-2.3-22b-IC-LoRA-In-Outpainting",
+   "class": "restricted",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "object-swap",
+    "ltx25-in-outpainting"
+   ]
+  },
+  {
+   "name": "gemma4_e2b_it_int8_convrot.safetensors",
+   "repo": "Comfy-Org/gemma-4",
+   "path": "text_encoders/gemma4_e2b_it_int8_convrot.safetensors",
+   "target": "text_encoders",
+   "bytes": 5199997904,
+   "sha256": "efeca0fcad2f863e5ed0a75e3af952b72bc963604c1dda6d20aee87a32b17566",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/Comfy-Org/gemma-4",
+   "class": "open",
+   "tier": "A",
+   "optional": true,
+   "used_by": [
+    "ltx25-prompt-enhancer"
+   ]
+  },
+  {
+   "name": "wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors",
+   "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+   "path": "split_files/diffusion_models/wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors",
+   "target": "diffusion_models",
+   "bytes": 14294742832,
+   "sha256": "6122e79d55e0f235698d11d657f3b196c5273c830da00b2b013c5a048d5e6a42",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+   "class": "open",
+   "tier": "B",
+   "optional": false,
+   "used_by": [
+    "wan2.2-i2v"
+   ]
+  },
+  {
+   "name": "wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors",
+   "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+   "path": "split_files/diffusion_models/wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors",
+   "target": "diffusion_models",
+   "bytes": 14294742832,
+   "sha256": "5471a457b6ac404202a5fbe6c11595a3d5641fc766b00f38763f72303fffc21e",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+   "class": "open",
+   "tier": "B",
+   "optional": false,
+   "used_by": [
+    "wan2.2-i2v"
+   ]
+  },
+  {
+   "name": "wan2.2_t2v_high_noise_14B_fp8_scaled.safetensors",
+   "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+   "path": "split_files/diffusion_models/wan2.2_t2v_high_noise_14B_fp8_scaled.safetensors",
+   "target": "diffusion_models",
+   "bytes": 14293923632,
+   "sha256": "cad711ae211c8b23455ec68cd6a190a33a3d874234a77eb57266d73f8f0e6c9f",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+   "class": "open",
+   "tier": "B",
+   "optional": false,
+   "used_by": [
+    "wan2.2-t2v"
+   ]
+  },
+  {
+   "name": "wan2.2_t2v_low_noise_14B_fp8_scaled.safetensors",
+   "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+   "path": "split_files/diffusion_models/wan2.2_t2v_low_noise_14B_fp8_scaled.safetensors",
+   "target": "diffusion_models",
+   "bytes": 14293923632,
+   "sha256": "e71b96d7c82e638694c5e7fb98fac4bfb0e4ddc5fbbb4b1df40da8f0f1278a97",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+   "class": "open",
+   "tier": "B",
+   "optional": false,
+   "used_by": [
+    "wan2.2-t2v"
+   ]
+  },
+  {
+   "name": "wan2.1_uni3c_controlnet.pth",
+   "repo": "ewrfcas/Uni3C",
+   "path": "controlnet.pth",
+   "target": "model_patches",
+   "bytes": 3991711400,
+   "sha256": "57eb4f73aa5b58dd27c2fceb348697bd18a80163d0e647c3072e2f6dddfc54e4",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/ewrfcas/Uni3C",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "uni3c-camera"
+   ]
+  },
+  {
+   "name": "wan2.1_i2v_480p_14B_fp8_scaled.safetensors",
+   "repo": "Comfy-Org/Wan_2.1_ComfyUI_repackaged",
+   "path": "split_files/diffusion_models/wan2.1_i2v_480p_14B_fp8_scaled.safetensors",
+   "target": "diffusion_models",
+   "bytes": 16401356938,
+   "sha256": "b2de21b99b2e72cb0ff15253b07e926f26e7cf1b7e229efc32f94ad1f1ed9395",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/Wan-AI/Wan2.1-I2V-14B-480P",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "uni3c-camera",
+    "wan2.1-i2v"
+   ]
+  },
+  {
+   "name": "wan2.1_fun_camera_v1.1_1.3B_bf16.safetensors",
+   "repo": "Comfy-Org/Wan_2.1_ComfyUI_repackaged",
+   "path": "split_files/diffusion_models/wan2.1_fun_camera_v1.1_1.3B_bf16.safetensors",
+   "target": "diffusion_models",
+   "bytes": 3232727784,
+   "sha256": "1a648f6fbb543dd6ac9f2f9af1ca4bc1bbe460482ee4d7984d50565699e97398",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/alibaba-pai/Wan2.1-Fun-V1.1-1.3B-Control-Camera",
+   "class": "open",
+   "tier": "A",
+   "optional": true,
+   "used_by": [
+    "camera-fun"
+   ]
+  },
+  {
+   "name": "wan2.1_vace_1.3B_fp16.safetensors",
+   "repo": "Comfy-Org/Wan_2.1_ComfyUI_repackaged",
+   "path": "split_files/diffusion_models/wan2.1_vace_1.3B_fp16.safetensors",
+   "target": "diffusion_models",
+   "bytes": 4309519800,
+   "sha256": "640ccc0577e6a5d4bb15cd91b11b699ef914fc55f126c5a1c544e152130784f2",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/Wan-AI/Wan2.1-VACE-1.3B",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "director",
+    "camera-rig"
+   ]
+  },
+  {
+   "name": "flux-2-klein-4b.safetensors",
+   "repo": "Comfy-Org/Flux-2-Klein-4B",
+   "path": "split_files/diffusion_models/flux-2-klein-4b.safetensors",
+   "target": "diffusion_models",
+   "bytes": 7751105712,
+   "sha256": "ec3d4e733a771f61c052fb4856c48b336c55eaf2c65487c2a1faeb9bbda7a343",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/Comfy-Org/Flux-2-Klein-4B",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "klein-txt2img",
+    "klein-edit",
+    "klein-inpaint",
+    "klein-faceswap",
+    "klein-product-compose",
+    "klein-product-scene",
+    "relight-klein"
+   ]
+  },
+  {
+   "name": "flux2-vae.safetensors",
+   "repo": "Comfy-Org/Flux-2-Klein-4B",
+   "path": "split_files/vae/flux2-vae.safetensors",
+   "target": "vae",
+   "bytes": 336211292,
+   "sha256": "868fe7b343cc8f3a19dbcfcafbc3d5f888802be3f89bd81b65b3621a066ce8f3",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/Comfy-Org/Flux-2-Klein-4B",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "klein-txt2img",
+    "klein-edit",
+    "klein-inpaint",
+    "klein-faceswap",
+    "klein-product-compose",
+    "klein-product-scene",
+    "relight-klein"
+   ]
+  },
+  {
+   "name": "ae.safetensors",
+   "repo": "Comfy-Org/z_image_turbo",
+   "path": "split_files/vae/ae.safetensors",
+   "target": "vae",
+   "bytes": 335304388,
+   "sha256": "afc8e28272cd15db3919bacdb6918ce9c1ed22e96cb12c4d5ed0fba823529e38",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/Comfy-Org/z_image_turbo",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "director"
+   ]
+  },
+  {
+   "name": "ltx-2.5-22b-dev-transformer-comfy-int8-convrot.safetensors",
+   "repo": "Lightricks/LTX-2.5",
+   "path": "diffusion_models/ltx-2.5-22b-dev-transformer-comfy-int8-convrot.safetensors",
+   "target": "diffusion_models",
+   "bytes": 21504034224,
+   "sha256": "pending",
+   "license": "ltx-2.x-community-license-agreement",
+   "license_url": "https://huggingface.co/Lightricks/LTX-2.5/blob/main/LICENSE",
+   "class": "restricted",
+   "tier": "A",
+   "optional": true,
+   "used_by": [
+    "ltx25-quality",
+    "final-render"
+   ]
+  },
+  {
+   "name": "sam3.1_multiplex_fp16.safetensors",
+   "repo": "Comfy-Org/sam3.1",
+   "path": "checkpoints/sam3.1_multiplex_fp16.safetensors",
+   "target": "checkpoints",
+   "bytes": 1745546848,
+   "sha256": "9ba99c92703c2e8b4f47de2d34a539bb8e18923049e238b780d70dbe6368eb03",
+   "license": "sam-license",
+   "license_url": "https://huggingface.co/facebook/sam3.1/blob/main/LICENSE",
+   "class": "restricted",
+   "tier": "A",
+   "optional": true,
+   "used_by": [
+    "vace-object-swap (tracked-mask upgrade)",
+    "person-swap masks",
+    "vfx masks"
+   ],
+   "notes": "SAM 3.1 (Meta SAM License) — approved for mask/track upgrades (Jalaj 28 Oct); gated HF download via HF_TOKEN, restricted/opt-in class."
+  },
+  {
+   "name": "yolox_l.onnx",
+   "repo": "yzd-v/DWPose",
+   "path": "yolox_l.onnx",
+   "target": "motionfield/dwpose",
+   "bytes": 216746733,
+   "sha256": "7860ae79de6c89a3c1eb72ae9a2756c0ccfbe04b7791bb5880afabd97855a411",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/yzd-v/DWPose",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "person-swap",
+    "lipsync",
+    "dub"
+   ]
+  },
+  {
+   "name": "dw-ll_ucoco_384.onnx",
+   "repo": "yzd-v/DWPose",
+   "path": "dw-ll_ucoco_384.onnx",
+   "target": "motionfield/dwpose",
+   "bytes": 134399116,
+   "sha256": "724f4ff2439ed61afb86fb8a1951ec39c6220682803b4a8bd4f598cd913b1843",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/yzd-v/DWPose",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "person-swap",
+    "lipsync",
+    "dub"
+   ]
+  },
+  {
+   "name": "RealESRGAN_x4plus.pth",
+   "repo": "xinntao/Real-ESRGAN",
+   "path": "releases/download/v0.1.0/RealESRGAN_x4plus.pth",
+   "url": "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth",
+   "target": "upscale_models",
+   "bytes": 67040989,
+   "sha256": "4fa0d38905f75ac06eb49a7951b426670021be3018265fd191d2125df9d682f1",
+   "license": "bsd-3-clause",
+   "license_url": "https://github.com/xinntao/Real-ESRGAN/blob/master/LICENSE",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "video-finish",
+    "upscale-4x"
+   ]
+  },
+  {
+   "name": "musetalk.json",
+   "repo": "TMElyralab/MuseTalk",
+   "path": "musetalk/musetalk.json",
+   "target": "diffusers/TMElyralab/MuseTalk/musetalk",
+   "bytes": 748,
+   "sha256": "5b6923aee04d71692e0e9846c471e0a4ea07a4f686d39545e472bd4ba17e1b47",
+   "license": "mit",
+   "license_url": "https://huggingface.co/TMElyralab/MuseTalk",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "lipsync",
+    "dub",
+    "person-swap"
+   ]
+  },
+  {
+   "name": "pytorch_model.bin",
+   "repo": "TMElyralab/MuseTalk",
+   "path": "musetalk/pytorch_model.bin",
+   "target": "diffusers/TMElyralab/MuseTalk/musetalk",
+   "bytes": 3400076549,
+   "sha256": "0ee7d5ea03ea75d8dca50ea7a76df791e90633687a135c4a69393abfc0475ffe",
+   "license": "mit",
+   "license_url": "https://huggingface.co/TMElyralab/MuseTalk",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "lipsync",
+    "dub",
+    "person-swap"
+   ]
+  },
+  {
+   "name": "config.json",
+   "repo": "stabilityai/sd-vae-ft-mse",
+   "path": "config.json",
+   "target": "diffusers/TMElyralab/MuseTalk/sd-vae-ft-mse",
+   "bytes": 547,
+   "sha256": "92d3dfb746fca211a2c9e019e285f8597412211728dce3c5bcf4eda0f2d62e7e",
+   "license": "mit",
+   "license_url": "https://huggingface.co/stabilityai/sd-vae-ft-mse",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "lipsync",
+    "dub",
+    "person-swap"
+   ]
+  },
+  {
+   "name": "diffusion_pytorch_model.safetensors",
+   "repo": "stabilityai/sd-vae-ft-mse",
+   "path": "diffusion_pytorch_model.safetensors",
+   "target": "diffusers/TMElyralab/MuseTalk/sd-vae-ft-mse",
+   "bytes": 334643276,
+   "sha256": "a1d993488569e928462932c8c38a0760b874d166399b14414135bd9c42df5815",
+   "license": "mit",
+   "license_url": "https://huggingface.co/stabilityai/sd-vae-ft-mse",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "lipsync",
+    "dub",
+    "person-swap"
+   ]
+  },
+  {
+   "name": "tiny.pt",
+   "repo": "openai/whisper",
+   "path": "tiny.pt",
+   "url": "https://openaipublic.azureedge.net/main/whisper/models/65147644a518d12f04e32d6f3b26facc3f8dd46e5390956a9424a650c0ce22b9/tiny.pt",
+   "target": "diffusers/TMElyralab/MuseTalk/whisper",
+   "bytes": 75572083,
+   "sha256": "65147644a518d12f04e32d6f3b26facc3f8dd46e5390956a9424a650c0ce22b9",
+   "license": "mit",
+   "license_url": "https://github.com/openai/whisper/blob/main/LICENSE",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "lipsync",
+    "dub",
+    "person-swap"
+   ]
+  },
+  {
+   "name": "kokoro_v1.onnx",
+   "repo": "taylorchu/kokoro-onnx",
+   "path": "releases/download/v0.2.0/kokoro.onnx",
+   "url": "https://github.com/taylorchu/kokoro-onnx/releases/download/v0.2.0/kokoro.onnx",
+   "target": "motionfield/kokoro",
+   "bytes": 325532387,
+   "sha256": "7d5df8ecf7d4b1878015a32686053fd0eebe2bc377234608764cc0ef3636a6c5",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/hexgrad/Kokoro-82M",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "kokoro-tts",
+    "dub",
+    "explainer"
+   ]
+  },
+  {
+   "name": "wan2.1_t2v_1.3B_fp16.safetensors",
+   "repo": "Comfy-Org/Wan_2.1_ComfyUI_repackaged",
+   "path": "split_files/diffusion_models/wan2.1_t2v_1.3B_fp16.safetensors",
+   "target": "diffusion_models",
+   "bytes": 2838303560,
+   "sha256": "be531024cd9018cb5b48c40cfbb6a6191645b1c792eb8bf4f8c1c6e10f924dc5",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/Wan-AI/Wan2.1-T2V-1.3B",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "wan-txt2video"
+   ]
+  },
+  {
+   "name": "wan2.2_s2v_14B_fp8_scaled.safetensors",
+   "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+   "path": "split_files/diffusion_models/wan2.2_s2v_14B_fp8_scaled.safetensors",
+   "target": "diffusion_models",
+   "bytes": 16394832474,
+   "sha256": "140e75af5534ac3d91e710d9df756f7032addd64b341ba2c1c70e3e6da9aa216",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/Wan-AI/Wan2.2-S2V-14B",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "lipsync-s2v"
+   ]
+  },
+  {
+   "name": "wav2vec2_large_english_fp16.safetensors",
+   "repo": "Comfy-Org/Wan_2.2_ComfyUI_Repackaged",
+   "path": "split_files/audio_encoders/wav2vec2_large_english_fp16.safetensors",
+   "target": "audio_encoders",
+   "bytes": 630997322,
+   "sha256": "f0017a43ea57ef6b3d4866be607844bbd8cada6d30966f7d70044ed0d63d3f9e",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/facebook/wav2vec2-large-960h-lv60",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "lipsync-s2v"
+   ]
+  },
+  {
+   "name": "acestep_v1.5_turbo.safetensors",
+   "repo": "Comfy-Org/ACE-Step-1.5",
+   "path": "split_files/diffusion_models/acestep_v1.5_turbo.safetensors",
+   "target": "diffusion_models",
+   "bytes": 4787825604,
+   "sha256": "3f6e0797fad420a39bd33979eb6e840e30989e34a3794e843d23b60ec6e422d7",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/ACE-Step/Ace-Step1.5",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "acestep-music"
+   ]
+  },
+  {
+   "name": "qwen_0.6b_ace15.safetensors",
+   "repo": "Comfy-Org/ACE-Step-1.5",
+   "path": "split_files/text_encoders/qwen_0.6b_ace15.safetensors",
+   "target": "text_encoders",
+   "bytes": 1191588248,
+   "sha256": "fd4590c82153b8ddb67e15a2e7aaa8afa8b83a858c8a9b82a4831063156aa7a7",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/ACE-Step/Ace-Step1.5",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "acestep-music"
+   ]
+  },
+  {
+   "name": "qwen_1.7b_ace15.safetensors",
+   "repo": "Comfy-Org/ACE-Step-1.5",
+   "path": "split_files/text_encoders/qwen_1.7b_ace15.safetensors",
+   "target": "text_encoders",
+   "bytes": 3708523360,
+   "sha256": "ed63e9247d1f55f3ace04fa11e95b085fc82d459c82c5626f0b2e37b91ebd710",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/ACE-Step/Ace-Step1.5",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "acestep-music"
+   ]
+  },
+  {
+   "name": "ace_1.5_vae.safetensors",
+   "repo": "Comfy-Org/ACE-Step-1.5",
+   "path": "split_files/vae/ace_1.5_vae.safetensors",
+   "target": "vae",
+   "bytes": 337431732,
+   "sha256": "6de92e3a862acd287e08b024ac90f0783a8635451b728721a33ff03565bcb2bb",
+   "license": "apache-2.0",
+   "license_url": "https://huggingface.co/ACE-Step/Ace-Step1.5",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "acestep-music"
+   ]
+  },
+  {
+   "name": "moge_2_vitl_normal_fp16.safetensors",
+   "repo": "Comfy-Org/MoGe",
+   "path": "geometry_estimation/moge_2_vitl_normal_fp16.safetensors",
+   "target": "geometry_estimation",
+   "bytes": 661859924,
+   "sha256": "cb1a692d03235671e959e81360d7b4d9f44aefadb1f852d6ca6aa17799d5e31f",
+   "license": "mit",
+   "license_url": "https://huggingface.co/Ruicheng/moge-2-vitl",
+   "class": "open",
+   "tier": "3d",
+   "optional": false,
+   "used_by": [
+    "moge-geometry-scan"
+   ]
+  },
+  {
+   "name": "ve.safetensors",
+   "repo": "ResembleAI/chatterbox",
+   "path": "ve.safetensors",
+   "target": "tts/chatterbox/resembleai_default_voice",
+   "bytes": 5695784,
+   "sha256": "f0921cab452fa278bc25cd23ffd59d36f816d7dc5181dd1bef9751a7fb61f63c",
+   "license": "mit",
+   "license_url": "https://huggingface.co/ResembleAI/chatterbox",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "chatterbox-voice-clone",
+    "dub-voice"
+   ]
+  },
+  {
+   "name": "t3_cfg.safetensors",
+   "repo": "ResembleAI/chatterbox",
+   "path": "t3_cfg.safetensors",
+   "target": "tts/chatterbox/resembleai_default_voice",
+   "bytes": 2129653744,
+   "sha256": "914cb1696f47527fe8852ca8f1fe1fa63cb34f76f9c715e84e067b744dd0da81",
+   "license": "mit",
+   "license_url": "https://huggingface.co/ResembleAI/chatterbox",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "chatterbox-voice-clone",
+    "dub-voice"
+   ]
+  },
+  {
+   "name": "s3gen.safetensors",
+   "repo": "ResembleAI/chatterbox",
+   "path": "s3gen.safetensors",
+   "target": "tts/chatterbox/resembleai_default_voice",
+   "bytes": 1056484620,
+   "sha256": "2b78103c654207393955e4900aac14a12de8ef25f4b09424f1ef91941f161d4e",
+   "license": "mit",
+   "license_url": "https://huggingface.co/ResembleAI/chatterbox",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "chatterbox-voice-clone",
+    "dub-voice"
+   ]
+  },
+  {
+   "name": "tokenizer.json",
+   "repo": "ResembleAI/chatterbox",
+   "path": "tokenizer.json",
+   "target": "tts/chatterbox/resembleai_default_voice",
+   "bytes": 25470,
+   "sha256": "d71e3a44eabb1784df9a68e9f95b251ecbf1a7af6a9f50835856b2ca9d8c14a5",
+   "license": "mit",
+   "license_url": "https://huggingface.co/ResembleAI/chatterbox",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "chatterbox-voice-clone",
+    "dub-voice"
+   ]
+  },
+  {
+   "name": "conds.pt",
+   "repo": "ResembleAI/chatterbox",
+   "path": "conds.pt",
+   "target": "tts/chatterbox/resembleai_default_voice",
+   "bytes": 107374,
+   "sha256": "6552d70568833628ba019c6b03459e77fe71ca197d5c560cef9411bee9d87f4e",
+   "license": "mit",
+   "license_url": "https://huggingface.co/ResembleAI/chatterbox",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "chatterbox-voice-clone",
+    "dub-voice"
+   ]
+  },
+  {
+   "name": "ggml-base.en.bin",
+   "repo": "ggerganov/whisper.cpp",
+   "path": "ggml-base.en.bin",
+   "target": "whisper",
+   "bytes": 147964211,
+   "sha256": "a03779c86df3323075f5e796cb2ce5029f00ec8869eee3fdfb897afe36c6d002",
+   "license": "mit",
+   "license_url": "https://github.com/ggml-org/whisper.cpp",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "dub",
+    "verify"
+   ]
+  },
+  {
+   "name": "ggml-large-v3-turbo.bin",
+   "repo": "ggerganov/whisper.cpp",
+   "path": "ggml-large-v3-turbo.bin",
+   "target": "whisper",
+   "bytes": 1624555275,
+   "sha256": "1fc70f774d38eb169993ac391eea357ef47c88757ef72ee5943879b7e8e2bc69",
+   "license": "mit",
+   "license_url": "https://github.com/ggml-org/whisper.cpp",
+   "class": "open",
+   "tier": "A",
+   "optional": false,
+   "used_by": [
+    "verify"
+   ]
+  }
+ ]
+}

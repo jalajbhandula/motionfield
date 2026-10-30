@@ -1,0 +1,101 @@
+{
+  "version": 1,
+  "width": 1280,
+  "height": 720,
+  "fps": 24,
+  "duration": 4,
+  "seed": 6208,
+  "background": { "color": "#0e1116" },
+  "camera": {
+    "fov": 50,
+    "keyframes": [{ "t": 0, "position": [0, 0, 1000], "target": [0, 0, 0] }]
+  },
+  "layers": [
+    {
+      "id": "card",
+      "type": "plane",
+      "props": { "width": 980, "height": 560, "color": "#161b24", "cornerRadius": 24, "roughness": 0.9, "metalness": 0.05 },
+      "transform": { "position": [0, 0, -60] }
+    },
+    {
+      "id": "bar",
+      "type": "plane",
+      "props": { "width": 980, "height": 74, "hue": 210, "cornerRadius": 24, "roughness": 0.85, "metalness": 0.1 },
+      "transform": { "position": [0, 243, -50] }
+    },
+    {
+      "id": "heading",
+      "type": "text",
+      "props": { "text": "Now available in 5 languages", "size": 34, "weight": 600, "color": "#eef2ff" },
+      "transform": { "position": [0, 243, -40] }
+    },
+    {
+      "id": "rows",
+      "type": "group",
+      "transform": { "position": [0, 40, 0] },
+      "props": {
+        "children": [
+          {
+            "id": "row1", "type": "text",
+            "props": { "text": "EN - Welcome back", "size": 40, "weight": 500, "color": "#f2f4fa" },
+            "transform": { "position": [0, 120, 0] },
+            "keyframes": [
+              { "t": 0.2, "path": "opacity", "value": 0 },
+              { "t": 0.55, "path": "opacity", "value": 1 },
+              { "t": 0.2, "path": "position.y", "value": 150 },
+              { "t": 0.55, "path": "position.y", "value": 120, "ease": "easeOut" }
+            ]
+          },
+          {
+            "id": "row2", "type": "text",
+            "props": { "text": "DE - Willkommen zurück", "size": 40, "weight": 500, "color": "#c9d4ee" },
+            "transform": { "position": [0, 40, 0] },
+            "keyframes": [
+              { "t": 0.55, "path": "opacity", "value": 0 },
+              { "t": 0.9, "path": "opacity", "value": 1 },
+              { "t": 0.55, "path": "position.y", "value": 70 },
+              { "t": 0.9, "path": "position.y", "value": 40, "ease": "easeOut" }
+            ]
+          },
+          {
+            "id": "row3", "type": "text",
+            "props": { "text": "JA - おかえりなさい", "size": 40, "weight": 500, "color": "#c9d4ee" },
+            "transform": { "position": [0, -40, 0] },
+            "keyframes": [
+              { "t": 0.9, "path": "opacity", "value": 0 },
+              { "t": 1.25, "path": "opacity", "value": 1 },
+              { "t": 0.9, "path": "position.y", "value": -10 },
+              { "t": 1.25, "path": "position.y", "value": -40, "ease": "easeOut" }
+            ]
+          },
+          {
+            "id": "row4", "type": "text",
+            "props": { "text": "FR - Bon retour", "size": 40, "weight": 500, "color": "#c9d4ee" },
+            "transform": { "position": [0, -120, 0] },
+            "keyframes": [
+              { "t": 1.25, "path": "opacity", "value": 0 },
+              { "t": 1.6, "path": "opacity", "value": 1 },
+              { "t": 1.25, "path": "position.y", "value": -90 },
+              { "t": 1.6, "path": "position.y", "value": -120, "ease": "easeOut" }
+            ]
+          },
+          {
+            "id": "row5", "type": "text",
+            "props": { "text": "ES - Bienvenido de nuevo", "size": 40, "weight": 500, "color": "#c9d4ee" },
+            "transform": { "position": [0, -200, 0] },
+            "keyframes": [
+              { "t": 1.6, "path": "opacity", "value": 0 },
+              { "t": 1.95, "path": "opacity", "value": 1 },
+              { "t": 1.6, "path": "position.y", "value": -170 },
+              { "t": 1.95, "path": "position.y", "value": -200, "ease": "easeOut" }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "params": [
+    { "id": "accentHue", "label": "Accent hue", "min": 0, "max": 360, "step": 1, "default": 210, "bind": "bar.props.hue" },
+    { "id": "boardScale", "label": "Board scale", "min": 0.7, "max": 1.15, "step": 0.01, "default": 1, "bind": "rows.scale" }
+  ]
+}

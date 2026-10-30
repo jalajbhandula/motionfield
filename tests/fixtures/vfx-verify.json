@@ -1,0 +1,145 @@
+{
+  "version": 1,
+  "records": {
+    "vfx-frostbite": {
+      "mechanism_hash": "c446db45891ac693acbd1b01b8e010802eacc4234699a3a10535046e4f9e5be6",
+      "status": "verified",
+      "out": {
+        "width": 480,
+        "height": 320,
+        "frames": 49,
+        "fps": 24,
+        "wall_s": 84
+      },
+      "effect_diff": {
+        "frames": [
+          9,
+          17,
+          24,
+          32,
+          39,
+          47
+        ],
+        "per_frame": [
+          4.18,
+          10.74,
+          10.54,
+          10.65,
+          27.93,
+          27.78
+        ],
+        "mean": 15.3,
+        "min": 4.18
+      },
+      "artifact_sha256": "0a74a3a9bcac2fbf8589dbb406e7dc08cd6faeeda9e1b2f09eda29ea61a8a6eb",
+      "sheet": "tests/artifacts/vfx-frostbite-side.png",
+      "note": "completed \u2192 /files/generated/8907678b-5792-489d-a6b3-94645c3c7720.mp4 \u00b7 vfx-lab-plate \u00b7 effect-diff 15.3 over 9,17,24,32,39,47",
+      "date": "2026-10-24"
+    },
+    "vfx-molten": {
+      "mechanism_hash": "f1c5489a765904ad50774d7adb46d8fd19080971f0518878f954c4530e15cef6",
+      "status": "verified",
+      "out": {
+        "width": 480,
+        "height": 320,
+        "frames": 49,
+        "fps": 24,
+        "wall_s": 54
+      },
+      "effect_diff": {
+        "frames": [
+          9,
+          17,
+          24,
+          32,
+          39,
+          47
+        ],
+        "per_frame": [
+          4.21,
+          10.96,
+          10.75,
+          10.86,
+          30.49,
+          30.29
+        ],
+        "mean": 16.26,
+        "min": 4.21
+      },
+      "artifact_sha256": "4bdaeb59d860302849dc6237584c213a479139e6259eeed311fd51b9ae3a6a08",
+      "sheet": "tests/artifacts/vfx-molten-side.png",
+      "note": "completed \u2192 /files/generated/c5fabda1-3de7-42fd-8c63-61cf4c731b73.mp4 \u00b7 vfx-lab-plate \u00b7 effect-diff 16.26 over 9,17,24,32,39,47",
+      "date": "2026-10-24"
+    },
+    "vfx-ashfall": {
+      "mechanism_hash": "5da34fd03464a8a9f79f9a5650fabd3a9d9b183e15161a15ca587830757fc80c",
+      "status": "verified",
+      "out": {
+        "width": 480,
+        "height": 320,
+        "frames": 49,
+        "fps": 24,
+        "wall_s": 57
+      },
+      "effect_diff": {
+        "frames": [
+          9,
+          17,
+          24,
+          32,
+          39,
+          47
+        ],
+        "per_frame": [
+          3.44,
+          10.05,
+          9.88,
+          9.95,
+          29.69,
+          29.4
+        ],
+        "mean": 15.4,
+        "min": 3.44
+      },
+      "artifact_sha256": "3b915d9054e5fb111ddb04d2af9bfe358dafe355f03033f90ce1a77a94e63e3b",
+      "sheet": "tests/artifacts/vfx-ashfall-side.png",
+      "note": "completed \u2192 /files/generated/211cfed9-1ca8-4d5c-b097-f6e866f65fb1.mp4 \u00b7 vfx-lab-plate \u00b7 effect-diff 15.4 over 9,17,24,32,39,47",
+      "date": "2026-10-24"
+    },
+    "vfx-overgrowth": {
+      "mechanism_hash": "c564ecbba60cdb969b27b0def415e4568e43fdc5d9327360560ce863e1846a2e",
+      "status": "verified",
+      "out": {
+        "width": 480,
+        "height": 320,
+        "frames": 33,
+        "fps": 16,
+        "wall_s": 265
+      },
+      "effect_diff": {
+        "frames": [
+          0,
+          6,
+          12,
+          19,
+          25,
+          31
+        ],
+        "per_frame": [
+          59.71,
+          60.02,
+          153.08,
+          148.34,
+          69.27,
+          70.86
+        ],
+        "mean": 93.55,
+        "min": 59.71
+      },
+      "artifact_sha256": "3a47cc7f53fcdc4d3a3f690bf14280c5187564ec12a592c63a9015c6c38f51f3",
+      "sheet": "tests/artifacts/vfx-overgrowth-side.png",
+      "note": "completed \u2192 /files/generated/ba90d01e-1eda-402a-98b8-5c0d6637c6a5.mp4 \u00b7 vfx-lab-alt/depth \u00b7 effect-diff 93.55 over 0,6,12,19,25,31",
+      "date": "2026-10-24"
+    }
+  }
+}

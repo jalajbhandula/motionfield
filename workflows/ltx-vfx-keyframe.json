@@ -1,0 +1,60 @@
+{
+  "_meta": {
+    "name": "LTX-2.5 VFX keyframe (first & last frame)",
+    "placeholders": {
+      "PROMPT": "effect prompt (preset-injected)",
+      "NEGATIVE": "negative prompt (encoded into the guider; distilled cfg is 1.0 so it is a no-op)",
+      "INPUT_IMAGE": "required first-frame keyframe image, comfy input/ filename",
+      "END_IMAGE": "optional last-frame keyframe image, comfy input/ filename",
+      "END_FRAME": "pixel frame index the end keyframe pins (host sends frames-1; only resolved when END_IMAGE is set)",
+      "WIDTH": "multiple of 32",
+      "HEIGHT": "multiple of 32",
+      "FRAMES": "8n+1",
+      "FPS": "fps",
+      "SEED": "noise seed",
+      "PREFIX": "filename prefix"
+    },
+    "optional": ["END_IMAGE", "END_FRAME"],
+    "passthrough": {
+      "23": ["positive", "negative", "latent"]
+    },
+    "requires": [
+      "ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors (diffusion_models)",
+      "gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors (text_encoders)",
+      "ltx-2.5-video-vae-bf16.safetensors (vae)",
+      "ltx-2.5-audio-vae-bf16.safetensors (vae)"
+    ],
+    "nodes": "core only",
+    "notes": "Official ComfyUI LTX-2.5 FLF2V recipe (video_ltx2_5_flf2v template): both keyframes resize to the target dims (center crop) and LTXVPreprocess(18)-compress; the first frame is attached by LTXVAddGuide at frame_idx 0, the optional last frame by a second LTXVAddGuide at frame_idx = last (frame_idx {{END_FRAME}} == frames-1 — the template uses -1, equivalent modulo latent length). Single-pass distilled 8-step sigma table on the joint AV latent through LTXVDualCFGGuider (cfg 1/1); LTXVCropGuides strips the guide latents from the decoded result. Without END_IMAGE node 23 and its loader chain drop via _meta.optional/passthrough (consumers rewire to the first guide's outputs). Native CreateVideo → SaveVideo muxes the generated audio."
+  },
+  "1": { "class_type": "UNETLoader", "inputs": { "unet_name": "ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors", "weight_dtype": "default" } },
+  "2": { "class_type": "VAELoader", "inputs": { "vae_name": "ltx-2.5-video-vae-bf16.safetensors" } },
+  "3": { "class_type": "VAELoader", "inputs": { "vae_name": "ltx-2.5-audio-vae-bf16.safetensors" } },
+  "4": { "class_type": "CLIPLoader", "inputs": { "clip_name": "gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors", "type": "ltxv", "device": "default" } },
+  "5": { "class_type": "CLIPTextEncode", "inputs": { "clip": ["4", 0], "text": "{{PROMPT}}" } },
+  "6": { "class_type": "CLIPTextEncode", "inputs": { "clip": ["4", 0], "text": "{{NEGATIVE}}" } },
+  "7": { "class_type": "LTXVConditioning", "inputs": { "positive": ["5", 0], "negative": ["6", 0], "frame_rate": "{{FPS}}" } },
+  "10": { "class_type": "LoadImage", "inputs": { "image": "{{INPUT_IMAGE}}" } },
+  "11": { "class_type": "ResizeImageMaskNode", "inputs": { "input": ["10", 0], "resize_type": "scale dimensions", "resize_type.width": "{{WIDTH}}", "resize_type.height": "{{HEIGHT}}", "resize_type.crop": "center", "scale_method": "nearest-exact" } },
+  "12": { "class_type": "LTXVPreprocess", "inputs": { "image": ["11", 0], "img_compression": 18 } },
+  "13": { "class_type": "GetImageSize", "inputs": { "image": ["11", 0] } },
+  "14": { "class_type": "EmptyLTXVLatentVideo", "inputs": { "width": ["13", 0], "height": ["13", 1], "length": "{{FRAMES}}", "batch_size": 1 } },
+  "15": { "class_type": "LTXVAddGuide", "inputs": { "positive": ["7", 0], "negative": ["7", 1], "vae": ["2", 0], "latent": ["14", 0], "image": ["12", 0], "frame_idx": 0, "strength": 0.7 } },
+  "20": { "class_type": "LoadImage", "inputs": { "image": "{{END_IMAGE}}" } },
+  "21": { "class_type": "ResizeImageMaskNode", "inputs": { "input": ["20", 0], "resize_type": "scale dimensions", "resize_type.width": "{{WIDTH}}", "resize_type.height": "{{HEIGHT}}", "resize_type.crop": "center", "scale_method": "nearest-exact" } },
+  "22": { "class_type": "LTXVPreprocess", "inputs": { "image": ["21", 0], "img_compression": 18 } },
+  "23": { "class_type": "LTXVAddGuide", "inputs": { "positive": ["15", 0], "negative": ["15", 1], "vae": ["2", 0], "latent": ["15", 2], "image": ["22", 0], "frame_idx": "{{END_FRAME}}", "strength": 0.7 } },
+  "30": { "class_type": "LTXVEmptyLatentAudio", "inputs": { "audio_vae": ["3", 0], "frames_number": "{{FRAMES}}", "frame_rate": "{{FPS}}", "batch_size": 1 } },
+  "31": { "class_type": "LTXVConcatAVLatent", "inputs": { "video_latent": ["23", 2], "audio_latent": ["30", 0] } },
+  "32": { "class_type": "RandomNoise", "inputs": { "noise_seed": "{{SEED}}" } },
+  "33": { "class_type": "LTXVDualCFGGuider", "inputs": { "model": ["1", 0], "positive": ["23", 0], "negative": ["23", 1], "video_cfg": 1.0, "audio_cfg": 1.0 } },
+  "34": { "class_type": "KSamplerSelect", "inputs": { "sampler_name": "euler_ancestral" } },
+  "35": { "class_type": "ManualSigmas", "inputs": { "sigmas": "1.0, 0.99375, 0.9875, 0.98125, 0.975, 0.909375, 0.725, 0.421875, 0.0" } },
+  "36": { "class_type": "SamplerCustomAdvanced", "inputs": { "noise": ["32", 0], "guider": ["33", 0], "sampler": ["34", 0], "sigmas": ["35", 0], "latent_image": ["31", 0] } },
+  "37": { "class_type": "LTXVSeparateAVLatent", "inputs": { "av_latent": ["36", 0] } },
+  "38": { "class_type": "LTXVCropGuides", "inputs": { "positive": ["23", 0], "negative": ["23", 1], "latent": ["37", 0] } },
+  "39": { "class_type": "VAEDecodeTiled", "inputs": { "samples": ["38", 2], "vae": ["2", 0], "tile_size": 512, "overlap": 64, "temporal_size": 64, "temporal_overlap": 8 } },
+  "40": { "class_type": "LTXVAudioVAEDecode", "inputs": { "samples": ["37", 1], "audio_vae": ["3", 0] } },
+  "41": { "class_type": "CreateVideo", "inputs": { "images": ["39", 0], "audio": ["40", 0], "fps": "{{FPS}}" } },
+  "42": { "class_type": "SaveVideo", "inputs": { "video": ["41", 0], "filename_prefix": "{{PREFIX}}", "format": "auto", "format.codec": "auto" } }
+}

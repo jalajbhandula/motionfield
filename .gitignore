@@ -1,0 +1,34 @@
+node_modules/
+.next/
+__pycache__/
+*.pyc
+test-results/
+playwright-report/
+AGENTS.md
+.data/
+*.tsbuildinfo
+.env
+.env.local
+.env*.local
+.DS_Store
+generated/
+public/files/
+
+# Playwright MCP browser captures
+.playwright-mcp/
+
+# local smoke-test clips (never commit)
+public/ltx-test.mp4
+public/mirage-test.mp4
+public/test-clip.mp4
+next-env.d.ts
+plugins/blender/dist/
+
+# Isolated browser/build verification
+.next-validation/
+
+# Root-level scratch screenshots (local captures, never shipped)
+/*.png
+# Any isolated Next build dir (MOTIONFIELD_DIST_DIR)
+/.next-*/
+.playwright-cli/

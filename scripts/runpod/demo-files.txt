@@ -1,0 +1,6 @@
+diffusion_models/flux-2-klein-4b-bf16.safetensors
+vae/flux2-vae.safetensors
+geometry_estimation/depth_anything_3_base.safetensors
+background_removal/birefnet.safetensors
+upscale_models/RealESRGAN_x4plus.pth
+frame_interpolation/rife_v4.26.safetensors

@@ -1,0 +1,262 @@
+{
+  "ok": true,
+  "workflow": "director-wan-txt.json",
+  "params": {
+    "prompt": "a lighthouse on a cliff at dusk",
+    "duration": 1,
+    "aspect_ratio": "16:9",
+    "seed": 42,
+    "steps": 6,
+    "fps": 16,
+    "moves": "dolly in then pan left",
+    "camera_aperture": "f1.4",
+    "camera_lens": "wide-24"
+  },
+  "job_id": "fb86ad93-9248-4f23-90e4-7afd89c8bedb",
+  "status": "succeeded",
+  "elapsed_s": 261,
+  "base_url": "http://127.0.0.1:8189",
+  "ran_at": "2026-10-23T18:10:06.868Z",
+  "outputs": [
+    {
+      "nodeId": "30",
+      "name": "of_dir_be59aee0-keyframe_00001_.png",
+      "type": "image",
+      "bytes": 658749,
+      "path": "/tmp/of-evidence/media/of_dir_be59aee0-keyframe_00001_.png",
+      "sha256": "52ebb209da059cbea7f0f7a6d60c28cfda4e9d2b9481f9cd6ea9003363d3c625",
+      "graded": false
+    },
+    {
+      "nodeId": "35",
+      "name": "of_dir_3a876841-refgrid_00001_.png",
+      "type": "image",
+      "bytes": 111808,
+      "path": "/tmp/of-evidence/media/of_dir_3a876841-refgrid_00001_.png",
+      "sha256": "1861a6fc1f772fe26e75f3c246e4778b05da8509d9eea8809714ed975a6d925d",
+      "graded": false
+    },
+    {
+      "nodeId": "22",
+      "name": "of_smoke-9a_00001.mp4",
+      "type": "video",
+      "bytes": 82504,
+      "path": "/tmp/of-evidence/media/of_smoke-9a_00001.mp4",
+      "sha256": "fbb82cae897795a506541a02a2fe0202dd08bf1b5992855ed8555a0e40f63578",
+      "graded": false
+    }
+  ],
+  "poses": {
+    "moves": [
+      "dolly-in",
+      "pan-left"
+    ],
+    "frames": [
+      {
+        "t": 0,
+        "pos": [
+          0,
+          0,
+          0
+        ],
+        "yaw": 0,
+        "pitch": 0,
+        "roll": 0,
+        "fov": 73.7
+      },
+      {
+        "t": 0.0625,
+        "pos": [
+          0,
+          0,
+          0.017968750000000002
+        ],
+        "yaw": -0.134765625,
+        "pitch": 0,
+        "roll": 0,
+        "fov": 73.7
+      },
+      {
+        "t": 0.125,
+        "pos": [
+          0,
+          0,
+          0.06875
+        ],
+        "yaw": -0.515625,
+        "pitch": 0,
+        "roll": 0,
+        "fov": 73.7
+      },
+      {
+        "t": 0.1875,
+        "pos": [
+          0,
+          0,
+          0.14765625000000002
+        ],
+        "yaw": -1.107421875,
+        "pitch": 0,
+        "roll": 0,
+        "fov": 73.7
+      },
+      {
+        "t": 0.25,
+        "pos": [
+          0,
+          0,
+          0.25
+        ],
+        "yaw": -1.875,
+        "pitch": 0,
+        "roll": 0,
+        "fov": 73.7
+      },
+      {
+        "t": 0.3125,
+        "pos": [
+          0,
+          0,
+          0.37109375
+        ],
+        "yaw": -2.783203125,
+        "pitch": 0,
+        "roll": 0,
+        "fov": 73.7
+      },
+      {
+        "t": 0.375,
+        "pos": [
+          0,
+          0,
+          0.50625
+        ],
+        "yaw": -3.796875,
+        "pitch": 0,
+        "roll": 0,
+        "fov": 73.7
+      },
+      {
+        "t": 0.4375,
+        "pos": [
+          0,
+          0,
+          0.6507812500000001
+        ],
+        "yaw": -4.880859375,
+        "pitch": 0,
+        "roll": 0,
+        "fov": 73.7
+      },
+      {
+        "t": 0.5,
+        "pos": [
+          0,
+          0,
+          0.8
+        ],
+        "yaw": -6,
+        "pitch": 0,
+        "roll": 0,
+        "fov": 73.7
+      },
+      {
+        "t": 0.5625,
+        "pos": [
+          0,
+          0,
+          0.94921875
+        ],
+        "yaw": -7.119140625,
+        "pitch": 0,
+        "roll": 0,
+        "fov": 73.7
+      },
+      {
+        "t": 0.625,
+        "pos": [
+          0,
+          0,
+          1.09375
+        ],
+        "yaw": -8.203125,
+        "pitch": 0,
+        "roll": 0,
+        "fov": 73.7
+      },
+      {
+        "t": 0.6875,
+        "pos": [
+          0,
+          0,
+          1.22890625
+        ],
+        "yaw": -9.216796875,
+        "pitch": 0,
+        "roll": 0,
+        "fov": 73.7
+      },
+      {
+        "t": 0.75,
+        "pos": [
+          0,
+          0,
+          1.35
+        ],
+        "yaw": -10.125,
+        "pitch": 0,
+        "roll": 0,
+        "fov": 73.7
+      },
+      {
+        "t": 0.8125,
+        "pos": [
+          0,
+          0,
+          1.45234375
+        ],
+        "yaw": -10.892578125,
+        "pitch": 0,
+        "roll": 0,
+        "fov": 73.7
+      },
+      {
+        "t": 0.875,
+        "pos": [
+          0,
+          0,
+          1.53125
+        ],
+        "yaw": -11.484375,
+        "pitch": 0,
+        "roll": 0,
+        "fov": 73.7
+      },
+      {
+        "t": 0.9375,
+        "pos": [
+          0,
+          0,
+          1.58203125
+        ],
+        "yaw": -11.865234375,
+        "pitch": 0,
+        "roll": 0,
+        "fov": 73.7
+      },
+      {
+        "t": 1,
+        "pos": [
+          0,
+          0,
+          1.6
+        ],
+        "yaw": -12,
+        "pitch": 0,
+        "roll": 0,
+        "fov": 73.7
+      }
+    ],
+    "layer": "scene"
+  }
+}

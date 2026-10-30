@@ -1,0 +1,7 @@
+1
+00:00:00,100 --> 00:00:01,100
+Hola, estoy probando el campo de movimiento.
+
+2
+00:00:02,420 --> 00:00:03,992
+Cada clip que ves aquí fue solo...

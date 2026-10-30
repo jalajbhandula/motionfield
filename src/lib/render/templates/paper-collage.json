@@ -1,0 +1,82 @@
+{
+  "version": 1,
+  "width": 1280,
+  "height": 720,
+  "fps": 24,
+  "duration": 3,
+  "seed": 9302,
+  "background": { "color": "#e8e2d5" },
+  "camera": {
+    "fov": 50,
+    "keyframes": [{ "t": 0, "position": [0, 0, 1000], "target": [0, 0, 0] }]
+  },
+  "layers": [
+    {
+      "id": "board",
+      "type": "group",
+      "transform": { "position": [0, 0, 0] },
+      "props": {
+        "children": [
+          {
+            "id": "scrap-a",
+            "type": "plane",
+            "props": { "width": 560, "height": 330, "color": "#f6f1e7", "cornerRadius": 18, "roughness": 0.95, "metalness": 0 },
+            "transform": { "position": [-200, 90, 0], "rotation": [0, 0, -0.07] },
+            "keyframes": [
+              { "t": 0.1, "path": "position.y", "value": 430 },
+              { "t": 0.9, "path": "position.y", "value": 90, "ease": "easeOut" },
+              { "t": 0.1, "path": "rotation.z", "value": -0.35 },
+              { "t": 0.9, "path": "rotation.z", "value": -0.07, "ease": "easeOut" }
+            ]
+          },
+          {
+            "id": "scrap-b",
+            "type": "plane",
+            "props": { "width": 430, "height": 270, "hue": 200, "cornerRadius": 14, "roughness": 0.9, "metalness": 0 },
+            "transform": { "position": [230, -60, 40], "rotation": [0, 0, 0.09] },
+            "keyframes": [
+              { "t": 0.35, "path": "position.y", "value": -480 },
+              { "t": 1.2, "path": "position.y", "value": -60, "ease": "easeOut" },
+              { "t": 0.35, "path": "rotation.z", "value": 0.4 },
+              { "t": 1.2, "path": "rotation.z", "value": 0.09, "ease": "easeOut" }
+            ]
+          },
+          {
+            "id": "scrap-c",
+            "type": "plane",
+            "props": { "width": 300, "height": 190, "color": "#ffd9c7", "cornerRadius": 12, "roughness": 0.95, "metalness": 0 },
+            "transform": { "position": [-60, -190, 80], "rotation": [0, 0, -0.16] },
+            "keyframes": [
+              { "t": 0.6, "path": "position.x", "value": -700 },
+              { "t": 1.5, "path": "position.x", "value": -60, "ease": "easeOut" }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "tape",
+      "type": "plane",
+      "props": { "width": 130, "height": 34, "color": "#f2e9a9", "opacity": 0.75, "roughness": 1, "metalness": 0 },
+      "transform": { "position": [-340, 250, 120], "rotation": [0, 0, -0.5] },
+      "keyframes": [
+        { "t": 1.1, "path": "opacity", "value": 0 },
+        { "t": 1.35, "path": "opacity", "value": 0.75 }
+      ]
+    },
+    {
+      "id": "caption",
+      "type": "text",
+      "props": { "text": "cut + paste", "size": 64, "weight": 600, "color": "#33302a" },
+      "transform": { "position": [230, -210, 140] },
+      "keyframes": [
+        { "t": 1.4, "path": "opacity", "value": 0 },
+        { "t": 2.0, "path": "opacity", "value": 1 }
+      ]
+    }
+  ],
+  "params": [
+    { "id": "accentHue", "label": "Accent hue", "min": 0, "max": 360, "step": 1, "default": 200, "bind": "scrap-b.props.hue" },
+    { "id": "boardZoom", "label": "Board zoom", "min": 0.8, "max": 1.2, "step": 0.01, "default": 1, "bind": "board.scale" }
+  ]
+}

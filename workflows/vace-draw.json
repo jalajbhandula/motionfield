@@ -1,0 +1,286 @@
+{
+  "_meta": {
+    "name": "Wan VACE draw-to-video",
+    "placeholders": {
+      "PROMPT": "what the stroke should do",
+      "NEGATIVE": "negative prompt",
+      "WIDTH": "multiple of 32",
+      "HEIGHT": "multiple of 32",
+      "FRAMES": "8n+1",
+      "SEED": "noise seed",
+      "STEPS": "20-30",
+      "INPUT_VIDEO": "source clip, comfy input/ filename",
+      "INPUT_IMAGE": "the source frame with the stroke drawn on it",
+      "DRAW_SKIP": "frames to skip to reach the edited frame (timestamp * 16)",
+      "PREFIX": "output filename prefix"
+    },
+    "requires": [
+      "wan2.1_vace_1.3B_fp16.safetensors (UNET; upgrade: wan2.1_vace_14B_fp8scaled.safetensors on a GPU / Comfy Cloud)",
+      "umt5_xxl_fp8_e4m3fn_scaled.safetensors (wan CLIP)",
+      "wan_2.1_vae.safetensors",
+      "custom-nodes: VideoHelperSuite (VHS_LoadVideo, VHS_VideoCombine), motionfield_nodes (OF_DrawMask, OF_PlateAudio)"
+    ],
+    "nodes": "core + VHS + motionfield_nodes",
+    "notes": "The stroke steers the edit. OF_DrawMask diffs the edited frame against the clean frame at DRAW_SKIP and repeats that ink mask across the clip as control_masks. control_video stays the source frames. The edited frame is not a reference_image \u2014 wiring it there copies the stroke color over the whole clip. No reference latent is prepended (trim amount stays 0). Source audio is muxed back through OF_PlateAudio."
+  },
+  "1": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "wan2.1_vace_1.3B_fp16.safetensors",
+      "weight_dtype": "default"
+    }
+  },
+  "2": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "type": "wan"
+    }
+  },
+  "3": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "wan_2.1_vae.safetensors"
+    }
+  },
+  "4": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "2",
+        0
+      ],
+      "text": "{{PROMPT}}"
+    }
+  },
+  "5": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "2",
+        0
+      ],
+      "text": "{{NEGATIVE}}"
+    }
+  },
+  "6": {
+    "class_type": "VHS_LoadVideo",
+    "inputs": {
+      "video": "{{INPUT_VIDEO}}",
+      "force_rate": 16,
+      "custom_width": "{{WIDTH}}",
+      "custom_height": "{{HEIGHT}}",
+      "frame_load_cap": "{{FRAMES}}",
+      "skip_first_frames": 0,
+      "select_every_nth": 1,
+      "format": "AnimateDiff"
+    }
+  },
+  "7": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "{{INPUT_IMAGE}}"
+    }
+  },
+  "8": {
+    "class_type": "VHS_LoadVideo",
+    "inputs": {
+      "video": "{{INPUT_VIDEO}}",
+      "force_rate": 16,
+      "custom_width": "{{WIDTH}}",
+      "custom_height": "{{HEIGHT}}",
+      "frame_load_cap": 1,
+      "skip_first_frames": "{{DRAW_SKIP}}",
+      "select_every_nth": 1,
+      "format": "AnimateDiff"
+    }
+  },
+  "9": {
+    "class_type": "OF_DrawMask",
+    "inputs": {
+      "edited": [
+        "7",
+        0
+      ],
+      "base": [
+        "8",
+        0
+      ],
+      "frames": "{{FRAMES}}",
+      "threshold": 0.08,
+      "grow": 16
+    }
+  },
+  "10": {
+    "class_type": "WanVaceToVideo",
+    "inputs": {
+      "positive": [
+        "4",
+        0
+      ],
+      "negative": [
+        "5",
+        0
+      ],
+      "vae": [
+        "3",
+        0
+      ],
+      "width": "{{WIDTH}}",
+      "height": "{{HEIGHT}}",
+      "length": "{{FRAMES}}",
+      "batch_size": 1,
+      "strength": 1.0,
+      "control_video": [
+        "41",
+        0
+      ],
+      "control_masks": [
+        "9",
+        0
+      ]
+    }
+  },
+  "11": {
+    "class_type": "KSampler",
+    "inputs": {
+      "model": [
+        "1",
+        0
+      ],
+      "positive": [
+        "10",
+        0
+      ],
+      "negative": [
+        "10",
+        1
+      ],
+      "latent_image": [
+        "10",
+        2
+      ],
+      "seed": "{{SEED}}",
+      "steps": "{{STEPS}}",
+      "cfg": 5.0,
+      "sampler_name": "uni_pc",
+      "scheduler": "simple",
+      "denoise": 1.0
+    }
+  },
+  "12": {
+    "class_type": "TrimVideoLatent",
+    "inputs": {
+      "samples": [
+        "11",
+        0
+      ],
+      "trim_amount": [
+        "10",
+        3
+      ]
+    }
+  },
+  "13": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "12",
+        0
+      ],
+      "vae": [
+        "3",
+        0
+      ]
+    }
+  },
+  "14": {
+    "class_type": "VHS_VideoCombine",
+    "inputs": {
+      "images": [
+        "42",
+        0
+      ],
+      "audio": [
+        "15",
+        0
+      ],
+      "frame_rate": 16,
+      "loop_count": 0,
+      "filename_prefix": "{{PREFIX}}",
+      "format": "video/h264-mp4",
+      "pix_fmt": "yuv420p",
+      "save_output": true,
+      "pingpong": false
+    }
+  },
+  "15": {
+    "class_type": "OF_PlateAudio",
+    "_meta": {
+      "title": "source audio (silent-safe)"
+    },
+    "inputs": {
+      "video": "{{INPUT_VIDEO}}",
+      "start_time": 0,
+      "duration": 0
+    }
+  },
+  "40": {
+    "class_type": "EmptyImage",
+    "inputs": {
+      "width": "{{WIDTH}}",
+      "height": "{{HEIGHT}}",
+      "batch_size": "{{FRAMES}}",
+      "color": 8421504
+    },
+    "_meta": {
+      "title": "grey plate - VACE regenerates only what it cannot see"
+    }
+  },
+  "41": {
+    "class_type": "ImageCompositeMasked",
+    "inputs": {
+      "destination": [
+        "6",
+        0
+      ],
+      "source": [
+        "40",
+        0
+      ],
+      "x": 0,
+      "y": 0,
+      "resize_source": false,
+      "mask": [
+        "9",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "grey out the drawn region"
+    }
+  },
+  "42": {
+    "class_type": "ImageCompositeMasked",
+    "inputs": {
+      "destination": [
+        "6",
+        0
+      ],
+      "source": [
+        "13",
+        0
+      ],
+      "mask": [
+        "9",
+        0
+      ],
+      "x": 0,
+      "y": 0,
+      "resize_source": false
+    },
+    "_meta": {
+      "title": "preserve original pixels outside the drawn stroke"
+    }
+  }
+}

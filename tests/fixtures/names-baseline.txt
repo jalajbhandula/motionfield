@@ -1,0 +1,4 @@
+docs/SMOKE.md	81b98401b36093b8b4f1cc553339233bf8a28ad7
+scripts/assistant-smoke.ts	81b98401b36093b8b4f1cc553339233bf8a28ad7
+src/lib/catalog/video/camera.ts	05713074c4d9c2fba53b068691855e297f7d23d8
+tests/fixtures/catalog-snapshot.json	05713074c4d9c2fba53b068691855e297f7d23d8

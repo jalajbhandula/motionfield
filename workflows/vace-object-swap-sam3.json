@@ -1,0 +1,374 @@
+{
+  "_meta": {
+    "name": "Wan VACE object-swap (frame-0 pick + SAM3 tracked matte)",
+    "placeholders": {
+      "PROMPT": "description incl. swapped object",
+      "NEGATIVE": "negative prompt",
+      "WIDTH": "multiple of 32",
+      "HEIGHT": "multiple of 32",
+      "FRAMES": "8n+1",
+      "SEED": "noise seed",
+      "STEPS": "20-30",
+      "INPUT_VIDEO": "source video, comfy input/ filename",
+      "MASK_IMAGE": "frame-0 pick \u2014 a white region painted/boxed on a black image at the clip's own dimensions (seeds the SAM3 tracker on frame 0)",
+      "REF_IMAGE": "replacement object reference image, comfy input/ filename",
+      "PREFIX": "output filename prefix"
+    },
+    "requires": [
+      "wan2.1_vace_1.3B_fp16.safetensors",
+      "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "wan_2.1_vae.safetensors",
+      "sam3.1_multiplex_fp16.safetensors (checkpoints, Meta SAM License \u2014 gated)",
+      "custom-nodes: VideoHelperSuite (VHS_LoadVideo, VHS_VideoCombine), motionfield_nodes (OF_PlateAudio)"
+    ],
+    "nodes": "core + VHS",
+    "notes": "SAM 3.1 quality upgrade over the BiRefNet/overlap tracker in vace-object-swap.json: the painted frame-0 pick becomes SAM3_VideoTrack's initial_mask, and SAM3's memory tracker propagates it through the whole clip (occlusions, lighting shifts, re-entry \u2014 the cases the per-frame overlap heuristic loses). SAM3_TrackToMask yields the per-frame regen matte, grown + feathered into control_masks identical to the BiRefNet variant; control_video stays the source frames and the reference image supplies the replacement object. Source audio is muxed back through OF_PlateAudio, which yields nothing when the clip has no audio stream instead of failing the job. The tracked matte is saved as evidence. Weights: sam3.1_multiplex_fp16.safetensors under the Meta SAM License (gated HF download \u2014 HF_TOKEN)."
+  },
+  "1": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "wan2.1_vace_1.3B_fp16.safetensors",
+      "weight_dtype": "default"
+    }
+  },
+  "2": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "type": "wan"
+    }
+  },
+  "3": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "wan_2.1_vae.safetensors"
+    }
+  },
+  "4": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "2",
+        0
+      ],
+      "text": "{{PROMPT}}"
+    }
+  },
+  "5": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "2",
+        0
+      ],
+      "text": "{{NEGATIVE}}"
+    }
+  },
+  "6": {
+    "class_type": "VHS_LoadVideo",
+    "inputs": {
+      "video": "{{INPUT_VIDEO}}",
+      "force_rate": 16,
+      "custom_width": "{{WIDTH}}",
+      "custom_height": "{{HEIGHT}}",
+      "frame_load_cap": "{{FRAMES}}",
+      "skip_first_frames": 0,
+      "select_every_nth": 1
+    }
+  },
+  "9": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "{{REF_IMAGE}}"
+    }
+  },
+  "10": {
+    "class_type": "WanVaceToVideo",
+    "inputs": {
+      "positive": [
+        "4",
+        0
+      ],
+      "negative": [
+        "5",
+        0
+      ],
+      "vae": [
+        "3",
+        0
+      ],
+      "width": "{{WIDTH}}",
+      "height": "{{HEIGHT}}",
+      "length": "{{FRAMES}}",
+      "batch_size": 1,
+      "strength": 1.0,
+      "control_video": [
+        "41",
+        0
+      ],
+      "control_masks": [
+        "21",
+        0
+      ],
+      "reference_image": [
+        "9",
+        0
+      ]
+    }
+  },
+  "11": {
+    "class_type": "KSampler",
+    "inputs": {
+      "model": [
+        "1",
+        0
+      ],
+      "positive": [
+        "10",
+        0
+      ],
+      "negative": [
+        "10",
+        1
+      ],
+      "latent_image": [
+        "10",
+        2
+      ],
+      "seed": "{{SEED}}",
+      "steps": "{{STEPS}}",
+      "cfg": 5.0,
+      "sampler_name": "uni_pc",
+      "scheduler": "simple",
+      "denoise": 1.0
+    }
+  },
+  "12": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "14",
+        0
+      ],
+      "vae": [
+        "3",
+        0
+      ]
+    }
+  },
+  "13": {
+    "class_type": "VHS_VideoCombine",
+    "inputs": {
+      "images": [
+        "12",
+        0
+      ],
+      "audio": [
+        "28",
+        0
+      ],
+      "frame_rate": 16,
+      "loop_count": 0,
+      "filename_prefix": "{{PREFIX}}",
+      "format": "video/h264-mp4",
+      "pix_fmt": "yuv420p",
+      "save_output": true,
+      "pingpong": false
+    }
+  },
+  "14": {
+    "class_type": "TrimVideoLatent",
+    "inputs": {
+      "samples": [
+        "11",
+        0
+      ],
+      "trim_amount": [
+        "10",
+        3
+      ]
+    }
+  },
+  "15": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "{{MASK_IMAGE}}"
+    }
+  },
+  "16": {
+    "class_type": "ImageToMask",
+    "inputs": {
+      "image": [
+        "15",
+        0
+      ],
+      "channel": "red"
+    }
+  },
+  "17": {
+    "class_type": "CheckpointLoaderSimple",
+    "inputs": {
+      "ckpt_name": "sam3.1_multiplex_fp16.safetensors"
+    }
+  },
+  "18": {
+    "class_type": "SAM3_VideoTrack",
+    "inputs": {
+      "images": [
+        "6",
+        0
+      ],
+      "model": [
+        "17",
+        0
+      ],
+      "initial_mask": [
+        "16",
+        0
+      ],
+      "detection_threshold": 0.5,
+      "max_objects": 4,
+      "detect_interval": 1
+    }
+  },
+  "19": {
+    "class_type": "SAM3_TrackToMask",
+    "inputs": {
+      "track_data": [
+        "18",
+        0
+      ],
+      "object_indices": ""
+    }
+  },
+  "20": {
+    "class_type": "GrowMask",
+    "inputs": {
+      "mask": [
+        "19",
+        0
+      ],
+      "expand": 8,
+      "tapered_corners": true
+    }
+  },
+  "21": {
+    "class_type": "FeatherMask",
+    "inputs": {
+      "mask": [
+        "20",
+        0
+      ],
+      "left": 10,
+      "top": 10,
+      "right": 10,
+      "bottom": 10
+    }
+  },
+  "22": {
+    "class_type": "MaskToImage",
+    "inputs": {
+      "mask": [
+        "19",
+        0
+      ]
+    }
+  },
+  "23": {
+    "class_type": "ImageFromBatch",
+    "inputs": {
+      "image": [
+        "22",
+        0
+      ],
+      "batch_index": 0,
+      "length": 1
+    }
+  },
+  "24": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "23",
+        0
+      ],
+      "filename_prefix": "{{PREFIX}}"
+    }
+  },
+  "25": {
+    "class_type": "MaskToImage",
+    "inputs": {
+      "mask": [
+        "21",
+        0
+      ]
+    }
+  },
+  "26": {
+    "class_type": "ImageFromBatch",
+    "inputs": {
+      "image": [
+        "25",
+        0
+      ],
+      "batch_index": 0,
+      "length": 1
+    }
+  },
+  "27": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "26",
+        0
+      ],
+      "filename_prefix": "{{PREFIX}}"
+    }
+  },
+  "28": {
+    "class_type": "OF_PlateAudio",
+    "_meta": {
+      "title": "source audio (silent-safe)"
+    },
+    "inputs": {
+      "video": "{{INPUT_VIDEO}}",
+      "start_time": 0,
+      "duration": 0
+    }
+  },
+  "40": {
+    "class_type": "EmptyImage",
+    "inputs": {
+      "width": "{{WIDTH}}",
+      "height": "{{HEIGHT}}",
+      "batch_size": "{{FRAMES}}",
+      "color": 8421504
+    },
+    "_meta": {
+      "title": "grey plate - VACE regenerates only what it cannot see"
+    }
+  },
+  "41": {
+    "class_type": "ImageCompositeMasked",
+    "inputs": {
+      "destination": [
+        "6",
+        0
+      ],
+      "source": [
+        "40",
+        0
+      ],
+      "x": 0,
+      "y": 0,
+      "resize_source": false,
+      "mask": [
+        "21",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "grey out the tracked region"
+    }
+  }
+}

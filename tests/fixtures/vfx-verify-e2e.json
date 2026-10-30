@@ -1,0 +1,325 @@
+{
+  "version": 1,
+  "records": {
+    "vfx-frostbite": {
+      "mechanism_hash": "c446db45891ac693acbd1b01b8e010802eacc4234699a3a10535046e4f9e5be6",
+      "status": "verified",
+      "date": "e2e",
+      "note": "e2e-fabricated",
+      "effect_diff": {
+        "mean": 80,
+        "min": 60,
+        "frames": [
+          0
+        ],
+        "per_frame": [
+          80
+        ]
+      }
+    },
+    "vfx-stone-set": {
+      "mechanism_hash": "d4a47a09941714f75604b0dbf46bf1d97ef369f5a776e0f13c86e438e2e1aa42",
+      "status": "verified",
+      "date": "e2e",
+      "note": "e2e-fabricated",
+      "effect_diff": {
+        "mean": 80,
+        "min": 60,
+        "frames": [
+          0
+        ],
+        "per_frame": [
+          80
+        ]
+      }
+    },
+    "vfx-molten": {
+      "mechanism_hash": "f1c5489a765904ad50774d7adb46d8fd19080971f0518878f954c4530e15cef6",
+      "status": "verified",
+      "date": "e2e",
+      "note": "e2e-fabricated",
+      "effect_diff": {
+        "mean": 80,
+        "min": 60,
+        "frames": [
+          0
+        ],
+        "per_frame": [
+          80
+        ]
+      }
+    },
+    "vfx-gilded": {
+      "mechanism_hash": "a39b4ce7188dc4962b7d2b2c5cde86f4494ac03417797a912b2766ec2f7c291c",
+      "status": "verified",
+      "date": "e2e",
+      "note": "e2e-fabricated",
+      "effect_diff": {
+        "mean": 80,
+        "min": 60,
+        "frames": [
+          0
+        ],
+        "per_frame": [
+          80
+        ]
+      }
+    },
+    "vfx-glasswork": {
+      "mechanism_hash": "d2243f57399dd7f1f6c0c80f54980a15779f18f58b519152fdfa2d2ec26a398f",
+      "status": "verified",
+      "date": "e2e",
+      "note": "e2e-fabricated",
+      "effect_diff": {
+        "mean": 80,
+        "min": 60,
+        "frames": [
+          0
+        ],
+        "per_frame": [
+          80
+        ]
+      }
+    },
+    "vfx-ashfall": {
+      "mechanism_hash": "5da34fd03464a8a9f79f9a5650fabd3a9d9b183e15161a15ca587830757fc80c",
+      "status": "verified",
+      "date": "e2e",
+      "note": "e2e-fabricated",
+      "effect_diff": {
+        "mean": 80,
+        "min": 60,
+        "frames": [
+          0
+        ],
+        "per_frame": [
+          80
+        ]
+      }
+    },
+    "vfx-sand-slip": {
+      "mechanism_hash": "369640239a65e3c7827bcdff1cc4adf3b59eb69de1bccdcffc71f78d46ecae04",
+      "status": "verified",
+      "date": "e2e",
+      "note": "e2e-fabricated",
+      "effect_diff": {
+        "mean": 80,
+        "min": 60,
+        "frames": [
+          0
+        ],
+        "per_frame": [
+          80
+        ]
+      }
+    },
+    "vfx-pixel-drift": {
+      "mechanism_hash": "8729421c9315b3a44a26c7cfb2ed41d6a8eb06761908fc2c51e2b4269ab46e05",
+      "status": "verified",
+      "date": "e2e",
+      "note": "e2e-fabricated",
+      "effect_diff": {
+        "mean": 80,
+        "min": 60,
+        "frames": [
+          0
+        ],
+        "per_frame": [
+          80
+        ]
+      }
+    },
+    "vfx-ink-smoke": {
+      "mechanism_hash": "a95db2c6ef0f38a3e8b9fa7c347d2341dfe0bfafff932eeb8757b225a4e041c8",
+      "status": "verified",
+      "date": "e2e",
+      "note": "e2e-fabricated",
+      "effect_diff": {
+        "mean": 80,
+        "min": 60,
+        "frames": [
+          0
+        ],
+        "per_frame": [
+          80
+        ]
+      }
+    },
+    "vfx-whiteout": {
+      "mechanism_hash": "7f122b5077f473771a1c592f8922ad5d733c2cbce18b5d7cae361211aa318094",
+      "status": "verified",
+      "date": "e2e",
+      "note": "e2e-fabricated",
+      "effect_diff": {
+        "mean": 80,
+        "min": 60,
+        "frames": [
+          0
+        ],
+        "per_frame": [
+          80
+        ]
+      }
+    },
+    "vfx-downpour": {
+      "mechanism_hash": "5c783a0daf003e644efaa5fe3d9d776ccff274655bb6d0a140b97406053630c7",
+      "status": "verified",
+      "date": "e2e",
+      "note": "e2e-fabricated",
+      "effect_diff": {
+        "mean": 80,
+        "min": 60,
+        "frames": [
+          0
+        ],
+        "per_frame": [
+          80
+        ]
+      }
+    },
+    "vfx-fog-bank": {
+      "mechanism_hash": "38689af6e53eb63f957420c8a1aab0db61f158095fac9027041b44ee07dc75f7",
+      "status": "verified",
+      "date": "e2e",
+      "note": "e2e-fabricated",
+      "effect_diff": {
+        "mean": 80,
+        "min": 60,
+        "frames": [
+          0
+        ],
+        "per_frame": [
+          80
+        ]
+      }
+    },
+    "vfx-ember-storm": {
+      "mechanism_hash": "7ae7a63a57c00f647a578b6ba078f5085feb86994344f414fa339af929d812a6",
+      "status": "verified",
+      "date": "e2e",
+      "note": "e2e-fabricated",
+      "effect_diff": {
+        "mean": 80,
+        "min": 60,
+        "frames": [
+          0
+        ],
+        "per_frame": [
+          80
+        ]
+      }
+    },
+    "vfx-overgrowth": {
+      "mechanism_hash": "c564ecbba60cdb969b27b0def415e4568e43fdc5d9327360560ce863e1846a2e",
+      "status": "verified",
+      "date": "e2e",
+      "note": "e2e-fabricated",
+      "effect_diff": {
+        "mean": 80,
+        "min": 60,
+        "frames": [
+          0
+        ],
+        "per_frame": [
+          80
+        ]
+      }
+    },
+    "vfx-arc-charge": {
+      "mechanism_hash": "5363e4829dcffa74d8fe622b80771fe943bbe83af3784fd9caffb9c274f2e1aa",
+      "status": "verified",
+      "date": "e2e",
+      "note": "e2e-fabricated",
+      "effect_diff": {
+        "mean": 80,
+        "min": 60,
+        "frames": [
+          0
+        ],
+        "per_frame": [
+          80
+        ]
+      }
+    },
+    "vfx-neon-trace": {
+      "mechanism_hash": "d722e764c3934999672cf9c95de84ca448397acc4ea5ae18537d1fd3c73096ff",
+      "status": "verified",
+      "date": "e2e",
+      "note": "e2e-fabricated",
+      "effect_diff": {
+        "mean": 80,
+        "min": 60,
+        "frames": [
+          0
+        ],
+        "per_frame": [
+          80
+        ]
+      }
+    },
+    "vfx-rift": {
+      "mechanism_hash": "4c8d01a04bfc330be11396c3d7d85ed58eb846de0ef46c964b4342200ea4d3fc",
+      "status": "verified",
+      "date": "e2e",
+      "note": "e2e-fabricated",
+      "effect_diff": {
+        "mean": 80,
+        "min": 60,
+        "frames": [
+          0
+        ],
+        "per_frame": [
+          80
+        ]
+      }
+    },
+    "vfx-shockwave": {
+      "mechanism_hash": "b142be152e004453e33ee80ab6a2362f2fc0fb3ff3d46b92aaebf33f2c800b49",
+      "status": "verified",
+      "date": "e2e",
+      "note": "e2e-fabricated",
+      "effect_diff": {
+        "mean": 80,
+        "min": 60,
+        "frames": [
+          0
+        ],
+        "per_frame": [
+          80
+        ]
+      }
+    },
+    "vfx-fracture": {
+      "mechanism_hash": "2d465196291e636db68eada6cdd3ab8b5ac4678d10f3d3635b5fbd47940dce1d",
+      "status": "verified",
+      "date": "e2e",
+      "note": "e2e-fabricated",
+      "effect_diff": {
+        "mean": 80,
+        "min": 60,
+        "frames": [
+          0
+        ],
+        "per_frame": [
+          80
+        ]
+      }
+    },
+    "vfx-glass-burst": {
+      "mechanism_hash": "9dd06a8b249fdaa452f1096fc57c79813d94745e7186572c3d6bb6c03f5bddbd",
+      "status": "verified",
+      "date": "e2e",
+      "note": "e2e-fabricated",
+      "effect_diff": {
+        "mean": 80,
+        "min": 60,
+        "frames": [
+          0
+        ],
+        "per_frame": [
+          80
+        ]
+      }
+    }
+  }
+}

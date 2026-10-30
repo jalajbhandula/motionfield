@@ -1,0 +1,23 @@
+{
+  "_meta": {
+    "name": "MOSS-SoundEffect v2.0 — text to sfx",
+    "desc": "Prompt-to-sound-effects on MOSS-SoundEffect v2.0 (Apache-2.0, 1.3B DiT + DAC VAE at 48 kHz) through the MIT OF_MossSFX node. On Apple Silicon the node drives the MLX 4-bit port; weights resolve from ComfyUI's models dir or an allow-listed HF repo. OF_SaveAudioWav loudness-normalizes to −16 LUFS / −1 dBTP and ships the wav; the deprecated SaveAudio anchors the tail for the provider-side pruner, which only keeps nodes reachable from core output classes — its flac is dropped.",
+    "placeholders": {
+      "PROMPT": "sound-effect description",
+      "DURATION": "seconds, 1–20",
+      "SEED": "0 = random",
+      "PREFIX": "output filename prefix"
+    },
+    "drop_outputs": ["3"],
+    "requires": ["mlx-community/MOSS-SoundEffect-v2.0-4bit (of_moss weights, ~6.4 GB)"],
+    "custom_nodes": ["OF_MossSFX", "OF_SaveAudioWav"]
+  },
+  "1": { "class_type": "OF_MossSFX", "inputs": {
+    "prompt": "{{PROMPT}}",
+    "seconds": "{{DURATION}}",
+    "seed": "{{SEED}}",
+    "repo_id": "mlx-community/MOSS-SoundEffect-v2.0-4bit"
+  } },
+  "2": { "class_type": "OF_SaveAudioWav", "inputs": { "audio": ["1", 0], "filename_prefix": "{{PREFIX}}", "lufs_target": -16.0, "true_peak": -1.0 } },
+  "3": { "class_type": "SaveAudio", "inputs": { "audio": ["2", 0], "filename_prefix": "audio/of-mix-anchor" } }
+}

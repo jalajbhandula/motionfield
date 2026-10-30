@@ -1,0 +1,16 @@
+diffusion_models/flux-2-klein-4b-bf16.safetensors
+diffusion_models/wan2.1_t2v_1.3B_fp16.safetensors
+checkpoints/ltx-video-2b-v0.9.5.safetensors
+text_encoders/t5xxl_fp8_e4m3fn_scaled.safetensors
+vae/flux2-vae.safetensors
+geometry_estimation/depth_anything_3_base.safetensors
+background_removal/birefnet.safetensors
+upscale_models/RealESRGAN_x4plus.pth
+frame_interpolation/rife_v4.26.safetensors
+motionfield/dwpose/yolox_l.onnx
+motionfield/dwpose/dw-ll_ucoco_384.onnx
+diffusers/TMElyralab/MuseTalk/musetalk/musetalk.json
+diffusers/TMElyralab/MuseTalk/musetalk/pytorch_model.bin
+diffusers/TMElyralab/MuseTalk/sd-vae-ft-mse/config.json
+diffusers/TMElyralab/MuseTalk/sd-vae-ft-mse/diffusion_pytorch_model.safetensors
+diffusers/TMElyralab/MuseTalk/whisper/tiny.pt

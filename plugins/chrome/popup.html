@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>MotionField</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body { font: 13px/1.45 system-ui, sans-serif; width: 340px; margin: 0; padding: 12px; }
+    h1 { font-size: 15px; margin: 0 0 8px; }
+    #of-banner { padding: 7px 9px; border-radius: 6px; background: #8881; margin-bottom: 8px; display: none; }
+    #of-banner.show { display: block; }
+    #of-banner.err { background: #d81d1d22; }
+    .job { display: flex; gap: 10px; align-items: center; padding: 7px 0; border-top: 1px solid #8883; }
+    .job .meta { flex: 1; min-width: 0; }
+    .job .ep { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .job .st { font-size: 12px; color: #888; }
+    .job img, .job video, .job audio { width: 84px; max-height: 56px; border-radius: 4px; background: #0001; }
+    .empty { color: #888; padding: 12px 0; }
+    button { font: inherit; padding: 5px 10px; border-radius: 6px; border: 1px solid #8886; background: #8881; cursor: pointer; }
+    a { color: #1d4ed8; }
+  </style>
+</head>
+<body>
+  <h1>MotionField</h1>
+  <div id="of-banner" role="alert"></div>
+  <div id="of-jobs"><p class="empty">no recent jobs</p></div>
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

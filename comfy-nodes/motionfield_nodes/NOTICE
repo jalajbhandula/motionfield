@@ -1,0 +1,19 @@
+MotionField nodes for ComfyUI
+Copyright (c) MotionField contributors
+
+=====================================================================
+Third-party attribution
+=====================================================================
+
+motionfield_nodes/dwpose_onnx/
+--------------------------
+Vendored from the DWPose project (https://github.com/IDEA-Research/DWPose,
+onnx branch — ControlNet-v1-1-nightly/annotator/dwpose/{onnxdet,onnxpose,
+wholebody}.py). Copyright IDEA-Research / the DWPose authors. Licensed
+under the Apache License, Version 2.0 — see the LICENSE and NOTICE files
+inside that directory.
+
+The ONNX weights loaded by that code (yolox_l.onnx,
+dw-ll_ucoco_384.onnx) are distributed from
+https://huggingface.co/yzd-v/DWPose under Apache-2.0 and are not vendored
+in this repository.

@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "width": 1280,
+  "height": 720,
+  "fps": 24,
+  "duration": 3,
+  "seed": 4117,
+  "background": { "gradient": ["#101423", "#2b3a66", 160] },
+  "camera": {
+    "fov": 50,
+    "keyframes": [{ "t": 0, "position": [0, 0, 1000], "target": [0, 0, 0] }]
+  },
+  "layers": [
+    {
+      "id": "sun",
+      "type": "sphere",
+      "props": { "radius": 150, "hue": 45, "metalness": 0.05, "roughness": 0.9, "segments": 48 },
+      "transform": { "position": [300, 160, -200] },
+      "keyframes": [
+        { "t": 0, "path": "scale", "value": 0.6 },
+        { "t": 1.2, "path": "scale", "value": 1, "ease": "spring" }
+      ]
+    },
+    {
+      "id": "hill-back",
+      "type": "sphere",
+      "props": { "radius": 620, "color": "#1c2b4a", "metalness": 0, "roughness": 1, "segments": 48 },
+      "transform": { "position": [-260, -780, -350] }
+    },
+    {
+      "id": "hill-front",
+      "type": "sphere",
+      "props": { "radius": 540, "color": "#243a5e", "metalness": 0, "roughness": 1, "segments": 48 },
+      "transform": { "position": [320, -760, -150] }
+    },
+    {
+      "id": "stars",
+      "type": "particles",
+      "props": { "count": 320, "radius": 780, "size": 3, "color": "#dfe8ff", "opacity": 0.9, "speed": 0.08, "drift": 30 },
+      "transform": { "position": [0, 80, -420] }
+    },
+    {
+      "id": "title",
+      "type": "text",
+      "props": { "text": "Made by hand", "size": 96, "weight": 700, "color": "#f5f7ff", "reveal": 1 },
+      "transform": { "position": [0, -180, 100] },
+      "keyframes": [
+        { "t": 0.3, "path": "props.reveal", "value": 0 },
+        { "t": 1.5, "path": "props.reveal", "value": 1, "ease": "easeInOut" },
+        { "t": 0.3, "path": "opacity", "value": 0 },
+        { "t": 0.7, "path": "opacity", "value": 1 }
+      ]
+    }
+  ],
+  "params": [
+    { "id": "accentHue", "label": "Accent hue", "min": 0, "max": 360, "step": 1, "default": 45, "bind": "sun.props.hue" },
+    { "id": "driftSpeed", "label": "Drift speed", "min": 0, "max": 1, "step": 0.02, "default": 0.08, "bind": "stars.props.speed" }
+  ]
+}

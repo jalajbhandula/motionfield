@@ -1,0 +1,51 @@
+{
+  "_meta": {
+    "name": "FLUX.2 klein 4B — masked edit / object removal",
+    "placeholders": {
+      "PROMPT": "what the masked region should become (remove mode fills background)",
+      "INPUT_IMAGE": "image to edit, comfy input/ filename",
+      "MASK_IMAGE": "brushed mask — white marks the region to change",
+      "STEPS": "4 (distilled)",
+      "SEED": "noise seed",
+      "BATCH": "images per run",
+      "PREFIX": "output filename prefix"
+    },
+    "requires": [
+      "flux-2-klein-4b.safetensors",
+      "qwen_3_4b_fp8_mixed.safetensors",
+      "flux2-vae.safetensors"
+    ],
+    "nodes": "core only",
+    "notes": "Klein is an instruction edit model — the brushed mask does not feed the sampler; it only gates the restore. The source is lanczos-scaled to ~1 MP for the model (11), the decode is lanczos-scaled back to the source's own size (39, via GetImageSize on the original LoadImage) and composited onto the ORIGINAL upload through the grown + feathered mask — the output is the source's size and pixels outside the brush are untouched. mode=remove swaps the prompt for a background-fill instruction via the catalog map."
+  },
+  "1": { "class_type": "UNETLoader", "inputs": { "unet_name": "flux-2-klein-4b.safetensors", "weight_dtype": "default" } },
+  "2": { "class_type": "CLIPLoader", "inputs": { "clip_name": "qwen_3_4b_fp8_mixed.safetensors", "type": "flux2" } },
+  "3": { "class_type": "VAELoader", "inputs": { "vae_name": "flux2-vae.safetensors" } },
+  "4": { "class_type": "CLIPTextEncode", "inputs": { "clip": ["2", 0], "text": "{{PROMPT}}" } },
+  "5": { "class_type": "ConditioningZeroOut", "inputs": { "conditioning": ["4", 0] } },
+  "10": { "class_type": "LoadImage", "inputs": { "image": "{{INPUT_IMAGE}}" } },
+  "11": { "class_type": "ImageScaleToTotalPixels", "inputs": { "image": ["10", 0], "upscale_method": "lanczos", "megapixels": 1.0, "resolution_steps": 16 } },
+  "12": { "class_type": "GetImageSize", "inputs": { "image": ["11", 0] } },
+  "20": { "class_type": "ReferenceMultiLatent", "inputs": {
+    "positive": ["4", 0], "negative": ["5", 0], "vae": ["3", 0],
+    "resolution": "resize", "resolution.megapixels": 1.0,
+    "images.image0": ["11", 0]
+  } },
+  "21": { "class_type": "Flux2Scheduler", "inputs": { "steps": "{{STEPS}}", "width": ["12", 0], "height": ["12", 1] } },
+  "22": { "class_type": "EmptyFlux2LatentImage", "inputs": { "width": ["12", 0], "height": ["12", 1], "batch_size": "{{BATCH}}" } },
+  "23": { "class_type": "RandomNoise", "inputs": { "noise_seed": "{{SEED}}" } },
+  "24": { "class_type": "KSamplerSelect", "inputs": { "sampler_name": "euler" } },
+  "25": { "class_type": "CFGGuider", "inputs": { "model": ["1", 0], "positive": ["20", 0], "negative": ["20", 1], "cfg": 1.0 } },
+  "26": { "class_type": "SamplerCustomAdvanced", "inputs": { "noise": ["23", 0], "guider": ["25", 0], "sampler": ["24", 0], "sigmas": ["21", 0], "latent_image": ["22", 0] } },
+  "27": { "class_type": "VAEDecode", "inputs": { "samples": ["26", 0], "vae": ["3", 0] } },
+  "30": { "class_type": "LoadImage", "inputs": { "image": "{{MASK_IMAGE}}" } },
+  "31": { "class_type": "ImageToMask", "inputs": { "image": ["30", 0], "channel": "red" } },
+  "32": { "class_type": "GrowMask", "inputs": { "mask": ["31", 0], "expand": 8, "tapered_corners": true } },
+  "33": { "class_type": "MaskToImage", "inputs": { "mask": ["32", 0] } },
+  "34": { "class_type": "ImageBlur", "inputs": { "image": ["33", 0], "blur_radius": 6, "sigma": 2.0 } },
+  "35": { "class_type": "ImageToMask", "inputs": { "image": ["34", 0], "channel": "red" } },
+  "36": { "class_type": "ImageCompositeMasked", "inputs": { "destination": ["10", 0], "source": ["39", 0], "x": 0, "y": 0, "resize_source": false, "mask": ["35", 0] } },
+  "37": { "class_type": "SaveImage", "inputs": { "images": ["36", 0], "filename_prefix": "{{PREFIX}}" } },
+  "38": { "class_type": "GetImageSize", "inputs": { "image": ["10", 0] } },
+  "39": { "class_type": "ImageScale", "inputs": { "image": ["27", 0], "upscale_method": "lanczos", "width": ["38", 0], "height": ["38", 1], "crop": "disabled" } }
+}

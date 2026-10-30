@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "width": 640,
+  "height": 360,
+  "fps": 24,
+  "duration": 2,
+  "seed": 99,
+  "background": { "color": "#101018" },
+  "camera": {
+    "fov": 50,
+    "keyframes": [{ "t": 0, "position": [0, 0, 700], "target": [0, 0, 0] }]
+  },
+  "layers": [
+    {
+      "id": "card",
+      "type": "plane",
+      "props": { "width": 500, "height": 260, "cornerRadius": 26, "color": "#1c2030", "roughness": 0.9 },
+      "transform": { "position": [0, 0, -40] }
+    },
+    {
+      "id": "word",
+      "type": "text3d",
+      "props": {
+        "text": "PLAY", "size": 70, "depth": 14, "bevelSize": 2,
+        "color": "#f5d35f", "metalness": 0.3, "roughness": 0.5,
+        "stagger": { "delay": 0.15, "from": "start" }
+      },
+      "transform": { "position": [0, 60, 0] },
+      "keyframes": [
+        { "t": 0, "path": "position.y", "value": -90 },
+        { "t": 0.9, "path": "position.y", "value": 0, "ease": "easeOut" },
+        { "t": 0, "path": "opacity", "value": 0 },
+        { "t": 0.9, "path": "opacity", "value": 1 }
+      ]
+    },
+    {
+      "id": "stroke",
+      "type": "line",
+      "props": {
+        "points": [[-160, -60, 0], [-60, -40, 0], [40, -70, 0], [160, -50, 0]],
+        "width": 8, "hue": 210, "progress": 1
+      },
+      "keyframes": [
+        { "t": 0.4, "path": "props.progress", "value": 0 },
+        { "t": 1.4, "path": "props.progress", "value": 1, "ease": "easeInOut" }
+      ]
+    },
+    {
+      "id": "caption",
+      "type": "text",
+      "props": { "text": "wipe me on", "size": 30, "weight": 600, "color": "#e8ecf8", "reveal": 1 },
+      "transform": { "position": [0, -130, 0] },
+      "keyframes": [
+        { "t": 1.0, "path": "props.reveal", "value": 0 },
+        { "t": 1.8, "path": "props.reveal", "value": 1, "ease": "easeInOut" }
+      ]
+    }
+  ],
+  "params": [
+    { "id": "accentHue", "label": "Accent hue", "min": 0, "max": 360, "step": 1, "default": 210, "bind": "stroke.props.hue" },
+    { "id": "depth", "label": "Letter depth", "min": 0, "max": 40, "step": 1, "default": 14, "bind": "word.props.depth" }
+  ]
+}

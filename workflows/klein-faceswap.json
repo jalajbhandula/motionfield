@@ -1,0 +1,56 @@
+{
+  "_meta": {
+    "name": "FLUX.2 klein 4B — consented face swap (photo)",
+    "placeholders": {
+      "PROMPT": "face-swap instruction (catalog map supplies the base text)",
+      "INPUT_IMAGE": "source photo — the person whose face gets replaced",
+      "REF_IMAGE": "identity photo — the consented face going in",
+      "STEPS": "4 (distilled)",
+      "SEED": "noise seed",
+      "PREFIX": "output filename prefix"
+    },
+    "requires": [
+      "flux-2-klein-4b.safetensors",
+      "qwen_3_4b_fp8_mixed.safetensors",
+      "flux2-vae.safetensors",
+      "birefnet.safetensors (models/birefnet, MIT)",
+      "dwpose onnx weights (models/motionfield/dwpose, Apache-2.0)",
+      "custom-nodes: motionfield_nodes (OF_FaceMask, OF_CropToMask, OF_ProvTag)"
+    ],
+    "nodes": "core + motionfield_nodes",
+    "notes": "One photo, one consented identity: the source is cropped to the face region (OF_CropToMask on the DWPose face mask + pad) so the model's edit canvas is face-tight — identity signal fills the latent instead of being ~15% of it — then lanczos-scaled to ~1 MP for klein (ReferenceMultiLatent image0 = edit target, image1 = the identity photo), sampled on the distilled 4-step stack (euler, cfg 1), scaled back to the crop's size and pasted at the crop offset; the grown + feathered face mask composites it onto the ORIGINAL photo — pixels outside the face stay the source's. The face region is DWPose 68-pt landmarks → jaw/brow hull + forehead strip (OF_FaceMask), clipped to the BiRefNet person matte so the forehead can't spill into the background. OF_ProvTag writes the final PNG: an iTXt 'prov' receipt (feature, seed, model, ts) plus an XMP 'prov:photo-face-swap' packet ride inside the output file. The soft mask is saved alongside as evidence. The endpoint carries likeness_consent — an unticked submit never reaches this graph."
+  },
+  "1": { "class_type": "UNETLoader", "inputs": { "unet_name": "flux-2-klein-4b.safetensors", "weight_dtype": "default" } },
+  "2": { "class_type": "CLIPLoader", "inputs": { "clip_name": "qwen_3_4b_fp8_mixed.safetensors", "type": "flux2" } },
+  "3": { "class_type": "VAELoader", "inputs": { "vae_name": "flux2-vae.safetensors" } },
+  "4": { "class_type": "CLIPTextEncode", "inputs": { "clip": ["2", 0], "text": "{{PROMPT}}" } },
+  "5": { "class_type": "ConditioningZeroOut", "inputs": { "conditioning": ["4", 0] } },
+  "10": { "class_type": "LoadImage", "inputs": { "image": "{{INPUT_IMAGE}}" } },
+  "11": { "class_type": "ImageScaleToTotalPixels", "inputs": { "image": ["60", 0], "upscale_method": "lanczos", "megapixels": 1.0, "resolution_steps": 16 } },
+  "12": { "class_type": "GetImageSize", "inputs": { "image": ["11", 0] } },
+  "13": { "class_type": "LoadImage", "inputs": { "image": "{{REF_IMAGE}}" } },
+  "20": { "class_type": "ReferenceMultiLatent", "inputs": {
+    "positive": ["4", 0], "negative": ["5", 0], "vae": ["3", 0],
+    "resolution": "resize", "resolution.megapixels": 1.0,
+    "images.image0": ["11", 0], "images.image1": ["13", 0]
+  } },
+  "21": { "class_type": "Flux2Scheduler", "inputs": { "steps": "{{STEPS}}", "width": ["12", 0], "height": ["12", 1] } },
+  "22": { "class_type": "EmptyFlux2LatentImage", "inputs": { "width": ["12", 0], "height": ["12", 1], "batch_size": 1 } },
+  "23": { "class_type": "RandomNoise", "inputs": { "noise_seed": "{{SEED}}" } },
+  "24": { "class_type": "KSamplerSelect", "inputs": { "sampler_name": "euler" } },
+  "25": { "class_type": "CFGGuider", "inputs": { "model": ["1", 0], "positive": ["20", 0], "negative": ["20", 1], "cfg": 1.0 } },
+  "26": { "class_type": "SamplerCustomAdvanced", "inputs": { "noise": ["23", 0], "guider": ["25", 0], "sampler": ["24", 0], "sigmas": ["21", 0], "latent_image": ["22", 0] } },
+  "27": { "class_type": "VAEDecode", "inputs": { "samples": ["26", 0], "vae": ["3", 0] } },
+  "40": { "class_type": "LoadBackgroundRemovalModel", "inputs": { "bg_removal_name": "birefnet.safetensors" } },
+  "41": { "class_type": "RemoveBackground", "inputs": { "bg_removal_model": ["40", 0], "image": ["10", 0] } },
+  "42": { "class_type": "OF_FaceMask", "inputs": { "image": ["10", 0], "matte": ["41", 0], "dilate": 10, "feather": 12, "resolution": 512 } },
+  "43": { "class_type": "GrowMask", "inputs": { "mask": ["42", 0], "expand": 12, "tapered_corners": true } },
+  "44": { "class_type": "MaskToImage", "inputs": { "mask": ["43", 0] } },
+  "45": { "class_type": "ImageBlur", "inputs": { "image": ["44", 0], "blur_radius": 12, "sigma": 4.0 } },
+  "46": { "class_type": "ImageToMask", "inputs": { "image": ["45", 0], "channel": "red" } },
+  "48": { "class_type": "ImageScale", "inputs": { "image": ["27", 0], "upscale_method": "lanczos", "width": ["60", 3], "height": ["60", 4], "crop": "disabled" } },
+  "49": { "class_type": "ImageCompositeMasked", "inputs": { "destination": ["10", 0], "source": ["48", 0], "x": ["60", 1], "y": ["60", 2], "resize_source": false, "mask": ["46", 0] } },
+  "60": { "class_type": "OF_CropToMask", "inputs": { "image": ["10", 0], "mask": ["43", 0], "pad_frac": 0.45 } },
+  "50": { "class_type": "OF_ProvTag", "inputs": { "images": ["49", 0], "feature": "photo-face-swap", "seed": "{{SEED}}", "model": "flux2-klein-4b", "filename_prefix": "{{PREFIX}}" } },
+  "51": { "class_type": "SaveImage", "inputs": { "images": ["45", 0], "filename_prefix": "{{PREFIX}}" } }
+}

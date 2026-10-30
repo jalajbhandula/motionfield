@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "width": 1920,
+  "height": 1080,
+  "fps": 24,
+  "duration": 4,
+  "seed": 4117,
+  "background": { "color": "#0a0a0b" },
+  "camera": { "fov": 50, "keyframes": [{ "t": 0, "position": [0, 0, 1500], "target": [0, 0, 0] }] },
+  "layers": [
+    {
+      "id": "head",
+      "type": "text3d",
+      "props": { "text": "every tool above is local", "size": 120, "depth": 18, "bevelSize": 2, "curveSegments": 6, "color": "#f2f5ff", "metalness": 0.2, "roughness": 0.5 },
+      "transform": { "position": [0, 260, 0] },
+      "keyframes": [
+        { "t": 0, "path": "opacity", "value": 0 },
+        { "t": 0.5, "path": "opacity", "value": 1 }
+      ]
+    },
+    {
+      "id": "rule",
+      "type": "line",
+      "props": { "points": [[-460, 140, 0], [460, 140, 0]], "width": 4, "color": "#d4ff3f", "progress": 1 },
+      "keyframes": [
+        { "t": 0.3, "path": "props.progress", "value": 0 },
+        { "t": 1.0, "path": "props.progress", "value": 1, "ease": "easeInOut" }
+      ]
+    },
+    {
+      "id": "nodesA",
+      "type": "text",
+      "props": { "text": "{{NODES_A}}", "size": 34, "weight": 500, "color": "#d4ff3f", "reveal": 1 },
+      "transform": { "position": [0, 20, 0] },
+      "keyframes": [
+        { "t": 0.7, "path": "props.reveal", "value": 0 },
+        { "t": 1.6, "path": "props.reveal", "value": 1, "ease": "easeInOut" }
+      ]
+    },
+    {
+      "id": "nodesB",
+      "type": "text",
+      "props": { "text": "{{NODES_B}}", "size": 34, "weight": 500, "color": "#d4ff3f", "reveal": 1 },
+      "transform": { "position": [0, -60, 0] },
+      "keyframes": [
+        { "t": 0.9, "path": "props.reveal", "value": 0 },
+        { "t": 1.8, "path": "props.reveal", "value": 1, "ease": "easeInOut" }
+      ]
+    },
+    {
+      "id": "tail",
+      "type": "text",
+      "props": { "text": "the MIT Comfy node pack that rendered this demo", "size": 30, "weight": 500, "color": "#63636c" },
+      "transform": { "position": [0, -170, 0] },
+      "keyframes": [
+        { "t": 0, "path": "opacity", "value": 0 },
+        { "t": 1.8, "path": "opacity", "value": 1 }
+      ]
+    }
+  ]
+}

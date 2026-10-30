@@ -1,0 +1,219 @@
+{
+ "_meta": {
+  "name": "MotionField CameraRig — image to video (Wan2.1-Fun camera control, trajectory-driven)",
+  "placeholders": {
+   "INPUT_IMAGE": "uploaded image filename (start frame)",
+   "MOVES": "'+'-joined trajectory stack (1-3 catalog ids)",
+   "PROMPT": "motion/scene prompt",
+   "NEGATIVE": "negative prompt",
+   "DURATION": "shot length, seconds (integer)",
+   "STRENGTH": "trajectory strength 0.25-2",
+   "DISTANCE": "subject distance, metres (aim point for the pose stream)",
+   "FOV": "camera horizontal fov, degrees",
+   "CAM_W": "output width (multiple of 16)",
+   "CAM_H": "output height (multiple of 16)",
+   "CAM_FRAMES": "frame count = duration*16+1 (4n+1)",
+   "CAM_SCALE": "camera-embedding translation scale (canonical range vs metres)",
+   "SEED": "noise seed",
+   "STEPS": "sampler steps",
+   "FPS": "output fps (16 — matches the pose stream)",
+   "PREFIX": "filename prefix"
+  },
+  "requires": [
+   "wan2.1_fun_camera_v1.1_1.3B_bf16.safetensors (diffusion_models)",
+   "umt5_xxl_fp8_e4m3fn_scaled.safetensors (text_encoders)",
+   "wan_2.1_vae.safetensors (vae)",
+   "clip_vision_h.safetensors (clip_vision)",
+   "custom-nodes: VideoHelperSuite (VHS_VideoCombine)",
+   "custom-nodes: motionfield_nodes (OF_Trajectory, OF_CameraEmbed)"
+  ],
+  "nodes": "OF_Trajectory emits the pose stream; OF_CameraEmbed turns it into Plücker camera conditioning; WanCameraImageToVideo injects it with the start frame into the Wan2.1-Fun camera-control DiT."
+ },
+ "1": {
+  "class_type": "UNETLoader",
+  "inputs": {
+   "unet_name": "wan2.1_fun_camera_v1.1_1.3B_bf16.safetensors",
+   "weight_dtype": "default"
+  }
+ },
+ "2": {
+  "class_type": "CLIPLoader",
+  "inputs": {
+   "clip_name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+   "type": "wan",
+   "device": "default"
+  }
+ },
+ "3": {
+  "class_type": "VAELoader",
+  "inputs": {
+   "vae_name": "wan_2.1_vae.safetensors"
+  }
+ },
+ "4": {
+  "class_type": "CLIPTextEncode",
+  "inputs": {
+   "clip": [
+    "2",
+    0
+   ],
+   "text": "{{PROMPT}}"
+  }
+ },
+ "5": {
+  "class_type": "CLIPTextEncode",
+  "inputs": {
+   "clip": [
+    "2",
+    0
+   ],
+   "text": "{{NEGATIVE}}"
+  }
+ },
+ "6": {
+  "class_type": "LoadImage",
+  "inputs": {
+   "image": "{{INPUT_IMAGE}}"
+  }
+ },
+ "7": {
+  "class_type": "OF_Trajectory",
+  "inputs": {
+   "trajectory": "locked-off",
+   "moves": "{{MOVES}}",
+   "strength": "{{STRENGTH}}",
+   "duration": "{{DURATION}}",
+   "fps": "{{FPS}}",
+   "seed": "{{SEED}}",
+   "target": "auto",
+   "layer": "auto",
+   "post": "auto",
+   "subject_class": "person",
+   "distance": "{{DISTANCE}}",
+   "fov": "{{FOV}}"
+  }
+ },
+ "17": {
+  "class_type": "OF_CameraEmbed",
+  "inputs": {
+   "poses_json": [
+    "7",
+    0
+   ],
+   "width": "{{CAM_W}}",
+   "height": "{{CAM_H}}",
+   "translation_scale": "{{CAM_SCALE}}"
+  }
+ },
+ "18": {
+  "class_type": "CLIPVisionLoader",
+  "inputs": {
+   "clip_name": "clip_vision_h.safetensors"
+  }
+ },
+ "19": {
+  "class_type": "CLIPVisionEncode",
+  "inputs": {
+   "clip_vision": [
+    "18",
+    0
+   ],
+   "image": [
+    "6",
+    0
+   ],
+   "crop": "none"
+  }
+ },
+ "20": {
+  "class_type": "WanCameraImageToVideo",
+  "inputs": {
+   "positive": [
+    "4",
+    0
+   ],
+   "negative": [
+    "5",
+    0
+   ],
+   "vae": [
+    "3",
+    0
+   ],
+   "width": "{{CAM_W}}",
+   "height": "{{CAM_H}}",
+   "length": [
+    "17",
+    3
+   ],
+   "batch_size": 1,
+   "start_image": [
+    "6",
+    0
+   ],
+   "clip_vision_output": [
+    "19",
+    0
+   ],
+   "camera_conditions": [
+    "17",
+    0
+   ]
+  }
+ },
+ "21": {
+  "class_type": "KSampler",
+  "inputs": {
+   "model": [
+    "1",
+    0
+   ],
+   "positive": [
+    "20",
+    0
+   ],
+   "negative": [
+    "20",
+    1
+   ],
+   "latent_image": [
+    "20",
+    2
+   ],
+   "seed": "{{SEED}}",
+   "steps": "{{STEPS}}",
+   "cfg": 5.0,
+   "sampler_name": "uni_pc",
+   "scheduler": "simple",
+   "denoise": 1.0
+  }
+ },
+ "22": {
+  "class_type": "VAEDecode",
+  "inputs": {
+   "samples": [
+    "21",
+    0
+   ],
+   "vae": [
+    "3",
+    0
+   ]
+  }
+ },
+ "23": {
+  "class_type": "VHS_VideoCombine",
+  "inputs": {
+   "images": [
+    "22",
+    0
+   ],
+   "frame_rate": "{{FPS}}",
+   "loop_count": 0,
+   "filename_prefix": "{{PREFIX}}",
+   "format": "video/h264-mp4",
+   "save_output": true,
+   "pingpong": false
+  }
+ }
+}

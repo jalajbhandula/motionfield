@@ -1,0 +1,98 @@
+{
+  "_meta": {
+    "name": "MuseTalk lip-sync (video + audio)",
+    "placeholders": {
+      "INPUT_VIDEO": "uploaded video filename",
+      "INPUT_AUDIO": "uploaded audio filename",
+      "BBOX_SHIFT": "mouth-open bias (-10..10, 0 default)",
+      "BATCH": "frames per inference batch",
+      "MASK_FORCE": "mask-stream force_size (\"Custom Width\" portrait / \"Custom Height\" landscape — computed server-side via ffprobe; ignored by newer VHS)",
+      "MASK_W": "mask-stream custom_width — 512 for portrait, else 0",
+      "MASK_H": "mask-stream custom_height — 512 for landscape, else 0",
+      "PREFIX": "filename prefix"
+    },
+    "requires": [
+      "ComfyUI-MuseTalk (chaojie, MIT) — MotionField patch (OF_MouthMask blend)",
+      "ComfyUI-VideoHelperSuite",
+      "motionfield_nodes pack (OF_MouthMask, DWPose ONNX)"
+    ],
+    "nodes": "custom (MuseTalkRun, OF_MouthMask, VHS_VideoInfoSource) + core LoadAudio + VHS"
+  },
+  "1": {
+    "class_type": "LoadAudio",
+    "inputs": {
+      "audio": "{{INPUT_AUDIO}}"
+    }
+  },
+  "4": {
+    "class_type": "VHS_LoadVideo",
+    "inputs": {
+      "video": "{{INPUT_VIDEO}}",
+      "force_rate": 0,
+      "custom_width": "{{MASK_W}}",
+      "custom_height": "{{MASK_H}}",
+      "frame_load_cap": 0,
+      "skip_first_frames": 0,
+      "select_every_nth": 1
+    }
+  },
+  "5": {
+    "class_type": "OF_MouthMask",
+    "inputs": {
+      "image": [
+        "4",
+        0
+      ],
+      "dilate": 6,
+      "feather": 9,
+      "resolution": 512
+    }
+  },
+  "6": {
+    "class_type": "VHS_VideoInfoSource",
+    "inputs": {
+      "video_info": [
+        "4",
+        3
+      ]
+    }
+  },
+  "2": {
+    "class_type": "MuseTalkRun",
+    "inputs": {
+      "video_path": "{{INPUT_VIDEO}}",
+      "mouth_masks": [
+        "5",
+        0
+      ],
+      "audio": [
+        "1",
+        0
+      ],
+      "bbox_shift": "{{BBOX_SHIFT}}",
+      "batch_size": "{{BATCH}}"
+    }
+  },
+  "3": {
+    "class_type": "VHS_VideoCombine",
+    "inputs": {
+      "images": [
+        "2",
+        0
+      ],
+      "audio": [
+        "1",
+        0
+      ],
+      "frame_rate": [
+        "6",
+        0
+      ],
+      "loop_count": 0,
+      "filename_prefix": "{{PREFIX}}",
+      "format": "video/h264-mp4",
+      "pingpong": false,
+      "save_output": true
+    }
+  }
+}

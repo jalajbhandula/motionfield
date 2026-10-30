@@ -1,0 +1,1 @@
+Test-only marker for whisper-fixture.mjs. This is not a speech model.

@@ -1,0 +1,238 @@
+{
+  "_meta": {
+    "name": "VFX Lab \u00b7 Wan VACE alt \u2014 depth",
+    "placeholders": {
+      "INPUT_VIDEO": "plate clip, comfy input/ filename \u2014 resampled to 16 fps inside the loader",
+      "PROMPT": "effect prompt",
+      "NEGATIVE": "negative prompt",
+      "WIDTH": "multiple of 16",
+      "HEIGHT": "multiple of 16",
+      "FRAMES": "4n+1",
+      "FPS": "fps (16)",
+      "SEED": "noise seed",
+      "STEPS": "steps",
+      "PREFIX": "filename prefix"
+    },
+    "requires": [
+      "wan2.1_vace_1.3B_fp16.safetensors",
+      "wan_2.1_vae.safetensors",
+      "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "depth_anything_3_mono_large.safetensors",
+      "ComfyUI-VideoHelperSuite",
+      "MotionField-DA3 nodes"
+    ],
+    "nodes": "core + VHS + MotionField DA3",
+    "notes": "The Apache alternative on video plates: DA3 mono infers per-frame depth, the depth video is the VACE control signal, plate frame 0 is the reference image. Output carries the plate's own audio (VHS), same 16-fps resample the preview card quotes."
+  },
+  "1": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "wan2.1_vace_1.3B_fp16.safetensors",
+      "weight_dtype": "default"
+    }
+  },
+  "2": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "type": "wan"
+    }
+  },
+  "3": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "wan_2.1_vae.safetensors"
+    }
+  },
+  "4": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "2",
+        0
+      ],
+      "text": "{{PROMPT}}"
+    }
+  },
+  "5": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "2",
+        0
+      ],
+      "text": "{{NEGATIVE}}"
+    }
+  },
+  "6": {
+    "class_type": "VHS_LoadVideo",
+    "inputs": {
+      "video": "{{INPUT_VIDEO}}",
+      "force_rate": "{{FPS}}",
+      "custom_width": "{{WIDTH}}",
+      "custom_height": "{{HEIGHT}}",
+      "frame_load_cap": "{{FRAMES}}",
+      "skip_first_frames": 0,
+      "select_every_nth": 1
+    }
+  },
+  "7": {
+    "class_type": "LoadDA3Model",
+    "inputs": {
+      "model_name": "depth_anything_3_mono_large.safetensors",
+      "weight_dtype": "fp16"
+    }
+  },
+  "8": {
+    "class_type": "DA3Inference",
+    "inputs": {
+      "da3_model": [
+        "7",
+        0
+      ],
+      "image": [
+        "6",
+        0
+      ],
+      "resolution": 518,
+      "resize_method": "upper_bound_resize",
+      "mode": "mono"
+    }
+  },
+  "9": {
+    "class_type": "DA3Render",
+    "inputs": {
+      "da3_geometry": [
+        "8",
+        0
+      ],
+      "output": "depth",
+      "output.normalization": "v2_style",
+      "output.apply_sky_clip": false
+    }
+  },
+  "10": {
+    "class_type": "ImageFromBatch",
+    "inputs": {
+      "image": [
+        "6",
+        0
+      ],
+      "batch_index": 0,
+      "length": 1
+    }
+  },
+  "11": {
+    "class_type": "WanVaceToVideo",
+    "inputs": {
+      "positive": [
+        "4",
+        0
+      ],
+      "negative": [
+        "5",
+        0
+      ],
+      "vae": [
+        "3",
+        0
+      ],
+      "width": "{{WIDTH}}",
+      "height": "{{HEIGHT}}",
+      "length": "{{FRAMES}}",
+      "batch_size": 1,
+      "strength": 1.0,
+      "control_video": [
+        "9",
+        0
+      ],
+      "reference_image": [
+        "10",
+        0
+      ]
+    }
+  },
+  "12": {
+    "class_type": "KSampler",
+    "inputs": {
+      "model": [
+        "1",
+        0
+      ],
+      "seed": "{{SEED}}",
+      "steps": "{{STEPS}}",
+      "cfg": 5.0,
+      "sampler_name": "uni_pc",
+      "scheduler": "simple",
+      "positive": [
+        "11",
+        0
+      ],
+      "negative": [
+        "11",
+        1
+      ],
+      "latent_image": [
+        "11",
+        2
+      ],
+      "denoise": 1.0
+    }
+  },
+  "13": {
+    "class_type": "TrimVideoLatent",
+    "inputs": {
+      "samples": [
+        "12",
+        0
+      ],
+      "trim_amount": [
+        "11",
+        3
+      ]
+    }
+  },
+  "14": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "13",
+        0
+      ],
+      "vae": [
+        "3",
+        0
+      ]
+    }
+  },
+  "15": {
+    "class_type": "VHS_VideoCombine",
+    "inputs": {
+      "images": [
+        "14",
+        0
+      ],
+      "frame_rate": "{{FPS}}",
+      "loop_count": 0,
+      "audio": [
+        "40",
+        0
+      ],
+      "filename_prefix": "{{PREFIX}}",
+      "format": "video/h264-mp4",
+      "pingpong": false,
+      "save_output": true
+    }
+  },
+  "40": {
+    "class_type": "OF_PlateAudio",
+    "_meta": {
+      "title": "plate audio (silent-safe)"
+    },
+    "inputs": {
+      "video": "{{INPUT_VIDEO}}",
+      "start_time": 0,
+      "duration": 0
+    }
+  }
+}

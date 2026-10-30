@@ -1,0 +1,6 @@
+{
+  "name": "motionfield-chrome",
+  "private": true,
+  "type": "module",
+  "description": "MotionField Chrome extension (MV3, plain JS — no build step). The manifest.json beside this file is the entry point; Chrome ignores this package.json, it only marks the .js files as ES modules for tooling."
+}

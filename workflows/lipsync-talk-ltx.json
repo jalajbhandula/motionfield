@@ -1,0 +1,101 @@
+{
+  "_meta": {
+    "name": "Portrait speaks text (image + line) — Kokoro TTS + LTX-2.5 (Open RAIL-M, use-restricted, opt-in) A2V motion + MuseTalk lip-sync",
+    "placeholders": {
+      "INPUT_IMAGE": "uploaded portrait filename",
+      "PROMPT": "the line the portrait should speak",
+      "VOICE": "kokoro voice id",
+      "SPEED": "speech speed 0.5-2.0",
+      "MOTION_PROMPT": "how the clip should move (subtle motion keeps faces aligned)",
+      "NEGATIVE": "negative prompt (encoded into the guider; distilled cfg is 1.0 so it is a no-op)",
+      "WIDTH": "multiple of 32",
+      "HEIGHT": "multiple of 32",
+      "FRAMES": "8n+1",
+      "FPS": "clip/output fps",
+      "SEED": "noise seed",
+      "BBOX_SHIFT": "mouth-open bias (-10..10, 0 default)",
+      "BATCH": "frames per inference batch",
+      "PREFIX": "filename prefix"
+    },
+    "requires": [
+      "ComfyUI-MuseTalk (chaojie, MIT) — MotionField patch (OF_MouthMask blend)",
+      "ComfyUI-VideoHelperSuite",
+      "comfyui-kokoro (stavsap)",
+      "ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors (diffusion_models)",
+      "gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors (text_encoders)",
+      "ltx-2.5-video-vae-bf16.safetensors (vae)",
+      "ltx-2.5-audio-vae-bf16.safetensors (vae)",
+      "motionfield_nodes pack (OF_MouthMask, DWPose ONNX)"
+    ],
+    "nodes": "core + custom (Kokoro, MuseTalkRun, OF_MouthMask, VHS) — TTS -> LTX-2.5 audio-conditioned i2v clip -> lip-sync pass",
+    "drop_outputs": [
+      "30"
+    ],
+    "notes": "Motion stage is now LTX-2.5 distilled running the A2V recipe (official LTX-2.5_A2V_Two_Stage_Distilled template, single-stage cut): the Kokoro line is trimmed to the clip length (ComfyMathExpression (FRAMES-1)/FPS), encoded by LTXVAudioVAEEncode, and FROZEN into the joint AV latent via SetLatentNoiseMask(SolidMask 0) so the portrait's motion follows the speech before MuseTalk even runs. Portrait pins frame 0 through LTXVImgToVideoInplace at strength 1.0. Distilled 8-step schedule — STEPS ignored. The generated audio half is not decoded; the MuseTalk pass and final mux keep the real TTS waveform exactly as before."
+  },
+  "1": { "class_type": "UNETLoader", "inputs": { "unet_name": "ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors", "weight_dtype": "default" } },
+  "35": { "class_type": "VAELoader", "inputs": { "vae_name": "ltx-2.5-video-vae-bf16.safetensors" } },
+  "36": { "class_type": "VAELoader", "inputs": { "vae_name": "ltx-2.5-audio-vae-bf16.safetensors" } },
+  "13": { "class_type": "CLIPLoader", "inputs": { "clip_name": "gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors", "type": "ltxv", "device": "default" } },
+  "2": { "class_type": "CLIPTextEncode", "inputs": { "clip": ["13", 0], "text": "{{MOTION_PROMPT}}" } },
+  "3": { "class_type": "CLIPTextEncode", "inputs": { "clip": ["13", 0], "text": "{{NEGATIVE}}" } },
+  "4": { "class_type": "LTXVConditioning", "inputs": { "positive": ["2", 0], "negative": ["3", 0], "frame_rate": "{{FPS}}" } },
+  "33": { "class_type": "EmptyLTXVLatentVideo", "inputs": {
+    "width": "{{WIDTH}}", "height": "{{HEIGHT}}", "length": "{{FRAMES}}", "batch_size": 1
+  } },
+  "12": { "class_type": "LoadImage", "inputs": { "image": "{{INPUT_IMAGE}}" } },
+  "37": { "class_type": "ImageScale", "inputs": {
+    "image": ["12", 0], "upscale_method": "lanczos",
+    "width": "{{WIDTH}}", "height": "{{HEIGHT}}", "crop": "disabled"
+  } },
+  "38": { "class_type": "LTXVPreprocess", "inputs": { "image": ["37", 0], "img_compression": 18 } },
+  "5": { "class_type": "LTXVImgToVideoInplace", "inputs": {
+    "vae": ["35", 0], "image": ["38", 0], "latent": ["33", 0],
+    "strength": 1.0, "bypass": false
+  } },
+  "39": { "class_type": "ComfyMathExpression", "inputs": {
+    "values.a": "{{FRAMES}}", "values.b": "{{FPS}}", "expression": "(a-1)/b"
+  } },
+  "40": { "class_type": "TrimAudioDuration", "inputs": {
+    "audio": ["25", 0], "start_index": 0, "duration": ["39", 0]
+  } },
+  "41": { "class_type": "LTXVAudioVAEEncode", "inputs": { "audio": ["40", 0], "audio_vae": ["36", 0] } },
+  "42": { "class_type": "SolidMask", "inputs": { "value": 0, "width": 1024, "height": 1024 } },
+  "43": { "class_type": "SetLatentNoiseMask", "inputs": { "samples": ["41", 0], "mask": ["42", 0] } },
+  "44": { "class_type": "LTXVConcatAVLatent", "inputs": { "video_latent": ["5", 0], "audio_latent": ["43", 0] } },
+  "45": { "class_type": "RandomNoise", "inputs": { "noise_seed": "{{SEED}}" } },
+  "46": { "class_type": "CFGGuider", "inputs": { "model": ["1", 0], "positive": ["4", 0], "negative": ["4", 1], "cfg": 1.0 } },
+  "8": { "class_type": "KSamplerSelect", "inputs": { "sampler_name": "euler_ancestral" } },
+  "47": { "class_type": "ManualSigmas", "inputs": { "sigmas": "1.0, 0.99375, 0.9875, 0.98125, 0.975, 0.909375, 0.725, 0.421875, 0.0" } },
+  "9": { "class_type": "SamplerCustomAdvanced", "inputs": {
+    "noise": ["45", 0], "guider": ["46", 0],
+    "sampler": ["8", 0], "sigmas": ["47", 0], "latent_image": ["44", 0]
+  } },
+  "48": { "class_type": "LTXVSeparateAVLatent", "inputs": { "av_latent": ["9", 0] } },
+  "10": { "class_type": "VAEDecodeTiled", "inputs": {
+    "samples": ["48", 0], "vae": ["35", 0],
+    "tile_size": 512, "overlap": 64, "temporal_size": 64, "temporal_overlap": 8
+  } },
+  "24": { "class_type": "KokoroSpeaker", "inputs": { "speaker_name": "{{VOICE}}" } },
+  "25": { "class_type": "KokoroGenerator", "inputs": {
+    "text": "{{PROMPT}}", "speaker": ["24", 0], "speed": "{{SPEED}}", "lang": "English"
+  } },
+  "30": { "class_type": "VHS_VideoCombine", "inputs": {
+    "images": ["10", 0], "frame_rate": "{{FPS}}", "loop_count": 0,
+    "filename_prefix": "{{PREFIX}}",
+    "format": "video/h264-mp4", "pingpong": false, "save_output": false
+  } },
+  "31": { "class_type": "VHS_FILENAMES_STRING_MuseTalk", "inputs": { "filenames": ["30", 0] } },
+  "32": { "class_type": "MuseTalkRun", "inputs": {
+    "mouth_masks": ["34", 0], "video_path": ["31", 0],
+    "audio": ["25", 0], "bbox_shift": "{{BBOX_SHIFT}}", "batch_size": "{{BATCH}}"
+  } },
+  "34": { "class_type": "OF_MouthMask", "inputs": {
+    "image": ["10", 0], "dilate": 6, "feather": 9, "resolution": 512
+  } },
+  "19": { "class_type": "VHS_VideoCombine", "inputs": {
+    "images": ["32", 0], "audio": ["25", 0], "frame_rate": "{{FPS}}", "loop_count": 0,
+    "filename_prefix": "{{PREFIX}}",
+    "format": "video/h264-mp4", "pingpong": false, "save_output": true
+  } }
+}

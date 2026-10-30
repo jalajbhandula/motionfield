@@ -1,0 +1,156 @@
+{
+ "_meta": {
+  "name": "Bernini-R r2v — reference-image to video (cloud tier, Apache-2.0)",
+  "placeholders": {
+   "INPUT_IMAGE": "reference image filename (in-context token — r2v)",
+   "PROMPT": "scene/motion prompt",
+   "NEGATIVE": "negative prompt",
+   "WIDTH": "output width px (multiple of 16)",
+   "HEIGHT": "output height px (multiple of 16)",
+   "FRAMES": "frame count (4n+1)",
+   "SEED": "noise seed",
+   "STEPS": "total sampler steps across the two experts",
+   "STEPS_HALF": "the expert hand-off step (= ceil(STEPS/2))",
+   "PREFIX": "filename prefix"
+  },
+  "requires": [
+   "wan2.2_bernini_r_high_noise_fp8_scaled.safetensors (diffusion_models — tier C optional manifest)",
+   "wan2.2_bernini_r_low_noise_fp8_scaled.safetensors (diffusion_models — tier C optional manifest)",
+   "umt5_xxl_fp8_e4m3fn_scaled.safetensors (text_encoders)",
+   "wan_2.1_vae.safetensors (vae)",
+   "custom-nodes: VideoHelperSuite (VHS_VideoCombine)"
+  ],
+  "nodes": "Bernini-R (ByteDance, Wan2.2 MoE) reference-to-video per the official card: BerniniConditioning injects the reference image as an in-context token and owns the latent; each expert gets ModelSamplingSD3 shift 5.0 with the KSamplerAdvanced half-schedule handoff. 16 fps. Tier-C optional pair of fp8 DiTs — pod only."
+ },
+ "1": {
+  "class_type": "UNETLoader",
+  "inputs": {
+   "unet_name": "wan2.2_bernini_r_high_noise_fp8_scaled.safetensors",
+   "weight_dtype": "default"
+  }
+ },
+ "2": {
+  "class_type": "UNETLoader",
+  "inputs": {
+   "unet_name": "wan2.2_bernini_r_low_noise_fp8_scaled.safetensors",
+   "weight_dtype": "default"
+  }
+ },
+ "3": {
+  "class_type": "CLIPLoader",
+  "inputs": {
+   "clip_name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+   "type": "wan",
+   "device": "default"
+  }
+ },
+ "4": {
+  "class_type": "VAELoader",
+  "inputs": {
+   "vae_name": "wan_2.1_vae.safetensors"
+  }
+ },
+ "5": {
+  "class_type": "CLIPTextEncode",
+  "inputs": {
+   "clip": ["3", 0],
+   "text": "{{PROMPT}}"
+  }
+ },
+ "6": {
+  "class_type": "CLIPTextEncode",
+  "inputs": {
+   "clip": ["3", 0],
+   "text": "{{NEGATIVE}}"
+  }
+ },
+ "7": {
+  "class_type": "LoadImage",
+  "inputs": {
+   "image": "{{INPUT_IMAGE}}"
+  }
+ },
+ "8": {
+  "class_type": "BerniniConditioning",
+  "inputs": {
+   "positive": ["5", 0],
+   "negative": ["6", 0],
+   "vae": ["4", 0],
+   "width": "{{WIDTH}}",
+   "height": "{{HEIGHT}}",
+   "length": "{{FRAMES}}",
+   "batch_size": 1,
+   "reference_images.reference_image_0": ["7", 0],
+   "ref_max_size": 848
+  }
+ },
+ "15": {
+  "class_type": "ModelSamplingSD3",
+  "inputs": {
+   "model": ["1", 0],
+   "shift": 5.0
+  }
+ },
+ "16": {
+  "class_type": "ModelSamplingSD3",
+  "inputs": {
+   "model": ["2", 0],
+   "shift": 5.0
+  }
+ },
+ "11": {
+  "class_type": "KSamplerAdvanced",
+  "inputs": {
+   "add_noise": "enable",
+   "noise_seed": "{{SEED}}",
+   "steps": "{{STEPS}}",
+   "cfg": 3.5,
+   "sampler_name": "euler",
+   "scheduler": "simple",
+   "model": ["15", 0],
+   "positive": ["8", 0],
+   "negative": ["8", 1],
+   "latent_image": ["8", 2],
+   "start_at_step": 0,
+   "end_at_step": "{{STEPS_HALF}}",
+   "return_with_leftover_noise": "enable"
+  }
+ },
+ "12": {
+  "class_type": "KSamplerAdvanced",
+  "inputs": {
+   "add_noise": "disable",
+   "noise_seed": "{{SEED}}",
+   "steps": "{{STEPS}}",
+   "cfg": 3.5,
+   "sampler_name": "euler",
+   "scheduler": "simple",
+   "model": ["16", 0],
+   "positive": ["8", 0],
+   "negative": ["8", 1],
+   "latent_image": ["11", 0],
+   "start_at_step": "{{STEPS_HALF}}",
+   "end_at_step": 10000,
+   "return_with_leftover_noise": "disable"
+  }
+ },
+ "13": {
+  "class_type": "VAEDecode",
+  "inputs": {
+   "samples": ["12", 0],
+   "vae": ["4", 0]
+  }
+ },
+ "14": {
+  "class_type": "VHS_VideoCombine",
+  "inputs": {
+   "images": ["13", 0],
+   "frame_rate": 16,
+   "loop_count": 0,
+   "filename_prefix": "{{PREFIX}}",
+   "format": "video/h264-mp4",
+   "save_output": true,
+   "pingpong": false
+  }
+ }
+}

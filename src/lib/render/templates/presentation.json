@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "width": 1280,
+  "height": 720,
+  "fps": 24,
+  "duration": 4,
+  "seed": 5150,
+  "background": { "gradient": ["#10131c", "#1b2233", 115] },
+  "camera": {
+    "fov": 50,
+    "keyframes": [
+      { "t": 0, "position": [0, 30, 980], "target": [0, 0, 0] },
+      { "t": 4, "position": [0, 0, 900], "target": [0, 0, 0] }
+    ]
+  },
+  "layers": [
+    {
+      "id": "headline",
+      "type": "text3d",
+      "props": { "text": "Q3 RESULTS", "size": 120, "depth": 26, "bevelSize": 3, "curveSegments": 6, "color": "#f4f6ff", "metalness": 0.35, "roughness": 0.4 },
+      "transform": { "position": [0, 150, 0] },
+      "keyframes": [
+        { "t": 0, "path": "opacity", "value": 0 },
+        { "t": 0.5, "path": "opacity", "value": 1 },
+        { "t": 0, "path": "position.y", "value": 230 },
+        { "t": 0.8, "path": "position.y", "value": 150, "ease": "spring" }
+      ]
+    },
+    {
+      "id": "rule",
+      "type": "line",
+      "props": { "points": [[-260, 60, 0], [260, 60, 0]], "width": 4, "hue": 45, "progress": 1 },
+      "keyframes": [
+        { "t": 0.6, "path": "props.progress", "value": 0 },
+        { "t": 1.4, "path": "props.progress", "value": 1, "ease": "easeInOut" }
+      ]
+    },
+    {
+      "id": "point1",
+      "type": "text",
+      "props": { "text": "Revenue up 31% quarter over quarter", "size": 42, "weight": 500, "color": "#dfe6f7", "reveal": 1 },
+      "transform": { "position": [0, -30, 0] },
+      "keyframes": [
+        { "t": 1.0, "path": "props.reveal", "value": 0 },
+        { "t": 1.9, "path": "props.reveal", "value": 1, "ease": "easeInOut" }
+      ]
+    },
+    {
+      "id": "point2",
+      "type": "text",
+      "props": { "text": "Retention crossed 94% for the first time", "size": 42, "weight": 500, "color": "#dfe6f7", "reveal": 1 },
+      "transform": { "position": [0, -110, 0] },
+      "keyframes": [
+        { "t": 1.7, "path": "props.reveal", "value": 0 },
+        { "t": 2.6, "path": "props.reveal", "value": 1, "ease": "easeInOut" }
+      ]
+    },
+    {
+      "id": "point3",
+      "type": "text",
+      "props": { "text": "Two new regions ship next month", "size": 42, "weight": 500, "color": "#dfe6f7", "reveal": 1 },
+      "transform": { "position": [0, -190, 0] },
+      "keyframes": [
+        { "t": 2.4, "path": "props.reveal", "value": 0 },
+        { "t": 3.2, "path": "props.reveal", "value": 1, "ease": "easeInOut" }
+      ]
+    }
+  ],
+  "params": [
+    { "id": "accentHue", "label": "Accent hue", "min": 0, "max": 360, "step": 1, "default": 45, "bind": "rule.props.hue" },
+    { "id": "headDepth", "label": "Headline depth", "min": 0, "max": 60, "step": 1, "default": 26, "bind": "headline.props.depth" }
+  ]
+}

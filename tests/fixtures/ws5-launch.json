@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "width": 1280,
+  "height": 720,
+  "fps": 24,
+  "duration": 2,
+  "seed": 20261021,
+  "background": { "gradient": ["#0b0e1a", "#263050", 135] },
+  "camera": {
+    "fov": 46,
+    "keyframes": [
+      { "t": 0, "position": [0, 40, 880], "target": [0, 0, 0] },
+      { "t": 2, "position": [0, 0, 700], "target": [0, 0, -20] }
+    ]
+  },
+  "layers": [
+    {
+      "id": "title",
+      "type": "text",
+      "props": {
+        "text": "MOTIONFIELD",
+        "size": 110,
+        "depth": 16,
+        "weight": 700,
+        "letterSpacing": 5,
+        "color": "#f4f6fb",
+        "metalness": 0.3,
+        "roughness": 0.45
+      },
+      "transform": { "position": [0, -140, -1400], "rotation": [-1.15, 0, 0] },
+      "keyframes": [
+        { "t": 0, "path": "position", "value": [0, -140, -1400] },
+        { "t": 1.0, "path": "position", "value": [0, 8, 0], "ease": "spring" },
+        { "t": 0, "path": "rotation.x", "value": -1.15 },
+        { "t": 1.0, "path": "rotation.x", "value": 0, "ease": "spring" },
+        { "t": 0, "path": "opacity", "value": 0 },
+        { "t": 0.4, "path": "opacity", "value": 1, "ease": "easeOut" }
+      ]
+    },
+    {
+      "id": "slab",
+      "type": "box",
+      "props": { "width": 500, "height": 12, "depth": 12, "color": "#d4ff3f", "metalness": 0.15, "roughness": 0.55 },
+      "transform": { "position": [0, -105, -40] },
+      "keyframes": [
+        { "t": 0.45, "path": "scale", "value": [0.01, 1, 1] },
+        { "t": 1.15, "path": "scale", "value": [1, 1, 1], "ease": "easeOut" }
+      ]
+    },
+    {
+      "id": "orb",
+      "type": "sphere",
+      "props": { "radius": 78, "hue": 205, "metalness": 0.85, "roughness": 0.25, "segments": 64 },
+      "transform": { "position": [330, -60, -60] },
+      "keyframes": [
+        { "t": 0, "path": "position.y", "value": -60 },
+        { "t": 1, "path": "position.y", "value": 10, "ease": "easeInOut" },
+        { "t": 2, "path": "position.y", "value": -60, "ease": "easeInOut" }
+      ]
+    },
+    {
+      "id": "crate",
+      "type": "box",
+      "props": { "width": 95, "height": 95, "depth": 95, "color": "#7f9db9", "metalness": 0.4, "roughness": 0.5 },
+      "transform": { "position": [-350, 60, -80] },
+      "keyframes": [
+        { "t": 0, "path": "position.y", "value": 60 },
+        { "t": 1, "path": "position.y", "value": 110, "ease": "easeInOut" },
+        { "t": 2, "path": "position.y", "value": 60, "ease": "easeInOut" },
+        { "t": 0, "path": "rotation", "value": [0.4, 0, 0.12] },
+        { "t": 2, "path": "rotation", "value": [0.9, 1.8, 0.12], "ease": "linear" }
+      ]
+    },
+    {
+      "id": "dust",
+      "type": "particles",
+      "props": { "count": 800, "radius": 560, "size": 3.2, "color": "#aeb8d8", "opacity": 0.85, "speed": 0.1, "drift": 26 },
+      "transform": { "position": [0, 0, -150] }
+    }
+  ],
+  "params": [
+    { "id": "titleScale", "label": "Title scale", "min": 0.5, "max": 1.6, "step": 0.05, "default": 1, "bind": "title.scale" },
+    { "id": "accentHue", "label": "Accent hue", "min": 0, "max": 360, "step": 1, "default": 205, "bind": "orb.props.hue" }
+  ]
+}

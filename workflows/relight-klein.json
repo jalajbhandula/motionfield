@@ -1,0 +1,288 @@
+{
+  "_meta": {
+    "name": "MotionField Relight — light guide + FLUX.2 klein 4B harmonise",
+    "placeholders": {
+      "INPUT_IMAGE": "photo to relight, comfy input/ filename",
+      "LIGHTS": "JSON list of {az, el, color, power, soft} (≤3)",
+      "AMBIENT": "ambient level 0–2",
+      "AMBIENT_COLOR": "#rrggbb fill colour",
+      "STRENGTH": "guide strength 0–1",
+      "PROMPT": "harmonise instruction (built from the lights by the app)",
+      "STEPS": "4 (distilled)",
+      "SEED": "noise seed",
+      "BATCH": "images per run",
+      "PREFIX": "output filename prefix"
+    },
+    "requires": [
+      "depth_anything_3_mono_large.safetensors",
+      "flux-2-klein-4b.safetensors",
+      "qwen_3_4b_fp8_mixed.safetensors",
+      "flux2-vae.safetensors",
+      "custom-nodes: motionfield_nodes (OF_RelightNormals, OF_Relight)"
+    ],
+    "nodes": "DA3 depth → OF_RelightNormals → OF_Relight renders the light guide (our shading model, core/relight.py) → klein edit with the guide as image0 and the untouched photo as image1, prompted to keep the subject and adopt the guide's lighting."
+  },
+  "1": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "flux-2-klein-4b.safetensors",
+      "weight_dtype": "default"
+    }
+  },
+  "2": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "qwen_3_4b_fp8_mixed.safetensors",
+      "type": "flux2"
+    }
+  },
+  "3": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "flux2-vae.safetensors"
+    }
+  },
+  "4": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "2",
+        0
+      ],
+      "text": "{{PROMPT}}"
+    }
+  },
+  "5": {
+    "class_type": "ConditioningZeroOut",
+    "inputs": {
+      "conditioning": [
+        "4",
+        0
+      ]
+    }
+  },
+  "10": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "{{INPUT_IMAGE}}"
+    }
+  },
+  "11": {
+    "class_type": "ImageScaleToTotalPixels",
+    "inputs": {
+      "image": [
+        "10",
+        0
+      ],
+      "upscale_method": "lanczos",
+      "megapixels": 1.0,
+      "resolution_steps": 16
+    }
+  },
+  "12": {
+    "class_type": "GetImageSize",
+    "inputs": {
+      "image": [
+        "11",
+        0
+      ]
+    }
+  },
+  "30": {
+    "class_type": "LoadDA3Model",
+    "inputs": {
+      "model_name": "depth_anything_3_mono_large.safetensors",
+      "weight_dtype": "default"
+    }
+  },
+  "31": {
+    "class_type": "DA3Inference",
+    "inputs": {
+      "da3_model": [
+        "30",
+        0
+      ],
+      "image": [
+        "11",
+        0
+      ],
+      "resolution": 518,
+      "resize_method": "upper_bound_resize",
+      "mode": "mono"
+    }
+  },
+  "32": {
+    "class_type": "DA3Render",
+    "inputs": {
+      "da3_geometry": [
+        "31",
+        0
+      ],
+      "output": "depth",
+      "output.normalization": "raw",
+      "output.apply_sky_clip": true
+    }
+  },
+  "33": {
+    "class_type": "OF_RelightNormals",
+    "inputs": {
+      "depth": [
+        "32",
+        0
+      ],
+      "fov": 50.0,
+      "smooth": 2.0,
+      "depth_mode": "auto"
+    }
+  },
+  "34": {
+    "class_type": "OF_Relight",
+    "inputs": {
+      "image": [
+        "11",
+        0
+      ],
+      "normals": [
+        "33",
+        0
+      ],
+      "lights": "{{LIGHTS}}",
+      "ambient": "{{AMBIENT}}",
+      "ambient_color": "{{AMBIENT_COLOR}}",
+      "strength": "{{STRENGTH}}"
+    }
+  },
+  "20": {
+    "class_type": "ReferenceMultiLatent",
+    "inputs": {
+      "positive": [
+        "4",
+        0
+      ],
+      "negative": [
+        "5",
+        0
+      ],
+      "vae": [
+        "3",
+        0
+      ],
+      "resolution": "resize",
+      "resolution.megapixels": 1.0,
+      "images.image0": [
+        "34",
+        0
+      ],
+      "images.image1": [
+        "11",
+        0
+      ]
+    }
+  },
+  "21": {
+    "class_type": "Flux2Scheduler",
+    "inputs": {
+      "steps": "{{STEPS}}",
+      "width": [
+        "12",
+        0
+      ],
+      "height": [
+        "12",
+        1
+      ]
+    }
+  },
+  "22": {
+    "class_type": "EmptyFlux2LatentImage",
+    "inputs": {
+      "width": [
+        "12",
+        0
+      ],
+      "height": [
+        "12",
+        1
+      ],
+      "batch_size": "{{BATCH}}"
+    }
+  },
+  "23": {
+    "class_type": "RandomNoise",
+    "inputs": {
+      "noise_seed": "{{SEED}}"
+    }
+  },
+  "24": {
+    "class_type": "KSamplerSelect",
+    "inputs": {
+      "sampler_name": "euler"
+    }
+  },
+  "25": {
+    "class_type": "CFGGuider",
+    "inputs": {
+      "model": [
+        "1",
+        0
+      ],
+      "positive": [
+        "20",
+        0
+      ],
+      "negative": [
+        "20",
+        1
+      ],
+      "cfg": 1.0
+    }
+  },
+  "26": {
+    "class_type": "SamplerCustomAdvanced",
+    "inputs": {
+      "noise": [
+        "23",
+        0
+      ],
+      "guider": [
+        "25",
+        0
+      ],
+      "sampler": [
+        "24",
+        0
+      ],
+      "sigmas": [
+        "21",
+        0
+      ],
+      "latent_image": [
+        "22",
+        0
+      ]
+    }
+  },
+  "27": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "26",
+        0
+      ],
+      "vae": [
+        "3",
+        0
+      ]
+    }
+  },
+  "28": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "27",
+        0
+      ],
+      "filename_prefix": "{{PREFIX}}"
+    }
+  }
+}

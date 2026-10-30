@@ -1,0 +1,494 @@
+{
+  "_meta": {
+    "name": "PersonSwap person window — masked VACE identity replace",
+    "placeholders": {
+      "PROMPT": "positive text",
+      "NEGATIVE": "negative text",
+      "WIDTH": "multiple of 32",
+      "HEIGHT": "multiple of 32",
+      "FRAMES": "8n+1",
+      "SEED": "noise seed",
+      "STEPS": "2-50 (local default 8)",
+      "INPUT_VIDEO": "window clip, comfy input/ filename",
+      "REF_IMAGE": "identity cut-out (white background) — stitched with REF_IMAGE_2/3",
+      "REF_IMAGE_2": "optional second identity cut-out",
+      "REF_IMAGE_3": "optional third identity cut-out",
+      "PREFIX": "output filename prefix"
+    },
+    "optional": [
+      "REF_IMAGE_2",
+      "REF_IMAGE_3"
+    ],
+    "requires": [
+      "wan2.1_vace_1.3B_fp16.safetensors",
+      "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "wan_2.1_vae.safetensors",
+      "birefnet.safetensors (models/birefnet, MIT)",
+      "dwpose onnx weights (models/motionfield/dwpose, Apache-2.0)",
+      "custom-nodes: VideoHelperSuite (VHS_LoadVideo, VHS_VideoCombine), motionfield_nodes (OF_DWPose, OF_MatteCoverage)"
+    ],
+    "nodes": "core + VHS + motionfield_nodes",
+    "notes": "Identity swap driven by an explicit matte: BiRefNet removes the background per frame → OF_MatteCoverage emits the coverage strip (a personless window refuses cheap) → the matte is grown + feathered and gates Wan VACE's control region. The control video is the source frames with DWPose keypoints composited over the person (n27): outside the matte VACE sees real footage, inside it sees the pose skeleton — so it re-renders the person from the reference image, not from old pixels. Ghost-hair guard: the control matte is grown hard (expand 18, feather 24) so its edge stops tracing the old hairline, and the output is NOT used raw — n28-30 mat the new person out of the decode, n31-32 build a background plate (source footage outside the old matte, a heavily blurred decode inside it so grey strands can't survive), and n33 lays the sharp output back only inside the new person's own matte — eroded 3 px (n37, net +1 after the n29 grow) so the feathered edge lands inside the new person and the rim band can't read the plate's blurred ghosts. Where the old person was and the new one isn't, the frame reads smooth surrounding background — the recipe measures that ring against nearby background on the smoke. Matte evidence is saved for both masks (applied regen matte + new-person matte) for the ring metric."
+  },
+  "1": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "wan2.1_vace_1.3B_fp16.safetensors",
+      "weight_dtype": "default"
+    }
+  },
+  "2": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "type": "wan"
+    }
+  },
+  "3": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "wan_2.1_vae.safetensors"
+    }
+  },
+  "4": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "2",
+        0
+      ],
+      "text": "{{PROMPT}}"
+    }
+  },
+  "5": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "2",
+        0
+      ],
+      "text": "{{NEGATIVE}}"
+    }
+  },
+  "6": {
+    "class_type": "VHS_LoadVideo",
+    "inputs": {
+      "video": "{{INPUT_VIDEO}}",
+      "force_rate": 16,
+      "custom_width": "{{WIDTH}}",
+      "custom_height": "{{HEIGHT}}",
+      "frame_load_cap": "{{FRAMES}}",
+      "skip_first_frames": 0,
+      "select_every_nth": 1
+    }
+  },
+  "7": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "{{REF_IMAGE}}"
+    }
+  },
+  "8": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "{{REF_IMAGE_2}}"
+    }
+  },
+  "9": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "{{REF_IMAGE_3}}"
+    }
+  },
+  "10": {
+    "class_type": "ImageStitch",
+    "inputs": {
+      "image1": [
+        "7",
+        0
+      ],
+      "image2": [
+        "8",
+        0
+      ],
+      "direction": "right",
+      "match_image_size": true,
+      "spacing_width": 0,
+      "spacing_color": "white"
+    }
+  },
+  "11": {
+    "class_type": "ImageStitch",
+    "inputs": {
+      "image1": [
+        "10",
+        0
+      ],
+      "image2": [
+        "9",
+        0
+      ],
+      "direction": "right",
+      "match_image_size": true,
+      "spacing_width": 0,
+      "spacing_color": "white"
+    }
+  },
+  "12": {
+    "class_type": "LoadBackgroundRemovalModel",
+    "inputs": {
+      "bg_removal_name": "birefnet.safetensors"
+    }
+  },
+  "13": {
+    "class_type": "RemoveBackground",
+    "inputs": {
+      "bg_removal_model": [
+        "12",
+        0
+      ],
+      "image": [
+        "6",
+        0
+      ]
+    }
+  },
+  "14": {
+    "class_type": "OF_MatteCoverage",
+    "inputs": {
+      "mask": [
+        "13",
+        0
+      ]
+    }
+  },
+  "15": {
+    "class_type": "GrowMask",
+    "inputs": {
+      "mask": [
+        "14",
+        0
+      ],
+      "expand": 18,
+      "tapered_corners": true
+    }
+  },
+  "16": {
+    "class_type": "FeatherMask",
+    "inputs": {
+      "mask": [
+        "15",
+        0
+      ],
+      "left": 24,
+      "top": 24,
+      "right": 24,
+      "bottom": 24
+    }
+  },
+  "17": {
+    "class_type": "WanVaceToVideo",
+    "inputs": {
+      "positive": [
+        "4",
+        0
+      ],
+      "negative": [
+        "5",
+        0
+      ],
+      "vae": [
+        "3",
+        0
+      ],
+      "width": "{{WIDTH}}",
+      "height": "{{HEIGHT}}",
+      "length": "{{FRAMES}}",
+      "batch_size": 1,
+      "strength": 1.0,
+      "control_video": [
+        "27",
+        0
+      ],
+      "control_masks": [
+        "16",
+        0
+      ],
+      "reference_image": [
+        "11",
+        0
+      ]
+    }
+  },
+  "18": {
+    "class_type": "KSampler",
+    "inputs": {
+      "model": [
+        "1",
+        0
+      ],
+      "positive": [
+        "17",
+        0
+      ],
+      "negative": [
+        "17",
+        1
+      ],
+      "latent_image": [
+        "17",
+        2
+      ],
+      "seed": "{{SEED}}",
+      "steps": "{{STEPS}}",
+      "cfg": 5.0,
+      "sampler_name": "uni_pc",
+      "scheduler": "simple",
+      "denoise": 1.0
+    }
+  },
+  "19": {
+    "class_type": "TrimVideoLatent",
+    "inputs": {
+      "samples": [
+        "18",
+        0
+      ],
+      "trim_amount": [
+        "17",
+        3
+      ]
+    }
+  },
+  "20": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "19",
+        0
+      ],
+      "vae": [
+        "3",
+        0
+      ]
+    }
+  },
+  "21": {
+    "class_type": "VHS_VideoCombine",
+    "inputs": {
+      "images": [
+        "33",
+        0
+      ],
+      "frame_rate": 16,
+      "loop_count": 0,
+      "filename_prefix": "{{PREFIX}}",
+      "format": "video/h264-mp4",
+      "pix_fmt": "yuv420p",
+      "save_output": true,
+      "pingpong": false
+    }
+  },
+  "22": {
+    "class_type": "MaskToImage",
+    "inputs": {
+      "mask": [
+        "16",
+        0
+      ]
+    }
+  },
+  "23": {
+    "class_type": "ImageFromBatch",
+    "inputs": {
+      "image": [
+        "22",
+        0
+      ],
+      "batch_index": 0,
+      "length": 1
+    }
+  },
+  "24": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "23",
+        0
+      ],
+      "filename_prefix": "{{PREFIX}}"
+    }
+  },
+  "25": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "14",
+        1
+      ],
+      "filename_prefix": "{{PREFIX}}"
+    }
+  },
+  "26": {
+    "class_type": "OF_DWPose",
+    "inputs": {
+      "image": [
+        "6",
+        0
+      ],
+      "detect_body": true,
+      "detect_hands": true,
+      "detect_face": false,
+      "resolution": 512
+    }
+  },
+  "27": {
+    "class_type": "ImageCompositeMasked",
+    "inputs": {
+      "destination": [
+        "6",
+        0
+      ],
+      "source": [
+        "26",
+        0
+      ],
+      "x": 0,
+      "y": 0,
+      "resize_source": false,
+      "mask": [
+        "16",
+        0
+      ]
+    }
+  },
+  "28": {
+    "class_type": "RemoveBackground",
+    "inputs": {
+      "bg_removal_model": [
+        "12",
+        0
+      ],
+      "image": [
+        "20",
+        0
+      ]
+    }
+  },
+  "29": {
+    "class_type": "GrowMask",
+    "inputs": {
+      "mask": [
+        "28",
+        0
+      ],
+      "expand": 4,
+      "tapered_corners": true
+    }
+  },
+  "37": {
+    "class_type": "GrowMask",
+    "inputs": {
+      "mask": [
+        "29",
+        0
+      ],
+      "expand": -3,
+      "tapered_corners": true
+    }
+  },
+  "30": {
+    "class_type": "FeatherMask",
+    "inputs": {
+      "mask": [
+        "37",
+        0
+      ],
+      "left": 10,
+      "top": 10,
+      "right": 10,
+      "bottom": 10
+    }
+  },
+  "31": {
+    "class_type": "ImageBlur",
+    "inputs": {
+      "image": [
+        "20",
+        0
+      ],
+      "blur_radius": 31,
+      "sigma": 10.0
+    }
+  },
+  "32": {
+    "class_type": "ImageCompositeMasked",
+    "inputs": {
+      "destination": [
+        "6",
+        0
+      ],
+      "source": [
+        "31",
+        0
+      ],
+      "x": 0,
+      "y": 0,
+      "resize_source": false,
+      "mask": [
+        "16",
+        0
+      ]
+    }
+  },
+  "33": {
+    "class_type": "ImageCompositeMasked",
+    "inputs": {
+      "destination": [
+        "32",
+        0
+      ],
+      "source": [
+        "20",
+        0
+      ],
+      "x": 0,
+      "y": 0,
+      "resize_source": false,
+      "mask": [
+        "30",
+        0
+      ]
+    }
+  },
+  "34": {
+    "class_type": "MaskToImage",
+    "inputs": {
+      "mask": [
+        "28",
+        0
+      ]
+    }
+  },
+  "35": {
+    "class_type": "ImageFromBatch",
+    "inputs": {
+      "image": [
+        "34",
+        0
+      ],
+      "batch_index": 0,
+      "length": 1
+    }
+  },
+  "36": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "35",
+        0
+      ],
+      "filename_prefix": "{{PREFIX}}"
+    }
+  }
+}
